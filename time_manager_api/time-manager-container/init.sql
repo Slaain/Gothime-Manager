@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS workingtime;
+DROP TABLE IF EXISTS clocks;
+DROP TABLE IF EXISTS users;
+
 -- Création de la base de données
 CREATE DATABASE time_manager_db;
 
