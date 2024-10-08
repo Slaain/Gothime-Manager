@@ -2,11 +2,18 @@
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 USER
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-– a GET method : http://localhost:4000/api/users?email=XXX&username=YYY -> curl "http://localhost:4000/api/users?email=leon2003@turner.name&username=manuel1949"
+– a GET method -- MARCHE
+http://localhost:4000/api/users?email=XXX&username=YYY
+Commande : curl "http://localhost:4000/api/users?email=leon2003@turner.name&username=manuel1949"
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-– a GET method : http://localhost:4000/api/users/:userID -> curl http://localhost:4000/api/users/6
+– a GET method -- MARCHE
+http://localhost:4000/api/users/:userID 
+Commande : curl http://localhost:4000/api/users/6
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
-– a POST method : http://localhost:4000/api/users -> Invoke-RestMethod -Uri http://localhost:4000/api/users -Method Post -ContentType "application/json" -InFile "user.json"
+– a POST method -- MARCHE
+http://localhost:4000/api/users 
+Commande : Invoke-RestMethod -Uri http://localhost:4000/api/users -Method Post -ContentType "application/json" -InFile "user.json"
+
 Fichier json associé : 
 {
   "user": {
@@ -16,6 +23,7 @@ Fichier json associé :
 }
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 – a PUT method : http://localhost:4000/api/users/:userID
+Commande : curl -X PUT http://localhost:4000/api/users/1 -H "Content-Type: application/json" -d @update_user.json
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 – a DELETE method : http://localhost:4000/api/users/:userID
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
