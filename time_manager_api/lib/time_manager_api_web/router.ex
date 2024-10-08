@@ -9,6 +9,8 @@ defmodule TimeManagerApiWeb.Router do
     pipe_through :api
 
     resources "/users", UserController, except: [:new, :edit]
-
+    resources "/clocks/:user_id", ClockController, only: [:create, :index]
   end
+
+
 end
