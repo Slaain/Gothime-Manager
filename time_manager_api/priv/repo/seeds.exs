@@ -49,3 +49,6 @@ for user <- users do
 end
 
 IO.puts("Seed finished!")
+
+
+#Commande : mix run priv/repo/seeds.exs
