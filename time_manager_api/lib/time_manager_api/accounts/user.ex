@@ -1,11 +1,10 @@
-defmodule TimeManagerApi.User do
+defmodule TimeManagerApi.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "users" do
     field :username, :string
     field :email, :string
-    has_many :tasks, TimeManagerApi.Task  # Ajoute cette ligne pour l'association
 
     timestamps(type: :utc_datetime)
   end
