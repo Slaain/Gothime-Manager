@@ -132,7 +132,10 @@ defmodule TimeManagerApi.Timesheet do
   """
   def get_working_time_for_user!(user_id, working_time_id) do
     from(w in WorkingTime,
-      where: w.user_id == ^user_id and w.id == ^working_time_id
+      join: u in TimeManagerApi.Accounts.User,  # Faire une jointure avec User
+      on: w.user_id == u.id,  # Condition de la jointure
+      where: w.user_id == ^user_id and w.id == ^working_time_id,
+      select: %{working_time: w, user_name: u.username, user_email: u.email}  # Sélectionner username au lieu de name
     )
     |> Repo.one!()
   end
