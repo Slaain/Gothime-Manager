@@ -18,7 +18,7 @@ defmodule TimeManagerApiWeb.Router do
     put "/workingtime/:id", WorkingTimeController, :update
     delete "/workingtime/:id", WorkingTimeController, :delete
 
-    # Routes pour les clocks
-    resources "/clocks", ClocksController, except: [:new, :edit]
+    resources "/users", UserController, except: [:new, :edit]
+    resources "/clocks/:user_id", ClockController, only: [:create, :index]
   end
 end
