@@ -4,11 +4,12 @@ defmodule TimeManagerApi.Repo.Migrations.CreateUsers do
   def change do
     create table(:users) do
       add :username, :string
-      add :email, :string
+      add :email, :string, unique: true
 
-      timestamps(type: :utc_datetime)
+      timestamps()
     end
 
     create unique_index(:users, [:email])
   end
 end
+#op

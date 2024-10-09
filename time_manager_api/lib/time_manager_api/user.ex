@@ -5,6 +5,7 @@ defmodule TimeManagerApi.User do
   schema "users" do
     field :username, :string
     field :email, :string
+    has_many :tasks, TimeManagerApi.Task  # Ajoute cette ligne pour l'association
 
     timestamps(type: :utc_datetime)
   end
