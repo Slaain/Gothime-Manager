@@ -19,6 +19,7 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
     render(conn, :show, working_time: working_time)
   end
 
+
   # POST: /api/workingtime/:userID
   def create(conn, %{"userID" => user_id, "working_time" => working_time_params}) do
     working_time_params = Map.put_new(working_time_params, "end", nil)  # Si end n'est pas fourni, il reste nil
