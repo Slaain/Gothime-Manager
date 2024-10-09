@@ -1,21 +1,40 @@
 {
-  "name": "time_manager_frontend",
-  "version": "0.0.0",
+  "name": "vue-material-dashboard",
+  "version": "1.5.2",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "serve": "vue-cli-service serve --open",
+    "dev": "npm run serve",
+    "build": "cross-env CI=false vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "prettify": "prettier --write ."
   },
   "dependencies": {
-    "vue": "^3.4.29"
+    "chartist": "0.11.4",
+    "core-js": "3.36.0",
+    "google-maps": "4.3.3",
+    "vue": "2.7.14",
+    "vue-clickaway": "2.2.2",
+    "vue-github-buttons": "3.1.0",
+    "vue-material": "1.0.0-beta-15",
+    "vue-router": "3.6.5",
+    "vue-social-sharing": "3.0.9"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.5",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.13",
-    "vite": "^5.3.1"
+    "@babel/eslint-parser": "7.22.15",
+    "@vue/cli-plugin-babel": "5.0.8",
+    "@vue/cli-plugin-eslint": "5.0.8",
+    "@vue/cli-plugin-router": "5.0.8",
+    "@vue/cli-service": "5.0.8",
+    "@vue/eslint-config-prettier": "7.1.0",
+    "es6-promise": "4.2.8",
+    "eslint": "8.56.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-vue": "9.17.0",
+    "prettier": "2.8.8",
+    "sass": "1.71.1",
+    "sass-loader": "13.3.2",
+    "vue-template-compiler": "2.7.16",
+    "cross-env": "^7.0.3"
   }
 }
