@@ -1,6 +1,7 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+import AccountDetails from './components/AccountDetails.vue'
 </script>
 
 <template>
@@ -14,6 +15,9 @@ import TheWelcome from './components/TheWelcome.vue'
 
   <main>
     <TheWelcome />
+    
+    <!-- Intégration du composant AccountDetails -->
+    <AccountDetails />
   </main>
 </template>
 
@@ -45,3 +49,4 @@ header {
   }
 }
 </style>
+  
