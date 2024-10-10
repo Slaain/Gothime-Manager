@@ -41,7 +41,7 @@ export default {
         throw error;
       });
   },
-  getUsers(limit = 10, offset = 0) {
+  getUsers(limit, offset) {
     return axios.get(`${API_URL}?limit=${limit}&offset=${offset}`)
       .then(response => response.data)
       .catch(error => {

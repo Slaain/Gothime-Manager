@@ -7,7 +7,7 @@
             <p class="mb-6 mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400 md:mt-4 md:text-base">
               Here you can change your account information
             </p>
-  
+    
             <!-- Name Input -->
             <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
               Your Name
@@ -21,7 +21,7 @@
                 type="text"
               />
             </div>
-  
+    
             <!-- Email Input -->
             <label class="mb-3 ml-2.5 flex px-2.5 font-bold leading-none text-zinc-950">Your Email</label>
             <div class="mb-8 flex flex-col md:flex-row">
@@ -43,27 +43,39 @@
       </div>
     </div>
   </template>
-  
+    
   <script>
-  import userService from '../userService'; // Assure-toi d'importer ton service utilisateur
+  import userService from '../userService'; // Assurez-vous d'importer votre service utilisateur
   
   export default {
+    props: {
+      selectedEmployeeId: { // Changer le nom de la prop ici
+        type: Number,
+        required: true,
+      },
+    },
     data() {
       return {
         username: '',
         email: '',
-        userID: null, // Ajout d'une propriété pour stocker l'ID de l'utilisateur
       };
     },
-    mounted() {
-      this.fetchUserDetails(8); // Remplacez 8 par l'ID de l'utilisateur que vous voulez récupérer
+    watch: {
+      selectedEmployeeId: {
+        immediate: true,
+        handler(newId) {
+          if (newId) {
+            this.fetchUserDetails(newId); // Appel de la méthode pour récupérer les détails de l'utilisateur
+          }
+        },
+      },
     },
     methods: {
       fetchUserDetails(userID) {
+        console.log(userID);
         userService.getUser(userID)
           .then(user => {
             console.log('User data retrieved:', user);
-            this.userID = userID; // Stocke l'ID de l'utilisateur
             this.username = user.data.username; // Remplir le champ nom
             this.email = user.data.email; // Remplir le champ email
           })
@@ -74,10 +86,10 @@
       updateEmail() {
         const userData = {
           email: this.email,
-          username: this.username
+          username: this.username,
         };
-        
-        userService.updateUser(this.userID, userData) // Utiliser l'ID de l'utilisateur stocké
+  
+        userService.updateUser(this.selectedEmployeeId, userData) // Utiliser l'ID de l'utilisateur passé en prop
           .then(response => {
             console.log('User updated successfully:', response);
           })
@@ -88,7 +100,7 @@
     },
   };
   </script>
-  
+    
   <style scoped>
   </style>
   

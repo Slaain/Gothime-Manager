@@ -1,15 +1,5 @@
 <template>
     <div class="max-w-[720px] mx-auto">
-      <div class="block mb-4 mx-auto border-b border-slate-300 pb-2 max-w-[360px]">
-        <a
-          target="_blank"
-          href="https://www.material-tailwind.com/docs/html/table"
-          class="block w-full px-4 py-2 text-center text-slate-700 transition-all"
-        >
-          More components on <b>Material Tailwind</b>.
-        </a>
-      </div>
-  
       <div class="relative flex flex-col w-full h-full text-slate-700 bg-white shadow-md rounded-xl bg-clip-border">
         <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
           <div class="flex items-center justify-between">
@@ -18,12 +8,6 @@
               <p class="text-slate-500">Review each person before edit</p>
             </div>
             <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
-              <button
-                class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                type="button"
-              >
-                View All
-              </button>
               <button
                 class="flex select-none items-center gap-2 rounded bg-slate-800 py-2.5 px-4 text-xs font-semibold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                 type="button"
@@ -53,111 +37,36 @@
                 <th
                   class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
                 >
-                  <p
-                    class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-                  >
+                  <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                     Member
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                      ></path>
-                    </svg>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    ></path>
                   </p>
                 </th>
                 <th
                   class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
                 >
-                  <p
-                    class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-                  >
-                    Function
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                      ></path>
-                    </svg>
-                  </p>
-                </th>
-                <th
-                  class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-                >
-                  <p
-                    class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-                  > 
+                  <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
                     Status
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                      ></path>
-                    </svg>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    ></path>
                   </p>
                 </th>
                 <th
                   class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
                 >
-                  <p
-                    class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-                  >
-                    Employed
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                      ></path>
-                    </svg>
-                  </p>
-                </th>
-                <th
-                  class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-                >
-                  <p
-                    class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-                  >
-                  </p>
+                  <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"></p>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(employee, index) in employees" :key="index">
+              <tr v-for="(employee, index) in employees" :key="index" @click="showAccountDetails(employee.id)">
                 <td class="p-4 border-b border-slate-200">
                   <div class="flex items-center gap-3">
                     <div class="flex flex-col">
@@ -168,14 +77,6 @@
                 </td>
                 <td class="p-4 border-b border-slate-200">
                   <p class="text-sm text-slate-500">{{ employee.status || 'N/A' }}</p>
-                </td>
-                <td class="p-4 border-b border-slate-200 text-right">
-                  <button
-                    class="text-slate-600 hover:text-slate-900 transition-all"
-                    @click="editEmployee(employee.id)"
-                  >
-                    Edit
-                  </button>
                 </td>
               </tr>
             </tbody>
@@ -199,6 +100,9 @@
       editEmployee(id) {
         console.log(`Editing employee with ID: ${id}`);
       },
+      showAccountDetails(employeeId) {
+        this.$emit('show-account-details', employeeId); // Émet l'événement pour afficher AccountDetails
+      },
       fetchEmployees() {
         const limit = 10;
         const offset = 0;
@@ -217,7 +121,4 @@
     },
   };
   </script>
-  
-  <style scoped>
-  </style>
   
