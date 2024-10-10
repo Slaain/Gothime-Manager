@@ -1,6 +1,6 @@
 defmodule TimeManagerApi.Repo.Migrations.CreateTasks do
   use Ecto.Migration
-
+  # git push
   def change do
     create table(:tasks) do
       add :title, :string
