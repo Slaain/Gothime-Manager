@@ -39,8 +39,7 @@
   
             <!-- Email Input -->
             <label
-              class="mb-3 ml-2.5 flex cursor-pointer px-2.5 font-bold leading-none text-zinc-950"
-              for="email"
+              class="mb-3 ml-2.5 flex px-2.5 font-bold leading-none text-zinc-950"
             >
               Your Email
             </label>
@@ -52,10 +51,10 @@
                 type="text"
               />
               <button
-                @click="updateEmail"
+                @click="Update"
                 class="whitespace-nowrap ring-offset-background transition-colors bg-blue-500 hover:bg-blue-600 text-white flex h-full max-h-full w-full items-center justify-center rounded-lg px-4 py-4 text-base md:ms-4 font-medium md:w-[300px] shadow-lg hover:shadow-xl transition-shadow duration-200"
               >
-                Update email
+                Update
               </button>
             </div>
           </div>
