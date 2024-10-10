@@ -1,6 +1,6 @@
 defmodule TimeManagerApi.Repo.Migrations.CreateClocks do
   use Ecto.Migration
-
+  # git push
   def change do
     create table(:clocks) do
       add :time, :naive_datetime
