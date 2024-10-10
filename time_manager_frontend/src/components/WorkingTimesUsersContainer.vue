@@ -48,7 +48,7 @@ export default {
   methods: {
     async fetchWorkingTimes() {
       try {
-        const userID = 1; // ID de l'utilisateur
+        const userID = 2; // ID de l'utilisateur
         const response = await axios.get(`http://localhost:4000/api/workingtimes/${userID}`);
         this.workingTimes = response.data.data;
         this.loading = false;
