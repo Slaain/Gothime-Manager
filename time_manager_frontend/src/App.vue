@@ -1,6 +1,7 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import WorkingTimeShow from './components/WorkingTimeShow.vue';
+
 </script>
 
 <template>
@@ -15,7 +16,13 @@ import TheWelcome from './components/TheWelcome.vue'
   <main>
     <TheWelcome />
   </main>
+
+  <div id="workingTimeShow">
+    <WorkingTimeShow />
+  </div>
 </template>
+
+
 
 <style scoped>
 header {

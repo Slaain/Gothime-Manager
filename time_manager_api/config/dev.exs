@@ -3,8 +3,8 @@ import Config
 # Configure your database
 config :time_manager_api, TimeManagerApi.Repo,
   username: "postgres",
-  password: "postgres",
-  hostname: "localhost",  # Utilisez localhost si PostgreSQL est dans Docker mais Phoenix est hors Docker
+  password: "test",
+  hostname: "db",  # Utilisez localhost si PostgreSQL est dans Docker mais Phoenix est hors Docker
   database: "time_manager_api_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
