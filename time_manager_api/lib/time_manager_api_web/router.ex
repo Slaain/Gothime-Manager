@@ -9,6 +9,12 @@ defmodule TimeManagerApiWeb.Router do
   scope "/api", TimeManagerApiWeb do
     pipe_through :api
 
+    # Route pour obtenir la liste des employés paginée
+    get "/employees", UserController, :paginated_employees
+
+    # Route pour obtenir les employés par utilisateur spécifique, si nécessaire
+    get "/employees/:userID", UserController, :paginated_employees
+
     # Routes pour les workingtimes
     get "/workingtimes/:userID/:id", WorkingTimeController, :show
     get "/workingtimes/:userID", WorkingTimeController, :index

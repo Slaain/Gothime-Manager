@@ -2,14 +2,17 @@
 import { ref, onMounted } from 'vue';
 import AccountDetails from './components/AccountDetails.vue';
 import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue';
+import UserList from './components/UserList.vue';
 import userService from './userService';
 
 const userID = ref(6); // Initialise userID à 6
+const userData = ref([]);
 
 onMounted(() => {
   userService.getUser(userID.value)
     .then(user => {
       console.log('User data:', user);
+      userData.value = user.employees || [];
     })
     .catch(error => {
       console.error('Erreur lors de la récupération de l\'utilisateur:', error);
@@ -19,12 +22,13 @@ onMounted(() => {
 
 <template>
   <header>
-
+    <!-- Ajoutez du contenu pour l'en-tête si nécessaire -->
   </header>
 
   <main>
     <WorkingTimeActionContainer />
     <AccountDetails :userID="userID" />
+    <UserList :employees="userData" />
   </main>
 </template>
 
