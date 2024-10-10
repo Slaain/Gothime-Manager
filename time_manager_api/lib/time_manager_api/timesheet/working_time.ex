@@ -17,4 +17,8 @@ defmodule TimeManagerApi.Timesheet.WorkingTime do
     |> validate_required([:start, :user_id])
   end
 
+  def get_working_time_for_user!(user_id, id) do
+    Repo.get_by!(WorkingTime, [id: id, user_id: user_id])
+  end
 end
+
