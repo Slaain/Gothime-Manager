@@ -32,8 +32,11 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
   # POST: /api/workingtime/:userID
   def create(conn, %{"userID" => user_id, "working_time" => working_time_params}) do
     # Si "start" et "end" sont fournis, on calcule la différence en minutes
+
     total_time = case {working_time_params["start"], working_time_params["end"]} do
       {start_str, end_str} when not is_nil(start_str) and not is_nil(end_str) ->
+        start_str = if String.length(start_str) == 16, do: start_str <> ":00", else: start_str
+      end_str = if String.length(end_str) == 16, do: end_str <> ":00", else: end_str
         # Log des valeurs reçues
         Logger.debug("Start time: #{start_str}")
         Logger.debug("End time: #{end_str}")
