@@ -95,18 +95,31 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
     end
   end
 
-
-
-
-
   # PUT: /api/workingtime/:id
   def update(conn, %{"id" => id, "working_time" => working_time_params}) do
     working_time = Timesheet.get_working_time!(id)
 
+    # Calculer la différence en minutes entre start et end
+    total_time = case {working_time_params["start"], working_time_params["end"]} do
+      {start_str, end_str} when not is_nil(start_str) and not is_nil(end_str) ->
+        start = NaiveDateTime.from_iso8601!(start_str)
+        end_time = NaiveDateTime.from_iso8601!(end_str)
+
+        # Calcul de la différence en minutes
+        NaiveDateTime.diff(end_time, start, :minute)
+      _ ->
+        nil
+    end
+
+    # Ajouter ou mettre à jour le champ total_time dans les paramètres
+    working_time_params = Map.put(working_time_params, "total_time", total_time)
+
+    # Mise à jour de la working_time avec les nouveaux paramètres
     with {:ok, %WorkingTime{} = working_time} <- Timesheet.update_working_time(working_time, working_time_params) do
-      render(conn, :show, working_time: working_time)
+      render(conn, :showWithoutData, working_time: working_time)
     end
   end
+
 
   # DELETE: /api/workingtime/:id
   def delete(conn, %{"id" => id}) do
