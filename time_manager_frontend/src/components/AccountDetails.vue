@@ -1,32 +1,17 @@
 <template>
     <div class="flex flex-col justify-center items-center bg-white min-h-[100vh]">
-      <div
-        class="mx-auto flex w-full mt-20 flex-col justify-center px-5 pt-0 md:h-[unset] max-w-[520px] lg:px-6 xl:pl-0"
-      >
+      <div class="mx-auto flex w-full mt-20 flex-col justify-center px-5 pt-0 md:h-[unset] max-w-[520px] lg:px-6 xl:pl-0">
         <div class="relative flex w-full flex-col pt-[20px] md:pt-0">
-          <div
-            class="rounded-lg border border-gray-300 bg-white text-black shadow-md mb-5 h-min max-w-full pt-8 pb-6 px-6 dark:border-zinc-800"
-          >
-  
-            <p class="text-xl font-extrabold text-zinc-950 md:text-3xl">
-              Account Details
-            </p>
-            <p
-              class="mb-6 mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400 md:mt-4 md:text-base"
-            >
+          <div class="rounded-lg border border-gray-300 bg-white text-black shadow-md mb-5 h-min max-w-full pt-8 pb-6 px-6 dark:border-zinc-800">
+            <p class="text-xl font-extrabold text-zinc-950 md:text-3xl">Account Details</p>
+            <p class="mb-6 mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400 md:mt-4 md:text-base">
               Here you can change your account information
             </p>
   
             <!-- Name Input -->
-            <label
-              class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-            >
+            <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
               Your Name
-              <p
-                class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
-              >
-                (30 characters maximum)
-              </p>
+              <p class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500">(30 characters maximum)</p>
             </label>
             <div class="mb-8 flex flex-col md:flex-row">
               <input
@@ -38,11 +23,7 @@
             </div>
   
             <!-- Email Input -->
-            <label
-              class="mb-3 ml-2.5 flex px-2.5 font-bold leading-none text-zinc-950"
-            >
-              Your Email
-            </label>
+            <label class="mb-3 ml-2.5 flex px-2.5 font-bold leading-none text-zinc-950">Your Email</label>
             <div class="mb-8 flex flex-col md:flex-row">
               <input
                 v-model="email"
@@ -51,7 +32,7 @@
                 type="text"
               />
               <button
-                @click="Update"
+                @click="updateEmail"
                 class="whitespace-nowrap ring-offset-background transition-colors bg-blue-500 hover:bg-blue-600 text-white flex h-full max-h-full w-full items-center justify-center rounded-lg px-4 py-4 text-base md:ms-4 font-medium md:w-[300px] shadow-lg hover:shadow-xl transition-shadow duration-200"
               >
                 Update
@@ -64,21 +45,36 @@
   </template>
   
   <script>
+  import userService from '../userService'; // Assure-toi d'importer ton service utilisateur
+  
   export default {
     data() {
       return {
-        fullName: 'VBZ',
-        email: 'vbz@gmail.com',
+        fullName: '',
+        email: '',
       };
     },
+    mounted() {
+      this.fetchUserDetails(6); // Remplace 6 par l'ID de l'utilisateur que tu veux récupérer
+    },
     methods: {
-      updateName() {
-        console.log(`Updated name to: ${this.fullName}`);
+      fetchUserDetails(userID) {
+        userService.getUser(userID)
+          .then(user => {   
+            // Vérification de la structure de la réponse
+            console.log('User data retrieved:', user);
+            this.fullName = user.data.username; // Remplir le champ nom
+            this.email = user.data.email; // Remplir le champ email
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération des informations de l\'utilisateur:', error);
+          });
       },
       updateEmail() {
         console.log(`Updated email to: ${this.email}`);
+        // Logique pour mettre à jour l'email via ton service
       },
-    }
+    },
   };
   </script>
   

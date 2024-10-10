@@ -1,7 +1,20 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue'
+import { ref, onMounted } from 'vue';
+import AccountDetails from './components/AccountDetails.vue';
+import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue';
+import userService from './userService';
+
+const userID = ref(6); // Initialise userID à 6
+
+onMounted(() => {
+  userService.getUser(userID.value)
+    .then(user => {
+      console.log('User data:', user);
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+    });
+});
 </script>
 
 <template>
@@ -9,8 +22,9 @@ import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.
 
   </header>
 
-  <main class="">
+  <main>
     <WorkingTimeActionContainer />
+    <AccountDetails :userID="userID" />
   </main>
 </template>
 
@@ -42,4 +56,3 @@ header {
   }
 }
 </style>
-  

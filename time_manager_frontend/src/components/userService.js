@@ -21,8 +21,6 @@ export default {
         throw error; 
       });
   },
-  
-  
 
   getUser(userID) {
     return axios.get(`${API_URL}/${userID}`)
