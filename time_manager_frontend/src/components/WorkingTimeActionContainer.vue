@@ -18,7 +18,7 @@ import Dropdown from './Dropdown.vue';
         <h2 class="mb-4 text-lg font-bold">Créer un nouveau temps de travail</h2>
         <!-- Dropdown et input pour la création -->
         <p class="mb-2">User</p>
-        <p>{{ selectedUserId }}</p>
+        <p>{{ userId }}</p>
         <Dropdown  :onUserSelected="handleUserSelected"/>
         <!-- Dropdown menu -->
         <div v-show="isOpen" class="absolute right-0 p-1 mt-2 space-y-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
@@ -68,7 +68,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      userId: 1, // Il faudra recuperer l'id de l'utilisateur selectionné
+      userId: "", // Il faudra recuperer l'id de l'utilisateur selectionné
       userData: {}, // Contient les données de l'utilisateur
       isOpen: false, // Gère l'état du menu déroulant
       searchTerm: '', // Gère la recherche dans le menu déroulant
@@ -103,7 +103,7 @@ export default {
       
       
      
-      axios.post("http://localhost:4000/api/workingtime/1", {
+      axios.post(`http://localhost:4000/api/workingtime/${this.userId}`, {
     working_time: {
       start: this.startTime,
       end: this.endTime,
@@ -162,7 +162,7 @@ this.endTime = formatDate(workingTimeData.data.end);
     });
   },
    handleUserSelected(userId) {
-      this.selectedUserId = userId; // Met à jour l'ID lorsque l'utilisateur est sélectionné
+      this.userId = userId; // Met à jour l'ID lorsque l'utilisateur est sélectionné
     },
     toggleDropdown() {
       this.isOpen = !this.isOpen; // Bascule l'affichage du menu déroulant
