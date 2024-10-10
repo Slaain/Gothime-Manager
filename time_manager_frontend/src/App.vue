@@ -1,7 +1,6 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import WorkingTimeShow from './components/WorkingTimeShow.vue';
-
 </script>
 
 <template>
@@ -17,8 +16,8 @@ import WorkingTimeShow from './components/WorkingTimeShow.vue';
     <TheWelcome />
   </main>
 
-  <div id="workingTimeShow">
-    <WorkingTimeShow />
+  <div>
+    <WorkingTimeShow :userId="user_id" />
   </div>
 </template>
 
@@ -52,3 +51,16 @@ header {
   }
 }
 </style>
+
+<script>
+export default {
+  components: {
+    WorkingTimeShow
+  },
+  data() {
+    return {
+      user_id: 1 // Exemple, remplacez-le par l'ID de l'utilisateur que vous souhaitez
+    };
+  }
+};
+</script>
