@@ -3,6 +3,7 @@ import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue'
 import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue'
+import WorkingTimesChart from "@/components/WorkingTimesChart.vue";
 </script>
 
 <template>
@@ -13,6 +14,7 @@ import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.
   <main class="">
     <WorkingTimeActionContainer />
     <WorkingTimesUsersContainer />
+    <WorkingTimesChart />
   </main>
 </template>
 
