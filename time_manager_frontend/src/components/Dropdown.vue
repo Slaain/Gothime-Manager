@@ -4,11 +4,11 @@
     <input
       type="text"
       v-model="searchTerm"
-      placeholder="Rechercher..."
+      placeholder="Search..."
       @focus="toggleDropdown(true)"
       @blur="toggleDropdown(false)"
       @input="filterOptions"
-      class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      class="w-full px-4 py-2 border border-black rounded-md focus:outline-none"
     />
 
     <!-- Dropdown -->

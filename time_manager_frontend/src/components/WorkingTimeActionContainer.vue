@@ -3,64 +3,66 @@ import Dropdown from './Dropdown.vue';
 </script>
 
 <template>
-  <div class="w-[40%] bg-green-400 flex flex-col justify-center items-center">
+  <div class="w-[40%] shadow-md rounded-lg flex flex-col justify-center items-center">
     <div class="border-b">
-      
-      <button @click="setFormMode('create')" :class="['focus:outline-none text-white bg-purple-700 focus:bg-purple-700 hover:bg-purple-800 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900', formMode == 'create' ? 'bg-purple-900' : '']">
+      <!-- Bouton "Créer" -->
+      <button @click="setFormMode('create')" 
+              :class="['focus:outline-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
+              formMode === 'create' ? 'bg-purple-800 text-white' : '']">
         Créer
       </button>
-      <button @click="setFormMode('update')" class="focus:outline-none text-white bg-purple-700 focus:bg-purple-700 hover:bg-purple-800  focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Modifier</button>
+      
+      <!-- Bouton "Modifier" avec exactement le même style que "Créer" -->
+      <button @click="setFormMode('update')" 
+              :class="['focus:outline-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
+              formMode === 'update' ? 'bg-purple-800 text-white' : '']">
+        Modifier
+      </button>
     </div>
 
-    <div class="">
+    <div class="w-full">
       <!-- Afficher le formulaire de création si formMode est 'create' -->
-      <div v-if="formMode === 'create'" class="flex flex-col items-start justify-center w-64 m-2 ">
+      <div v-if="formMode === 'create'" class="flex flex-col items-start justify-center w-full px-4 py-4">
         <h2 class="mb-4 text-lg font-bold">Créer un nouveau temps de travail</h2>
         <!-- Dropdown et input pour la création -->
         <p class="mb-2">User</p>
-        <p>{{ userId }}</p>
-        <Dropdown  :onUserSelected="handleUserSelected"/>
-        <!-- Dropdown menu -->
-        <div v-show="isOpen" class="absolute right-0 p-1 mt-2 space-y-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-          <input v-model="searchTerm" class="block w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-md focus:outline-none" type="text" placeholder="Search items" autocomplete="off">
-          <a v-for="(item, index) in filteredItems" :key="index" href="#" class="block px-4 py-2 text-gray-700 rounded-md cursor-pointer hover:bg-gray-100 active:bg-blue-100">{{ item }}</a>
+        <Dropdown :onUserSelected="handleUserSelected" class="w-full" />
+        <div class="w-full">
+          <p>Start time</p>
+          <input type="datetime-local" v-model="startTime" class="w-full px-2 py-2 border border-black rounded-lg">
         </div>
         <div class="w-full">
-        <p>Start time</p>
-        <input type="datetime-local" v-model="startTime" class="w-full px-2 py-2 rounded-lg ">
+          <p>End time</p>
+          <input type="datetime-local" v-model="endTime" class="w-full px-2 py-2 border border-black rounded-lg">
         </div>
-        <div class="w-full">
-        <p>End time</p>
-        <input type="datetime-local" v-model="endTime" class="w-full px-2 py-2 rounded-lg">
-        </div>
-        <button @click="addWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-blue-500 rounded-md">Enregistrer</button>
+        <button @click="createWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800">
+          Enregistrer
+        </button>
       </div>
 
       <!-- Afficher le formulaire de modification si formMode est 'update' -->
-      <div v-if="formMode === 'update'" class="flex flex-col items-start justify-center w-64 m-2">
+      <div v-if="formMode === 'update'" class="flex flex-col items-start justify-center w-full px-4 py-4">
         <h2 class="mb-4 text-lg font-bold">Modifier le temps de travail</h2>
         <!-- Dropdown et input pour la modification -->
-        <div>
-
-        
         <p class="mb-2">User</p>
-        <Dropdown />
-        </div>
-
+        <Dropdown class="w-full" />
         <div class="w-full">
-        <p>Start time</p>
-        <input type="datetime-local" v-model="startTime" class="w-full px-2 py-2 rounded-lg" value={{data.start}}>
+          <p>Start time</p>
+          <input type="datetime-local" v-model="startTime" class="w-full px-2 py-2 border border-black rounded-lg">
         </div>
-
         <div class="w-full">
-        <p>End time</p>
-        <input type="datetime-local" v-model="endTime" class="w-full px-2 py-2 rounded-lg" value={{data.end}}>
+          <p>End time</p>
+          <input type="datetime-local" v-model="endTime" class="w-full px-2 py-2 border border-black rounded-lg">
         </div>
-        <button @click="updateWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-blue-500 rounded-md">Modifier</button>
+        <button @click="updateWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800">
+          Modifier
+        </button>
       </div>
     </div>
-  </div>  
+  </div>
 </template>
+
+
 
 <script>
 import axios from 'axios';
@@ -96,7 +98,15 @@ export default {
     // fetchUserData() {
     //   axios.get()
     // },
-    addWorkingTime() {
+        formatDate  (dateString) {
+  const date = new Date(dateString);
+  console.log("date: ", date);
+  
+  console.log("date.toISOString(): ", date.toISOString());
+  
+  return date.toISOString().slice(0, 16); // Format 'YYYY-MM-DDTHH:MM'
+},
+    createWorkingTime() {
       // Ajouter ici la logique pour ajouter un temps de travail
       console.log("start time: ", this.startTime);
       console.log("end time: ", this.endTime);
@@ -122,6 +132,12 @@ export default {
     },
     updateWorkingTime() {
       // Ajouter ici la logique pour modifier un temps de travail
+
+      console.log("start time: ", this.startTime);
+
+      
+      
+      
       axios.put("http://localhost:4000/api/workingtime/2", {
     working_time: {
       start: this.startTime,
@@ -148,14 +164,11 @@ export default {
     console.log('Données récupérées :', workingTimeData.data);
 
 
-      const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toISOString().slice(0, 16); // Format 'YYYY-MM-DDTHH:MM'
-};
+   
 
 
-    this.startTime = formatDate(workingTimeData.data.start);
-this.endTime = formatDate(workingTimeData.data.end);
+    this.startTime =workingTimeData.data.start;
+this.endTime =workingTimeData.data.end;
     })
     .catch(error => {
       console.error("Erreur lors de la requête :", error);
