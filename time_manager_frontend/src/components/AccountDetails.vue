@@ -15,7 +15,7 @@
             </label>
             <div class="mb-8 flex flex-col md:flex-row">
               <input
-                v-model="fullName"
+                v-model="username"
                 placeholder="Please enter your full name"
                 class="mb-2 mr-4 flex h-full w-full items-center justify-center rounded-lg border-2 border-gray-400 bg-transparent px-4 py-4 text-zinc-950 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 type="text"
@@ -50,20 +50,21 @@
   export default {
     data() {
       return {
-        fullName: '',
+        username: '',
         email: '',
+        userID: null, // Ajout d'une propriété pour stocker l'ID de l'utilisateur
       };
     },
     mounted() {
-      this.fetchUserDetails(6); // Remplace 6 par l'ID de l'utilisateur que tu veux récupérer
+      this.fetchUserDetails(8); // Remplacez 8 par l'ID de l'utilisateur que vous voulez récupérer
     },
     methods: {
       fetchUserDetails(userID) {
         userService.getUser(userID)
-          .then(user => {   
-            // Vérification de la structure de la réponse
+          .then(user => {
             console.log('User data retrieved:', user);
-            this.fullName = user.data.username; // Remplir le champ nom
+            this.userID = userID; // Stocke l'ID de l'utilisateur
+            this.username = user.data.username; // Remplir le champ nom
             this.email = user.data.email; // Remplir le champ email
           })
           .catch(error => {
@@ -71,8 +72,18 @@
           });
       },
       updateEmail() {
-        console.log(`Updated email to: ${this.email}`);
-        // Logique pour mettre à jour l'email via ton service
+        const userData = {
+          email: this.email,
+          username: this.username
+        };
+        
+        userService.updateUser(this.userID, userData) // Utiliser l'ID de l'utilisateur stocké
+          .then(response => {
+            console.log('User updated successfully:', response);
+          })
+          .catch(error => {
+            console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
+          });
       },
     },
   };
