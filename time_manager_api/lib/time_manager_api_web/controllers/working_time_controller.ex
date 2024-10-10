@@ -20,6 +20,15 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
     render(conn, :show, working_time: working_time)
   end
 
+  # GET (ALL2): /api/workingtimes/:userID
+  def index(conn, %{"userID" => user_id}) do
+    # Récupérer tous les working_times avec les informations utilisateur
+    working_times_with_user_info = Timesheet.list_workingtimes_for_user(user_id)
+    # Rendre la réponse JSON avec les informations de chaque working_time et utilisateur
+    render(conn, "get_all.json", workingtimes: working_times_with_user_info)
+  end
+
+
   # POST: /api/workingtime/:userID
   def create(conn, %{"userID" => user_id, "working_time" => working_time_params}) do
     # Si "start" et "end" sont fournis, on calcule la différence en minutes
