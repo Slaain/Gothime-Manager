@@ -1,7 +1,7 @@
 // src/userService.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000/api/users';
+const API_URL = 'http://localhost:4000/api/users'; // URL correcte pour l'API des utilisateurs
 
 export default {
   createUser(user) {
@@ -14,7 +14,7 @@ export default {
   },
 
   updateUser(userID, user) {
-    return axios.put(`${API_URL}/${userID}`, { user }) // Envoyer l'objet user dans le corps de la requête
+    return axios.put(`${API_URL}/${userID}`, { user })
       .then(response => response.data)
       .catch(error => {
         console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
@@ -37,6 +37,15 @@ export default {
       .catch(error => {
         console.error('Erreur lors de la suppression de l\'utilisateur:', error);
         throw error;
+      });
+  },
+
+  getUsers(limit = 10, offset = 0) {
+    return axios.get(`${API_URL}?limit=${limit}&offset=${offset}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Erreur lors de la récupération des utilisateurs:', error);
+        throw error; 
       });
   },
 };

@@ -103,7 +103,7 @@
                 >
                   <p
                     class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-                  >
+                  > 
                     Status
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -160,11 +160,6 @@
               <tr v-for="(employee, index) in employees" :key="index">
                 <td class="p-4 border-b border-slate-200">
                   <div class="flex items-center gap-3">
-                    <img
-                      :src="employee.image"
-                      :alt="employee.name"
-                      class="relative inline-block h-9 w-9 !rounded-full object-cover object-center"
-                    />
                     <div class="flex flex-col">
                       <p class="text-sm font-semibold text-slate-700">{{ employee.name }}</p>
                       <p class="text-sm text-slate-500">{{ employee.email }}</p>
@@ -172,13 +167,7 @@
                   </div>
                 </td>
                 <td class="p-4 border-b border-slate-200">
-                  <p class="text-sm text-slate-500">{{ employee.function }}</p>
-                </td>
-                <td class="p-4 border-b border-slate-200">
                   <p class="text-sm text-slate-500">{{ employee.status }}</p>
-                </td>
-                <td class="p-4 border-b border-slate-200">
-                  <p class="text-sm text-slate-500">{{ employee.employed }}</p>
                 </td>
                 <td class="p-4 border-b border-slate-200 text-right">
                   <button
@@ -209,6 +198,17 @@
       editEmployee(id) {
         console.log(`Editing employee with ID: ${id}`);
       },
+      fetchEmployees() {
+      const limit = 10;
+      const offset = 0;
+      userService.getUsers(limit, offset)
+        .then(data => {
+          this.employees = data;
+        })
+        .catch(error => {
+          console.error('Erreur lors de la récupération des employés:', error);
+        });
+    },
     },
   };
   </script>

@@ -44,6 +44,7 @@ defmodule TimeManagerApiWeb.UserController do
     render(conn, :show, user: user)
   end
 
+
   # Action pour mettre à jour un utilisateur
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Accounts.get_user!(id)
