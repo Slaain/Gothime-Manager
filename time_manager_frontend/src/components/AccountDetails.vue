@@ -71,33 +71,34 @@
       },
     },
     methods: {
-      fetchUserDetails(userID) {
-        console.log(userID);
-        userService.getUser(userID)
-          .then(user => {
-            console.log('User data retrieved:', user);
-            this.username = user.data.username; // Remplir le champ nom
-            this.email = user.data.email; // Remplir le champ email
-          })
-          .catch(error => {
-            console.error('Erreur lors de la récupération des informations de l\'utilisateur:', error);
-          });
-      },
-      updateEmail() {
-        const userData = {
-          email: this.email,
-          username: this.username,
-        };
-  
-        userService.updateUser(this.selectedEmployeeId, userData) // Utiliser l'ID de l'utilisateur passé en prop
-          .then(response => {
-            console.log('User updated successfully:', response);
-          })
-          .catch(error => {
-            console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
-          });
-      },
-    },
+  fetchUserDetails(userID) {
+    console.log(userID);
+    userService.getUser(userID)
+      .then(user => {
+        console.log('User data retrieved:', user);
+        this.username = user.data.username; // Remplir le champ nom
+        this.email = user.data.email; // Remplir le champ email
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des informations de l\'utilisateur:', error);
+      });
+  },
+  updateEmail() {
+    const userData = {
+      email: this.email,
+      username: this.username,
+    };
+
+    userService.updateUser(this.selectedEmployeeId, userData) // Utiliser l'ID de l'utilisateur passé en prop
+      .then(response => {
+        console.log('User updated successfully:', response);
+        this.$emit('user-updated'); // Émettre l'événement après mise à jour
+      })
+      .catch(error => {
+        console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
+      });
+  },
+},
   };
   </script>
     

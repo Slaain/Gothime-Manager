@@ -5,7 +5,7 @@
 
   <main>
     <WorkingTimeActionContainer />
-    <AccountDetails v-if="selectedEmployeeId" :selectedEmployeeId="selectedEmployeeId" /> <!-- Mise à jour ici -->
+    <AccountDetails v-if="selectedEmployeeId" :selectedEmployeeId="selectedEmployeeId" @user-updated="reloadPage"/> <!-- Mise à jour ici -->
     <UserList :employees="userData" @show-account-details="setSelectedEmployeeId" />
   </main>
 </template>
@@ -24,6 +24,10 @@ const selectedEmployeeId = ref(null); // Variable pour stocker l'ID de l'employ�
 const setSelectedEmployeeId = (employeeId) => {
   selectedEmployeeId.value = employeeId; // Met à jour l'ID de l'employé sélectionné
   console.log(`Selected employee ID: ${employeeId}`);
+};
+
+const reloadPage = () => {
+  location.reload(); // Recharge la page après la mise à jour
 };
 
 onMounted(() => {
