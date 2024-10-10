@@ -44,7 +44,6 @@ defmodule TimeManagerApiWeb.UserController do
     render(conn, :show, user: user)
   end
 
-
   # Action pour mettre à jour un utilisateur
   def update(conn, %{"id" => id, "user" => user_params}) do
     user = Accounts.get_user!(id)
@@ -63,23 +62,19 @@ defmodule TimeManagerApiWeb.UserController do
     end
   end
 
+  # Action pour obtenir une liste paginée d'utilisateurs
+  def paginated_users(conn, %{"limit" => limit, "offset" => offset}) do
+    limit = String.to_integer(limit)
+    offset = String.to_integer(offset)
+
+    users = Accounts.get_paginated_employees(limit, offset)
+    render(conn, :index, users: users)
+  end
 
 
-    # Action pour obtenir une liste paginée d'employés
-    def paginated_employees(conn, %{"limit" => limit, "offset" => offset}) do
-      limit = String.to_integer(limit)
-      offset = String.to_integer(offset)
-
-      employees = Accounts.get_paginated_employees(limit, offset)
-      render(conn, :index, users: employees)
-    end
-
-    # Action sans offset/limit par défaut (valeurs par défaut)
-    def paginated_employees(conn, _params) do
-      employees = Accounts.get_paginated_employees(10, 0) # Par défaut, 10 employés, offset 0
-      render(conn, :index, users: employees)
-    end
-
-
-
+  # Action sans offset/limit par défaut (valeurs par défaut)
+  def paginated_users(conn, _params) do
+    users = Accounts.get_paginated_users(10, 0) # Par défaut, 10 utilisateurs, offset 0
+    render(conn, :index, users: users)
+  end
 end

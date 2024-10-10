@@ -72,8 +72,6 @@ defmodule TimeManagerApi.Accounts do
     User.changeset(user, attrs)
   end
 
-
-
   # Fonction pour récupérer les employés avec pagination
   def get_paginated_employees(limit, offset) do
     User
