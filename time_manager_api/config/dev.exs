@@ -4,7 +4,7 @@ import Config
 config :time_manager_api, TimeManagerApi.Repo,
   username: "postgres",
   password: "test",
-  hostname: "db",  # Utilisez localhost si PostgreSQL est dans Docker mais Phoenix est hors Docker
+  hostname: "localhost",
   database: "time_manager_api_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
@@ -18,7 +18,9 @@ config :logger, :console,
 
 # Configuration du serveur Phoenix
 config :time_manager_api, TimeManagerApiWeb.Endpoint,
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  # Binding to loopback ipv4 address prevents access from other machines.
+  # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
+  http: [ip: {0, 0, 0, 0}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
