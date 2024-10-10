@@ -161,13 +161,13 @@
                 <td class="p-4 border-b border-slate-200">
                   <div class="flex items-center gap-3">
                     <div class="flex flex-col">
-                      <p class="text-sm font-semibold text-slate-700">{{ employee.name }}</p>
+                      <p class="text-sm font-semibold text-slate-700">{{ employee.username }}</p>
                       <p class="text-sm text-slate-500">{{ employee.email }}</p>
                     </div>
                   </div>
                 </td>
                 <td class="p-4 border-b border-slate-200">
-                  <p class="text-sm text-slate-500">{{ employee.status }}</p>
+                  <p class="text-sm text-slate-500">{{ employee.status || 'N/A' }}</p>
                 </td>
                 <td class="p-4 border-b border-slate-200 text-right">
                   <button
@@ -186,29 +186,34 @@
   </template>
   
   <script>
+  import userService from '../userService';
+  
   export default {
     name: 'EmployeeList',
-    props: {
-      employees: {
-        type: Array,
-        required: true,
-      },
+    data() {
+      return {
+        employees: [],
+      };
     },
     methods: {
       editEmployee(id) {
         console.log(`Editing employee with ID: ${id}`);
       },
       fetchEmployees() {
-      const limit = 10;
-      const offset = 0;
-      userService.getUsers(limit, offset)
-        .then(data => {
-          this.employees = data;
-        })
-        .catch(error => {
-          console.error('Erreur lors de la récupération des employés:', error);
-        });
+        const limit = 10;
+        const offset = 0;
+        userService.getUsers(limit, offset)
+          .then(data => {
+            console.log('Employees data:', data);
+            this.employees = data.data;
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération des employés:', error);
+          });
+      },
     },
+    mounted() {
+      this.fetchEmployees();
     },
   };
   </script>

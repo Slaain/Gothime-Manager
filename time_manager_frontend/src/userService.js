@@ -41,4 +41,12 @@ export default {
         throw error;
       });
   },
+  getUsers(limit = 10, offset = 0) {
+    return axios.get(`${API_URL}?limit=${limit}&offset=${offset}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Erreur lors de la récupération des utilisateurs:', error);
+        throw error; 
+      });
+  },
 };
