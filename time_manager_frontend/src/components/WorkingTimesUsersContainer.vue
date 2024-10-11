@@ -46,7 +46,7 @@ export default {
     };
   },
   methods: {
-    async fetchWorkingTimes() {
+    async getWorkingTimes() {
       try {
         const userID = 1; // ID de l'utilisateur
         const response = await axios.get(`http://localhost:4000/api/workingtimes/${userID}`);
@@ -70,7 +70,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchWorkingTimes();
+    this.getWorkingTimes();
   },
 };
 </script>
