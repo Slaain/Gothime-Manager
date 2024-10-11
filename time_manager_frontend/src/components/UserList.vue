@@ -4,11 +4,12 @@
       <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-slate-800">Employees List</h3>
+              <h3 class="text-lg font-semibold text-slate-800">Employees List</h3>
             <p class="text-slate-500">Review each person before edit</p>
           </div>
           <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
             <button
+              @click="showCreateUserForm = true"
               class="flex select-none items-center gap-2 rounded bg-slate-800 py-2.5 px-4 text-xs font-semibold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
             >
@@ -27,6 +28,41 @@
               Add member
             </button>
           </div>
+        </div>
+      </div>
+
+      <div v-if="showCreateUserForm">
+        <div class="p-4">
+          <p class="text-xl font-extrabold text-zinc-950">New User</p>
+          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+            User's Name
+            <p class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500">(30 characters maximum)</p>
+          </label>
+          <input
+            v-model="newUser.username"
+            placeholder="Please enter your full name"
+            class="mb-2 flex h-full w-full items-center justify-center rounded-lg border-2 border-gray-400 bg-transparent px-4 py-4 text-zinc-950 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            type="text"
+          />
+          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">User's Email</label>
+          <input
+            v-model="newUser.email"
+            placeholder="Please enter your email"
+            class="mb-2 flex h-full w-full items-center justify-center rounded-lg border-2 border-gray-400 bg-transparent px-4 py-4 text-zinc-950 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            type="text"
+          />
+          <button
+            @click="createUser"
+            class="mt-4 w-full rounded-lg bg-blue-500 hover:bg-blue-600 text-white py-2 transition-all"
+          >
+            Create User
+          </button>
+          <button
+            @click="showCreateUserForm = false"
+            class="mt-2 w-full rounded-lg bg-red-500 hover:bg-red-600 text-white py-2 transition-all"
+          >
+            Cancel
+          </button>
         </div>
       </div>
 
@@ -113,9 +149,35 @@ export default {
       currentPage: 1,
       limit: 10,
       totalPages: 5,
+      showCreateUserForm: false, // Ajout de la variable pour le formulaire
+      newUser: {
+        username: '',
+        email: '',
+      },
     };
   },
   methods: {
+    createUser() {
+      const userData = {
+        username: this.newUser.username,
+        email: this.newUser.email,
+      };
+      console.log('Creating user:', userData);
+      
+
+      /*userService.createUser(userData)
+        .then(() => {
+          this.employees.push({ ...userData, status: 'Active' });
+          this.newUser.username = '';
+          this.newUser.email = '';
+          this.showCreateUserForm = false;
+        })
+        .catch(error => {
+          console.error('Error creating user:', error);
+        });
+        */
+    },
+
     editEmployee(id) {
       console.log(`Editing employee with ID: ${id}`);
       this.showAccountDetails(id); // Affiche les détails du compte lors de l'édition
@@ -138,7 +200,7 @@ export default {
     nextPage() {
       console.log('Next page');
       if (this.currentPage < this.totalPages) {
-        this.currentPage++;
+        this.currentPage++; 
         this.fetchEmployees();
       }
     },
