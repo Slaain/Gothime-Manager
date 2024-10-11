@@ -34,29 +34,18 @@
         <table class="w-full mt-4 text-left table-auto min-w-max">
           <thead>
             <tr>
-              <th
-                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-              >
-                <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                  Member
-                </p>
+              <th class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">Member</p>
               </th>
-              <th
-                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-              >
-                <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">
-                  Status
-                </p>
+              <th class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100">
+                <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500">Status</p>
               </th>
-              <th
-                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-              >
-                <p class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"></p>
-              </th>
+              <th class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"></th>
+              <th class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(employee, index) in employees" :key="index" @click="showAccountDetails(employee.id)">
+            <tr v-for="(employee, index) in employees" :key="index">
               <td class="p-4 border-b border-slate-200">
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
@@ -68,26 +57,46 @@
               <td class="p-4 border-b border-slate-200">
                 <p class="text-sm text-slate-500">{{ employee.status || 'N/A' }}</p>
               </td>
+              <td class="p-4 border-b border-slate-200">
+                <button
+                  @click.stop="editEmployee(employee.id)"
+                  class="text-blue-600 hover:underline text-sm"
+                >
+                  Edit
+                </button>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <button
+                  @click.stop="confirmDelete(employee.id)"
+                  class="text-red-600 hover:underline text-sm"
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="flex items-center justify-between p-3">
-          <p class="block text-sm text-slate-500">
-          Page {{ currentPage }} of {{ totalPages }}
-          </p>
-          <div class="flex gap-1">
+        <p class="block text-sm text-slate-500">Page {{ currentPage }} of {{ totalPages }}</p>
+        <div class="flex gap-1">
           <button
-              class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-              type="button" @click="previousPage" :disabled="currentPage === 1">
-              Previous
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            type="button"
+            @click="previousPage"
+            :disabled="currentPage === 1"
+          >
+            Previous
           </button>
           <button
-              class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-              type="button" @click="nextPage" :disabled="currentPage === totalPages">
-              Next
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            type="button"
+            @click="nextPage"
+            :disabled="currentPage === totalPages"
+          >
+            Next
           </button>
-          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -103,12 +112,13 @@ export default {
       employees: [],
       currentPage: 1,
       limit: 10,
-      totalPages: 5, // Fixez le nombre total de pages à 10
+      totalPages: 5,
     };
   },
   methods: {
     editEmployee(id) {
       console.log(`Editing employee with ID: ${id}`);
+      this.showAccountDetails(id); // Affiche les détails du compte lors de l'édition
     },
     showAccountDetails(employeeId) {
       this.$emit('show-account-details', employeeId);
@@ -120,7 +130,6 @@ export default {
         .then(data => {
           console.log('Employees data:', data);
           this.employees = data.data;
-          // Retirer la ligne de calcul de totalPages
         })
         .catch(error => {
           console.error('Erreur lors de la récupération des employés:', error);
@@ -140,10 +149,24 @@ export default {
         this.fetchEmployees();
       }
     },
+    confirmDelete(id) {
+      if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+        this.deleteEmployee(id);
+      }
+    },
+    deleteEmployee(id) {
+      console.log(`Deleting employee with ID: ${id}`);
+      userService.deleteUser(id)
+        .then(() => {
+          this.fetchEmployees();
+        })
+        .catch(error => {
+          console.error('Erreur lors de la suppression de l\'employé:', error);
+        });
+    },
   },
   mounted() {
     this.fetchEmployees();
   },
 };
 </script>
-

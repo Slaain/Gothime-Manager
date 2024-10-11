@@ -45,11 +45,11 @@
   </template>
     
   <script>
-  import userService from '../userService'; // Assurez-vous d'importer votre service utilisateur
+  import userService from '../userService'; 
   
   export default {
     props: {
-      selectedEmployeeId: { // Changer le nom de la prop ici
+      selectedEmployeeId: {
         type: Number,
         required: true,
       },
@@ -65,7 +65,7 @@
         immediate: true,
         handler(newId) {
           if (newId) {
-            this.fetchUserDetails(newId); // Appel de la méthode pour récupérer les détails de l'utilisateur
+            this.fetchUserDetails(newId);
           }
         },
       },
@@ -76,8 +76,8 @@
     userService.getUser(userID)
       .then(user => {
         console.log('User data retrieved:', user);
-        this.username = user.data.username; // Remplir le champ nom
-        this.email = user.data.email; // Remplir le champ email
+        this.username = user.data.username;
+        this.email = user.data.email;
       })
       .catch(error => {
         console.error('Erreur lors de la récupération des informations de l\'utilisateur:', error);
