@@ -9,6 +9,12 @@ defmodule TimeManagerApiWeb.Router do
   scope "/api", TimeManagerApiWeb do
     pipe_through :api
 
+    # Route pour obtenir la liste paginée des utilisateurs
+    get "/users", UserController, :paginated_users
+
+    # Route pour obtenir les employés par utilisateur spécifique, si nécessaire
+    get "/users/:id", UserController, :show
+
     # Routes pour les workingtimes
     get "/workingtimes/:userID/:id", WorkingTimeController, :show
     get "/workingtimes/:userID", WorkingTimeController, :index
@@ -19,6 +25,9 @@ defmodule TimeManagerApiWeb.Router do
     post "/workingtime/:userID", WorkingTimeController, :create
     put "/workingtime/:id", WorkingTimeController, :update
     delete "/workingtime/:id", WorkingTimeController, :delete
+
+    # Routes pour tester
+    post "/test", TestController, :create
 
     resources "/users", UserController, except: [:new, :edit]
     resources "/clocks/:user_id", ClockController, only: [:create, :index]
