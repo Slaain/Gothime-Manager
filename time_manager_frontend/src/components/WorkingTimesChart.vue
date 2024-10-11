@@ -119,8 +119,10 @@ export default {
       const startTime = new Date(start);
       const endTime = new Date(end);
       const durationMs = endTime - startTime;
-      return (durationMs / (1000 * 60 * 60)).toFixed(2);
-    },
+      const durationHours = durationMs / (1000 * 60 * 60); // Convertir en heures
+      return Math.round(durationHours); // Arrondir à l'entier le plus proche
+    }
+
   },
   mounted() {
     this.getWorkingTimes();
