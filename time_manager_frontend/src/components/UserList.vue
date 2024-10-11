@@ -158,29 +158,30 @@ export default {
   },
   methods: {
     createUser() {
-      const userData = {
+    const userData = {
+      user: {
         username: this.newUser.username,
         email: this.newUser.email,
-      };
-      console.log('Creating user:', userData);
-      
-
-      /*userService.createUser(userData)
-        .then(() => {
-          this.employees.push({ ...userData, status: 'Active' });
-          this.newUser.username = '';
-          this.newUser.email = '';
-          this.showCreateUserForm = false;
-        })
-        .catch(error => {
-          console.error('Error creating user:', error);
-        });
-        */
-    },
+      }
+    };
+    console.log('Creating user:', userData);
+    
+    userService.createUser(userData)
+      .then(() => {
+        this.employees.push({ ...userData.user, status: 'Active' });
+        this.newUser.username = '';
+        this.newUser.email = '';
+        this.showCreateUserForm = false;
+      })
+      .catch(error => {
+        console.error('Error creating user:', error);
+        alert("Une erreur s'est produite lors de la création de l'utilisateur.");
+      });
+  },
 
     editEmployee(id) {
       console.log(`Editing employee with ID: ${id}`);
-      this.showAccountDetails(id); // Affiche les détails du compte lors de l'édition
+      this.showAccountDetails(id);
     },
     showAccountDetails(employeeId) {
       this.$emit('show-account-details', employeeId);
