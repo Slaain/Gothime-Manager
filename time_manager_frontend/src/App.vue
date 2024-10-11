@@ -4,6 +4,8 @@
 
   <main>
     <WorkingTimeActionContainer />
+    <WorkingTimesUsersContainer />
+    <WorkingTimesChart/>
     <AccountDetails 
       v-if="selectedEmployeeId" 
       :selectedEmployeeId="selectedEmployeeId" 
@@ -21,6 +23,8 @@
 import { ref, onMounted } from 'vue';
 import AccountDetails from './components/AccountDetails.vue';
 import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue';
+import WorkingTimesChart from "@/components/WorkingTimesChart.vue";
+import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue';
 import UserList from './components/UserList.vue';
 import userService from './userService';
 
