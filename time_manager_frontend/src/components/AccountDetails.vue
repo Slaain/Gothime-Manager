@@ -84,20 +84,21 @@
       });
   },
   updateEmail() {
-    const userData = {
-      email: this.email,
-      username: this.username,
-    };
+  const userData = {
+    email: this.email,
+    username: this.username,
+  };
 
-    userService.updateUser(this.selectedEmployeeId, userData) // Utiliser l'ID de l'utilisateur passé en prop
-      .then(response => {
-        console.log('User updated successfully:', response);
-        this.$emit('user-updated'); // Émettre l'événement après mise à jour
-      })
-      .catch(error => {
-        console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
-      });
-  },
+  userService.updateUser(this.selectedEmployeeId, userData)
+    .then(response => {
+      console.log('User updated successfully:', response);
+      this.$emit('user-updated'); // Émettre l'événement après la mise à jour
+    })
+    .catch(error => {
+      console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
+    });
+}
+,
 },
   };
   </script>
