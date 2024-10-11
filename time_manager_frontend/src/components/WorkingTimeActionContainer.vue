@@ -114,10 +114,8 @@ export default {
       
      
       axios.post(`http://localhost:4000/api/workingtime/${this.userId}`, {
-    working_time: {
       start: this.startTime,
       end: this.endTime,
-    }
   }, {
     headers: {
       'Content-Type': 'application/json',  // Assurez-vous que c'est compatible avec ce que votre serveur attend
