@@ -71,4 +71,13 @@ defmodule TimeManagerApi.Accounts do
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end
+
+  # Fonction pour récupérer les employés avec pagination
+  def get_paginated_employees(limit, offset) do
+    User
+    |> order_by([u], asc: u.username)
+    |> limit(^limit)
+    |> offset(^offset)
+    |> Repo.all()
+  end
 end

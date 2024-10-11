@@ -3,14 +3,14 @@
       <div class="mx-auto flex w-full mt-20 flex-col justify-center px-5 pt-0 md:h-[unset] max-w-[520px] lg:px-6 xl:pl-0">
         <div class="relative flex w-full flex-col pt-[20px] md:pt-0">
           <div class="rounded-lg border border-gray-300 bg-white text-black shadow-md mb-5 h-min max-w-full pt-8 pb-6 px-6 dark:border-zinc-800">
-            <p class="text-xl font-extrabold text-zinc-950 md:text-3xl">Account Details</p>
+            <p class="text-xl font-extrabold text-zinc-950 md:text-3xl">New user</p>
             <p class="mb-6 mt-1 text-sm font-medium text-zinc-500 dark:text-zinc-400 md:mt-4 md:text-base">
-              Here you can change your account information
+              Here you can add a new user
             </p>
     
-            <!-- Name Input -->
+           
             <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
-              Your Name
+              User's Name
               <p class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500">(30 characters maximum)</p>
             </label>
             <div class="mb-8 flex flex-col md:flex-row">
@@ -23,7 +23,7 @@
             </div>
     
             <!-- Email Input -->
-            <label class="mb-3 ml-2.5 flex px-2.5 font-bold leading-none text-zinc-950">Your Email</label>
+            <label class="mb-3 ml-2.5 flex px-2.5 font-bold leading-none text-zinc-950">User's Email</label>
             <div class="mb-8 flex flex-col md:flex-row">
               <input
                 v-model="email"
@@ -92,8 +92,7 @@
   userService.updateUser(this.selectedEmployeeId, userData)
     .then(response => {
       console.log('User updated successfully:', response);
-      this.$emit('user-updated');
-      id: this.selectedEmployeeId; // Émettre l'événement après la mise à jour
+      this.$emit('user-updated'); // Émettre l'événement après la mise à jour
     })
     .catch(error => {
       console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);

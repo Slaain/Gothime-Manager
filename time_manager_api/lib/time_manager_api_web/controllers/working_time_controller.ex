@@ -4,6 +4,7 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
   alias TimeManagerApi.Timesheet
   alias TimeManagerApi.Timesheet.WorkingTime
   alias TimeManagerApi.Repo
+  alias TimeManagerApi.Attendance
 
 
 
@@ -31,32 +32,46 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
 
 
   # POST: /api/workingtime/:userID
-  # def create(conn, %{"user_id" => user_id, "clocks" => clocks_params}) do
-  #   # Vérifier si une clock existe pour cet utilisateur
-  #   case TimeManager.get_last_clock_for_user(user_id) do
-  #     nil ->
-  #       # Si aucune clock n'existe, en créer une nouvelle
-  #       new_clock_params = Map.put(clocks_params, "user_id", user_id)
+  def create(conn, %{"userID" => user_id} = params) do
+    start_time = params["start"]
+    end_time = params["end"]
 
-  #       with {:ok, %Clocks{} = clocks} <- TimeManager.create_clocks(new_clock_params) do
-  #         conn
-  #         |> put_status(:created)
-  #         |> put_resp_header("location", ~p"/api/clocks/#{clocks.id}")
-  #         |> render(:show, clocks: clocks)
-  #       else
-  #         {:error, changeset} ->
-  #           conn
-  #           |> put_status(:unprocessable_entity)
-  #           |> render(TimeManagerApiWeb.ChangesetView, "error.json", changeset: changeset)
-  #       end
+    total_time = case {start_time, end_time} do
+      {start_str, end_str} when not is_nil(start_str) and not is_nil(end_str) ->
+        # Ajouter ":00" si la longueur du string est 16 (YYYY-MM-DDTHH:MM)
+        start_str = if String.length(start_str) == 16, do: start_str <> ":00", else: start_str
+        end_str = if String.length(end_str) == 16, do: end_str <> ":00", else: end_str
 
-  #     %Clocks{} = existing_clock ->
-  #       # Si une clock existe, la renvoyer ou mettre à jour si nécessaire
-  #       conn
-  #       |> put_status(:ok)
-  #       |> render(:show, clocks: existing_clock)
-  #   end
-  # end
+        # Conversion en NaiveDateTime
+        start = NaiveDateTime.from_iso8601!(start_str)
+        end_time = NaiveDateTime.from_iso8601!(end_str)
+
+        # Calcul de la différence en minutes
+        NaiveDateTime.diff(end_time, start, :minute)
+
+      _ -> nil
+    end
+
+    # Log des paramètres
+    Logger.debug("Params passed: #{inspect(params)}")
+
+    params = %{"start" => start_time, "end" => end_time, "user_id" => user_id, "total_time" => total_time}
+
+    case Attendance.test(params) do
+      {:ok, result} ->
+        Logger.debug("Test passed successfully: #{inspect(result)}")
+        conn
+        |> put_status(:ok)
+        |> json(%{message: "Test réussi", result: result})
+
+      {:error, changeset} ->
+        Logger.error("Test failed with changeset: #{inspect(changeset)}")
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{message: "Erreur", result: false})
+    end
+  end
+
 
 
   # PUT: /api/workingtime/:id

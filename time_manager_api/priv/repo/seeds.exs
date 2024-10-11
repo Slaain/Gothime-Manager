@@ -12,7 +12,7 @@ Repo.delete_all(Clock)
 Repo.delete_all(User)
 
 # Créez des utilisateurs avec des données fictives
-for _ <- 1..10 do
+for _ <- 1..30 do
   %User{}
   |> User.changeset(%{
     username: Faker.Internet.user_name(),
