@@ -1,63 +1,68 @@
+<script setup>
+import Dropdown from './Dropdown.vue';
+</script>
+
 <template>
-  <div class="w-[40%] bg-green-400 flex flex-col justify-center items-center">
-    <div class="border-b border-neutral-400">
-      <!-- Bouton pour activer le mode création -->
-      <button @click="setFormMode('create')" class="w-32 px-2 py-2 m-2 bg-indigo-400 rounded-lg">Créer</button>
-      <!-- Bouton pour activer le mode modification -->
-      <button @click="setFormMode('update')" class="w-32 px-2 py-2 m-2 bg-indigo-400 rounded-lg">Modifier</button>
+  <div class="w-[40%] shadow-md rounded-lg flex flex-col justify-center items-center">
+    <div class="border-b">
+      <!-- Bouton "Créer" -->
+      <button @click="setFormMode('create')" 
+              :class="['focus:outline-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
+              formMode === 'create' ? 'bg-purple-800 text-white' : '']">
+        Créer
+      </button>
+      
+      <!-- Bouton "Modifier" avec exactement le même style que "Créer" -->
+      <button @click="setFormMode('update')" 
+              :class="['focus:outline-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
+              formMode === 'update' ? 'bg-purple-800 text-white' : '']">
+        Modifier
+      </button>
     </div>
 
-    <div>
+    <div class="w-full">
       <!-- Afficher le formulaire de création si formMode est 'create' -->
-      <div v-if="formMode === 'create'" class="flex flex-col items-start justify-center w-full m-2">
+      <div v-if="formMode === 'create'" class="flex flex-col items-start justify-center w-full px-4 py-4">
         <h2 class="mb-4 text-lg font-bold">Créer un nouveau temps de travail</h2>
         <!-- Dropdown et input pour la création -->
-        <p>User</p>
-        <button @click="toggleDropdown" class="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm">
-          <span class="mr-2">Open Dropdown</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2 -mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </button>
-        <!-- Dropdown menu -->
-        <div v-show="isOpen" class="absolute right-0 p-1 mt-2 space-y-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-          <input v-model="searchTerm" class="block w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-md focus:outline-none" type="text" placeholder="Search items" autocomplete="off">
-          <a v-for="(item, index) in filteredItems" :key="index" href="#" class="block px-4 py-2 text-gray-700 rounded-md cursor-pointer hover:bg-gray-100 active:bg-blue-100">{{ item }}</a>
+        <p class="mb-2">User</p>
+        <Dropdown :onUserSelected="handleUserSelected" class="w-full" />
+        <div class="w-full">
+          <p>Start time</p>
+          <input type="datetime-local" v-model="startTime" class="w-full px-2 py-2 border border-black rounded-lg">
         </div>
-
-        <p>Start time</p>
-        <input type="datetime-local" v-model="startTime" class="w-32 px-2 py-2 m-2 rounded-lg">
-        <p>End time</p>
-        <input type="datetime-local" v-model="endTime" class="w-32 px-2 py-2 m-2 rounded-lg">
-        <button @click="addWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-blue-500 rounded-md">Enregistrer</button>
+        <div class="w-full">
+          <p>End time</p>
+          <input type="datetime-local" v-model="endTime" class="w-full px-2 py-2 border border-black rounded-lg">
+        </div>
+        <button @click="createWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800">
+          Enregistrer
+        </button>
       </div>
 
       <!-- Afficher le formulaire de modification si formMode est 'update' -->
-      <div v-if="formMode === 'update'" class="flex flex-col items-start justify-center w-full m-2">
+      <div v-if="formMode === 'update'" class="flex flex-col items-start justify-center w-full px-4 py-4">
         <h2 class="mb-4 text-lg font-bold">Modifier le temps de travail</h2>
         <!-- Dropdown et input pour la modification -->
-        <p>User</p>
-        <button @click="toggleDropdown" class="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm">
-          <span class="mr-2">Open Dropdown</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 ml-2 -mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </button>
-        <!-- Dropdown menu -->
-        <div v-show="isOpen" class="absolute right-0 p-1 mt-2 space-y-1 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-          <input v-model="searchTerm" class="block w-full px-4 py-2 text-gray-800 border border-gray-300 rounded-md focus:outline-none" type="text" placeholder="Search items" autocomplete="off">
-          <a v-for="(item, index) in filteredItems" :key="index" href="#" class="block px-4 py-2 text-gray-700 rounded-md cursor-pointer hover:bg-gray-100 active:bg-blue-100">{{ item }}</a>
+        <p class="mb-2">User</p>
+        <Dropdown class="w-full" />
+        <div class="w-full">
+          <p>Start time</p>
+          <input type="datetime-local" v-model="startTime" class="w-full px-2 py-2 border border-black rounded-lg">
         </div>
-
-        <p>Start time</p>
-        <input type="datetime-local" v-model="startTime" class="w-32 px-2 py-2 m-2 rounded-lg">
-        <p>End time</p>
-        <input type="datetime-local" v-model="endTime" class="w-32 px-2 py-2 m-2 rounded-lg">
-        <button @click="submitForm" class="w-full px-4 py-2 mt-4 text-white bg-blue-500 rounded-md">Modifier</button>
+        <div class="w-full">
+          <p>End time</p>
+          <input type="datetime-local" v-model="endTime" class="w-full px-2 py-2 border border-black rounded-lg">
+        </div>
+        <button @click="updateWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800">
+          Modifier
+        </button>
       </div>
     </div>
-  </div>  
+  </div>
 </template>
+
+
 
 <script>
 import axios from 'axios';
@@ -65,7 +70,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      userId: 1, // Il faudra recuperer l'id de l'utilisateur selectionné
+      userId: "", // Il faudra recuperer l'id de l'utilisateur selectionné
       userData: {}, // Contient les données de l'utilisateur
       isOpen: false, // Gère l'état du menu déroulant
       searchTerm: '', // Gère la recherche dans le menu déroulant
@@ -78,6 +83,7 @@ export default {
   mounted() {
     // Appel GET pour récupérer les données à l'initialisation du composant
     // this.fetchUserData();
+    this.getWorkingTime();
   },
   computed: {
     // Filtre les éléments en fonction de la recherche
@@ -92,14 +98,22 @@ export default {
     // fetchUserData() {
     //   axios.get()
     // },
-    addWorkingTime() {
+        formatDate  (dateString) {
+  const date = new Date(dateString);
+  console.log("date: ", date);
+  
+  console.log("date.toISOString(): ", date.toISOString());
+  
+  return date.toISOString().slice(0, 16); // Format 'YYYY-MM-DDTHH:MM'
+},
+    createWorkingTime() {
       // Ajouter ici la logique pour ajouter un temps de travail
       console.log("start time: ", this.startTime);
       console.log("end time: ", this.endTime);
       
       
      
-      axios.post("http://localhost:4000/api/workingtime/1", {
+      axios.post(`http://localhost:4000/api/workingtime/${this.userId}`, {
     working_time: {
       start: this.startTime,
       end: this.endTime,
@@ -115,6 +129,53 @@ export default {
   .catch(error => {
     console.error("Erreur lors de la requête :", error);
   });
+    },
+    updateWorkingTime() {
+      // Ajouter ici la logique pour modifier un temps de travail
+
+      console.log("start time: ", this.startTime);
+
+      
+      
+      
+      axios.put("http://localhost:4000/api/workingtime/2", {
+    working_time: {
+      start: this.startTime,
+      end: this.endTime,
+    }
+  }, {
+    headers: {
+      'Content-Type': 'application/json',  // Assurez-vous que c'est compatible avec ce que votre serveur attend
+    }
+  })
+  .then(response => {
+    console.log("Réponse :", response.data);
+  })
+  .catch(error => {
+    console.error("Erreur lors de la requête :", error);
+  });
+    },
+     getWorkingTime() {
+    axios.get("http://localhost:4000/api/workingtime/1/2")
+    .then(response => {
+      // Assigner les données reçues à startTime et endTime
+      const workingTimeData = response.data; 
+
+    console.log('Données récupérées :', workingTimeData.data);
+
+
+   
+
+
+    this.startTime =workingTimeData.data.start;
+this.endTime =workingTimeData.data.end;
+    })
+    .catch(error => {
+      console.error("Erreur lors de la requête :", error);
+    });
+  },
+   handleUserSelected(userId) {
+      this.userId = userId; // Met à jour l'ID lorsque l'utilisateur est sélectionné
     },
     toggleDropdown() {
       this.isOpen = !this.isOpen; // Bascule l'affichage du menu déroulant
