@@ -147,8 +147,8 @@ export default {
     return {
       employees: [],
       currentPage: 1,
-      limit: 10,
-      totalPages: 5,
+      limit: 5,
+      totalPages: 10,
       showCreateUserForm: false, // Ajout de la variable pour le formulaire
       newUser: {
         username: '',

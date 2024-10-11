@@ -33,10 +33,9 @@ const setSelectedEmployeeId = (employeeId) => {
   selectedEmployeeId.value = employeeId;
   console.log(`Selected employee ID: ${employeeId}`);
 };
-
+  
 const onUserUpdated = () => {
   userListKey.value += 1;
-  fetchEmployees();
 };
 
 const fetchEmployees = () => {

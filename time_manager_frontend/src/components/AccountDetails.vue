@@ -92,7 +92,8 @@
   userService.updateUser(this.selectedEmployeeId, userData)
     .then(response => {
       console.log('User updated successfully:', response);
-      this.$emit('user-updated'); // Émettre l'événement après la mise à jour
+      this.$emit('user-updated');
+      id: this.selectedEmployeeId; // Émettre l'événement après la mise à jour
     })
     .catch(error => {
       console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
