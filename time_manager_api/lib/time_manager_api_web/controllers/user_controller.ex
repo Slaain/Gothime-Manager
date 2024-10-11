@@ -61,4 +61,20 @@ defmodule TimeManagerApiWeb.UserController do
       send_resp(conn, :no_content, "") # Répondre avec un statut 204 No Content
     end
   end
+
+  # Action pour obtenir une liste paginée d'utilisateurs
+  def paginated_users(conn, %{"limit" => limit, "offset" => offset}) do
+    limit = String.to_integer(limit)
+    offset = String.to_integer(offset)
+
+    users = Accounts.get_paginated_employees(limit, offset)
+    render(conn, :index, users: users)
+  end
+
+
+  # Action sans offset/limit par défaut (valeurs par défaut)
+  def paginated_users(conn, _params) do
+    users = Accounts.get_paginated_users(10, 0) # Par défaut, 10 utilisateurs, offset 0
+    render(conn, :index, users: users)
+  end
 end
