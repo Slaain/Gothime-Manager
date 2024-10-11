@@ -55,6 +55,15 @@ defmodule TimeManagerApi.Timesheet do
     |> Repo.insert()
   end
 
+  def get_last_working_time_of_user(user_id) do
+    from(w in WorkingTime,
+      where: w.user_id == ^user_id,
+      order_by: [desc: w.inserted_at],
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
   @doc """
   Updates a working_time.
 
