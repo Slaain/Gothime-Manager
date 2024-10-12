@@ -47,6 +47,7 @@ defmodule TimeManagerApiWeb.TestController do
     end
   end
 
+
   def beep(conn, %{"userID" => user_id}) do
     # Récupérer l'heure et la formater
     truncated_time = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
@@ -97,6 +98,66 @@ defmodule TimeManagerApiWeb.TestController do
     |> put_status(:ok)
     |> json(%{message: message, time: truncated_time})
   end
+
+  # Exemple de body de requête POST
+  #   {
+  #     "start": "2024-10-11T12:00:00Z",
+  #     "end": "2024-10-11T15:00:00Z"
+  #   }
+  def create_working_time(conn, %{"user_id" => user_id} = params) do
+    start_time = params["start"]
+    end_time = params["end"]
+
+    # Vérifier si les paramètres start et end sont présents
+    if is_nil(start_time) or is_nil(end_time) do
+      conn
+      |> put_status(:bad_request)
+      |> json(%{message: "Les paramètres start et end sont requis"})
+      |> halt()
+    end
+
+    # Vérifier si le paramètre start est au bon format
+    case NaiveDateTime.from_iso8601(start_time) do
+      {:ok, _} -> :ok  # Continue si c'est au bon format
+      {:error, _} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{message: "The start parameter must be in ISO8601 format"})
+        |> halt()
+    end
+
+    # Vérifier si le paramètre end est au bon format
+    case NaiveDateTime.from_iso8601(end_time) do
+      {:ok, _} -> :ok  # Continue si c'est au bon format
+      {:error, _} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{message: "The end parameter must be in ISO8601 format"})
+        |> halt()
+    end
+
+    # Calculer la différence en minutes
+    total_time = NaiveDateTime.diff(NaiveDateTime.from_iso8601!(end_time), NaiveDateTime.from_iso8601!(start_time), :minute)
+
+    # Créer un nouveau working_time
+    user_id_int = String.to_integer(user_id)
+    case WorkingTimeService.create_working_time(%{"start" => start_time, "end" => end_time, "user_id" => user_id_int, "total_time" => total_time}) do
+      {:ok, _} -> :ok
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(changeset)
+    end
+
+    # Réponse finale réussie
+    conn
+    |> put_status(:ok)
+    |> json(%{message: "The working time has been created successfully", working_time: %{start: start_time, end: end_time, user_id: user_id, total_time: total_time}})
+  end
+
+
+
+
 
 
 

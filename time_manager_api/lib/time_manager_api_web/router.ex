@@ -21,10 +21,12 @@ defmodule TimeManagerApiWeb.Router do
     delete "/workingtime/:id", WorkingTimeController, :delete
 
     # Routes pour tester
-    post "/test/:userID", TestController, :beep
+    post "/test/:user_id", TestController, :create_working_time
 
     resources "/users", UserController, except: [:new, :edit]
-    resources "/clocks/:user_id", ClockController, only: [:create, :index]
+
+    # Routes pour les clocks
+    post "/clocks/:user_id", ClockController, :beep
 
     # Route pour les requêtes OPTIONS
     match :options, "/*_path", TimeManagerApiWeb.CORSController, :options
