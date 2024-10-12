@@ -21,7 +21,7 @@ defmodule TimeManagerApiWeb.Router do
     delete "/workingtime/:id", WorkingTimeController, :delete
 
     # Routes pour tester
-    post "/test", TestController, :create
+    post "/test/:userID", TestController, :beep
 
     resources "/users", UserController, except: [:new, :edit]
     resources "/clocks/:user_id", ClockController, only: [:create, :index]
