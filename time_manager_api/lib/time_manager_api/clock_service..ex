@@ -1,6 +1,6 @@
-defmodule TimeManagerApi.Attendance do
+defmodule TimeManagerApi.ClockService do
   @moduledoc """
-  The Attendance context.
+  The ClockService context.
   """
 
   import Ecto.Query, warn: false
@@ -10,28 +10,28 @@ defmodule TimeManagerApi.Attendance do
   alias TimeManagerApi.Repo
   alias TimeManagerApi.Clock
   alias TimeManagerApi.WorkingTime
-  alias TimeManagerApi.ClockService
 
   def create_clock(attrs \\ %{}) do
-    %Clock{}
-    |> Clock.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  def test(attrs \\ %{}) do
-    %WorkingTime{}
-    |> WorkingTime.changeset(attrs)
-    |> Repo.insert()
+    case Repo.insert(Clock.changeset(%Clock{}, attrs)) do
+      {:ok, clock} -> clock  # Retourner directement la clock en cas de succès
+      {:error, _changeset} -> nil  # Retourner nil en cas d'erreur (ou gérer l'erreur ici)
+    end
   end
 
 
+  # Toggle status
+  def toggle_status(%Clock{} = clock) do
+    new_status = !clock.status
+    Clock.changeset(clock, %{"status" => new_status})
+    |> Repo.update()
+  end
 
-  def beep(userID \\ %{}) do
-
-
-    clock = ClockService.get_last_clock_by_user(userID)
-
-    IO.inspect(clock, label: "clock")
+  def get_clock_by_user(user_id) do
+    Clock
+    |> where([c], c.user_id == ^user_id)
+    |> order_by([c], desc: c.inserted_at)
+    |> limit(1)
+    |> Repo.one()
   end
 
   # Récupérer la dernière clock d'un utilisateur
