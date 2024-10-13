@@ -29,7 +29,7 @@ defmodule TimeManagerApi.WorkingTimeService do
     |> Repo.one()
   end
 
-  # Modifier un working_time existant SANS END
+  # Modifier un working_time existant SANS START
   def update_working_time_without_start_attr(%WorkingTime{} = working_time, attrs) do
     IO.inspect(attrs, label: "Attributes")
 
@@ -45,6 +45,7 @@ defmodule TimeManagerApi.WorkingTimeService do
     |> Repo.update()
   end
 
+  # Modifier un working_time existant
   def update_working_time(%WorkingTime{} = working_time, attrs) do
     IO.inspect(attrs, label: "Attributes")
 
@@ -67,6 +68,11 @@ defmodule TimeManagerApi.WorkingTimeService do
     %WorkingTime{}
     |> WorkingTime.changeset(attrs)
     |> Repo.insert()
+  end
+
+  # Supprimer un working_time
+  def delete_working_time(%WorkingTime{} = working_time) do
+    Repo.delete(working_time)
   end
 
 

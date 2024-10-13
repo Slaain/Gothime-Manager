@@ -159,10 +159,24 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
 
   # DELETE: /api/workingtime/:id
   def delete(conn, %{"id" => id}) do
-    working_time = Timesheet.get_working_time!(id)
+    working_time = WorkingTimeService.get_working_time_by_id(id)
 
-    with {:ok, %WorkingTime{}} <- Timesheet.delete_working_time(working_time) do
-      send_resp(conn, :no_content, "")
+    IO.inspect(working_time, label: "Working Time")
+
+    # Vérifier si le working_time existe
+    if is_nil(working_time) do
+      conn
+      |> put_status(:not_found)
+      |> json(%{message: "The working time with ID #{id} does not exist", result: false})
+      |> halt()
     end
+
+    # Supprimer le working_time
+    WorkingTimeService.delete_working_time(working_time)
+
+    # Réponse finale réussie
+    conn
+    |> put_status(:ok)
+    |> json(%{message: "The working time has been deleted successfully", result: true})
   end
 end
