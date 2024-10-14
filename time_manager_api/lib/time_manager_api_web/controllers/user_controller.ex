@@ -38,16 +38,32 @@ defmodule TimeManagerApiWeb.UserController do
     #   |> render(:show, user: user) # Rendre la vue avec l'utilisateur créé
     # end
 
-    # Vérifier si les paramètres requis sont présents
+    # Vérifier si les paramètres requis sont présents et ne sont pas vide
     required_params = ["email", "username"]
     Enum.each(required_params, fn param ->
       if Map.get(user_params, param) == nil do
         conn
-        |> put_status(:bad_request) # Indique une mauvaise requête
-        |> json(%{message: "The #{param} parameter is required", result: false}) # Renvoyer un message d'erreur
+        |> put_status(:bad_request) # Indique que la requête est incorrecte
+        |> json(%{message: "Missing required parameter: #{param}", result: false}) # Renvoyer un message d'erreur
         |> halt() # Arrêter le traitement
       end
     end)
+
+    # Verifier si le nom d'utilisateur a entre 2 et 30 caractères
+    if String.length(user_params["username"]) < 2 or String.length(user_params["username"]) > 30 do
+      conn
+      |> put_status(:bad_request) # Indique que la requête est incorrecte
+      |> json(%{message: "Username must be between 2 and 30 characters", result: false}) # Renvoyer un message d'erreur
+      |> halt() # Arrêter le traitement
+    end
+
+    # Vérifier si l'email est valide
+    if String.match?(user_params["email"], ~r/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) == false do
+      conn
+      |> put_status(:bad_request) # Indique que la requête est incorrecte
+      |> json(%{message: "Invalid email address", result: false}) # Renvoyer un message d'erreur
+      |> halt() # Arrêter le traitement
+    end
 
     # Verifier si l'utilisateur existe déjà
     user = UserService.get_user_by_email(user_params["email"])
