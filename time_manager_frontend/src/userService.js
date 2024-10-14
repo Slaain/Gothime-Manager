@@ -7,10 +7,10 @@ export default {
   createUser(user) {
     return axios.post(API_URL, user)
       .then(response => response.data)
-      .catch(error => {
-        console.error('Erreur lors de la création de l\'utilisateur:', error);
-        throw error;
-      });
+      // .catch(error => {
+      //   console.error('Erreur lors de la création de l\'utilisateur:', error);
+      //   throw error;
+      // });
   },
 
   updateUser(userID, user) {

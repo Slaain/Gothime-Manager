@@ -1,7 +1,9 @@
 <template>
+    
   <div class="max-w-[720px] mx-auto">
-    <div class="relative flex flex-col w-full h-full text-slate-700 bg-white shadow-md rounded-xl bg-clip-border">
-      <div class="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
+
+    <div class="relative flex flex-col w-full h-full bg-white shadow-md text-slate-700 rounded-xl bg-clip-border">
+      <div class="relative mx-4 mt-4 overflow-hidden bg-white rounded-none text-slate-700 bg-clip-border">
         <div class="flex items-center justify-between">
           <div>
               <h3 class="text-lg font-semibold text-slate-800">Employees List</h3>
@@ -9,7 +11,7 @@
           </div>
           <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
             <button
-              @click="showCreateUserForm = true"
+              @click="openUserModal"
               class="flex select-none items-center gap-2 rounded bg-slate-800 py-2.5 px-4 text-xs font-semibold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
             >
@@ -31,8 +33,8 @@
         </div>
       </div>
 
-      <div v-if="showCreateUserForm">
-        <div class="p-4">
+<div v-if="showCreateUserModal" id="default-modal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50">
+      <div class="w-1/2 px-8 py-4 bg-white ">
           <p class="text-xl font-extrabold text-zinc-950">New User</p>
           <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
             User's Name
@@ -41,30 +43,55 @@
           <input
             v-model="newUser.username"
             placeholder="Please enter your full name"
-            class="mb-2 flex h-full w-full items-center justify-center rounded-lg border-2 border-gray-400 bg-transparent px-4 py-4 text-zinc-950 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             type="text"
           />
           <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">User's Email</label>
           <input
             v-model="newUser.email"
             placeholder="Please enter your email"
-            class="mb-2 flex h-full w-full items-center justify-center rounded-lg border-2 border-gray-400 bg-transparent px-4 py-4 text-zinc-950 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             type="text"
           />
+          <p class="h-6 text-red-600">{{error}}</p>
           <button
             @click="createUser"
-            class="mt-4 w-full rounded-lg bg-blue-500 hover:bg-blue-600 text-white py-2 transition-all"
+            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
           >
             Create User
           </button>
           <button
-            @click="showCreateUserForm = false"
-            class="mt-2 w-full rounded-lg bg-red-500 hover:bg-red-600 text-white py-2 transition-all"
+            @click="closeUserModal"
+            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
           >
             Cancel
           </button>
         </div>
-      </div>
+    </div>
+
+    <div v-if="showDeleteUserModal" id="default-modal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50">
+      <div class="w-1/2 px-8 py-4 bg-white ">
+          <p class="text-xl font-extrabold text-zinc-950">Delete User</p>
+          <p>Are you sure you want to delete this user?</p>
+          <p class="h-6 text-red-600">{{error}}</p>
+          <button
+            @click="createUser"
+            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
+          >
+            Create User
+          </button>
+          <button
+            @click="closeUserModal"
+            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
+          >
+            Cancel
+          </button>
+        </div>
+    </div>
+
+    
+    
+      
 
       <div class="p-0 overflow-scroll">
         <table class="w-full mt-4 text-left table-auto min-w-max">
@@ -96,15 +123,15 @@
               <td class="p-4 border-b border-slate-200">
                 <button
                   @click.stop="editEmployee(employee.id)"
-                  class="text-blue-600 hover:underline text-sm"
+                  class="text-sm text-blue-600 hover:underline"
                 >
                   Edit
                 </button>
               </td>
               <td class="p-4 border-b border-slate-200">
                 <button
-                  @click.stop="confirmDelete(employee.id)"
-                  class="text-red-600 hover:underline text-sm"
+                  @click.stop="openUserDeleteModal"
+                  class="text-sm text-red-600 hover:underline"
                 >
                   Delete
                 </button>
@@ -140,8 +167,21 @@
 
 <script>
 import userService from '../userService';
+import { useToast } from "vue-toastification";
+import CreateUserModal from './modal/CreateUserModal.vue';
+
+// Propriété réactive pour contrôler la visibilité de la modale
+
+// Méthode pour ouvrir la modale
+
 
 export default {
+
+
+  setup (){
+    const toast = useToast();
+    return { toast };
+  },
   name: 'EmployeeList',
   data() {
     return {
@@ -149,14 +189,49 @@ export default {
       currentPage: 1,
       limit: 5,
       totalPages: 10,
-      showCreateUserForm: false, // Ajout de la variable pour le formulaire
+      showCreateUserModal: false, // Ajout de la variable pour le formulaire
       newUser: {
         username: '',
         email: '',
       },
+      error: '',
+      showCreateUserModal: false,
+      showDeleteUserModal: false,
     };
   },
   methods: {
+    
+    openUserModal() {
+      this.showCreateUserModal = true;
+    },
+
+    closeUserModal() {
+      this.newUser.username = '';
+      this.newUser.email = '';
+      this.error = '';
+      this.showCreateUserModal = false;
+      
+    },
+
+    openUserDeleteModal(){
+      this.showDeleteUserModal = true;
+    },
+
+    closeUserDeleteModal(){
+      this.showDeleteUserModal = false;
+    },
+
+
+    // params in english
+        showSuccessToast(message = "Successful operation" ) {
+      this.toast.success(message);
+          console.log("this.toast : ", this.toast);
+
+    },
+    // params in english
+    showErrorToast(message = "An error occurred") {
+      this.toast.error(message);
+    },
     createUser() {
     const userData = {
       user: {
@@ -164,18 +239,44 @@ export default {
         email: this.newUser.email,
       }
     };
+    console.log("this.$toast : ", this.$toast);
+
+    if(userData.user.username === '' || userData.user.email === '') {
+      // alert("Please fill in all fields.");
+      // this.showErrorToast("Please fill in all fields.");
+      this.error = "Please fill in all fields.";
+      return;
+    }
+
+    
     console.log('Creating user:', userData);
     
+    
     userService.createUser(userData)
-      .then(() => {
+      .then((response) => {
         this.employees.push({ ...userData.user, status: 'Active' });
         this.newUser.username = '';
         this.newUser.email = '';
-        this.showCreateUserForm = false;
+        this.error = '';
+        this.showCreateUserModal = false;
+        console.log("User created successfully:", response);
+
+        if(response.result){
+          // succes toaster
+          this.showSuccessToast(response.message);
+
+        } else {
+          // error toaster
+          // this.showErrorToast(response.message);
+          this.error = response.message;
+        }
       })
       .catch(error => {
-        console.error('Error creating user:', error);
-        alert("Une erreur s'est produite lors de la création de l'utilisateur.");
+        console.error(`Error creating user: ${error.response.data.message}`, error);
+        // this.toast.info(error.response.data.message)
+        this.error = error.response.data.message;
+        
+        // alert("Une erreur s'est produite lors de la création de l'utilisateur.");
       });
   },
 

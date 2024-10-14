@@ -3,12 +3,12 @@
   </header>
 
   <main>
-    <WorkingTimeActionContainer />
+    <!-- <WorkingTimeActionContainer />
     <AccountDetails 
       v-if="selectedEmployeeId" 
       :selectedEmployeeId="selectedEmployeeId" 
       @user-updated="onUserUpdated" 
-    /> 
+    />  -->
     <UserList 
       :key="userListKey"
       :employees="userData" 
