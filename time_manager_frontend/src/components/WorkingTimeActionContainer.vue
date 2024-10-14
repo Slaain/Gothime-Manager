@@ -7,14 +7,14 @@ import Dropdown from './Dropdown.vue';
     <div class="border-b">
       <!-- Bouton "Créer" -->
       <button @click="setFormMode('create')" 
-              :class="['focus:outline-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
-              formMode === 'create' ? 'bg-purple-800 text-white' : '']">
+              :class="['focus:outline-none m-2 border border-purple-800    hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 ', 
+              formMode === 'create' ? 'bg-purple-800  text-white' : '']">
         Créer
       </button>
       
       <!-- Bouton "Modifier" avec exactement le même style que "Créer" -->
       <button @click="setFormMode('update')" 
-              :class="['focus:outline-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
+              :class="['focus:outline-none m-2 border border-purple-800    hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 ', 
               formMode === 'update' ? 'bg-purple-800 text-white' : '']">
         Modifier
       </button>
@@ -114,10 +114,8 @@ export default {
       
      
       axios.post(`http://localhost:4000/api/workingtime/${this.userId}`, {
-    working_time: {
       start: this.startTime,
       end: this.endTime,
-    }
   }, {
     headers: {
       'Content-Type': 'application/json',  // Assurez-vous que c'est compatible avec ce que votre serveur attend

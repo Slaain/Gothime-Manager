@@ -55,6 +55,15 @@ defmodule TimeManagerApi.Timesheet do
     |> Repo.insert()
   end
 
+  def get_last_working_time_of_user(user_id) do
+    from(w in WorkingTime,
+      where: w.user_id == ^user_id,
+      order_by: [desc: w.inserted_at],
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
   @doc """
   Updates a working_time.
 
@@ -135,7 +144,7 @@ defmodule TimeManagerApi.Timesheet do
       join: u in TimeManagerApi.Accounts.User,  # Faire une jointure avec User
       on: w.user_id == u.id,  # Condition de la jointure
       where: w.user_id == ^user_id and w.id == ^working_time_id,
-      select: %{working_time: w, user_name: u.username, user_email: u.email}  # Sélectionner username au lieu de name
+      select: %{working_time: w, user_name: u.username, user_email: u.email, }  # Sélectionner username au lieu de name
     )
     |> Repo.one!()
   end
@@ -147,7 +156,7 @@ defmodule TimeManagerApi.Timesheet do
       join: u in TimeManagerApi.Accounts.User,  # Jointure avec la table User
       on: w.user_id == u.id,  # Condition de la jointure
       where: w.user_id == ^user_id,
-      select: %{working_time: w, user_name: u.username, user_email: u.email}  # Sélection des informations utilisateur
+      select: %{working_time: w, user_name: u.username, user_email: u.email, total_time: w.total_time}  # Ajout de total_time
     )
     |> Repo.all()  # Renvoie tous les résultats
   end

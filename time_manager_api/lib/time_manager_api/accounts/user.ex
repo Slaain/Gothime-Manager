@@ -1,6 +1,7 @@
 defmodule TimeManagerApi.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query, warn: false  # Import Ecto.Query pour utiliser les fonctions
 
   schema "users" do
     field :username, :string
@@ -16,4 +17,6 @@ defmodule TimeManagerApi.Accounts.User do
     |> validate_required([:username, :email])
     |> unique_constraint(:email)
   end
+
+
 end

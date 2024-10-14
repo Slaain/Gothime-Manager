@@ -25,7 +25,7 @@
               <td class="px-4 py-2">{{ `Session ${index + 1}` }}</td>
               <td class="px-4 py-2">{{ formatDateTime(wt.start) }}</td>
               <td class="px-4 py-2">{{ formatDateTime(wt.end) }}</td>
-              <td class="px-4 py-2">{{ calculateDuration(wt.start, wt.end) }}</td>
+              <td class="px-4 py-2">{{ calculateDuration(wt.total_time) }}</td>
             </tr>
             </tbody>
           </table>
@@ -46,11 +46,12 @@ export default {
     };
   },
   methods: {
-    async fetchWorkingTimes() {
+    async getWorkingTimes() {
       try {
         const userID = 1; // ID de l'utilisateur
         const response = await axios.get(`http://localhost:4000/api/workingtimes/${userID}`);
         this.workingTimes = response.data.data;
+        console.log("aled : ", this.workingTimes)
         this.loading = false;
       } catch (error) {
         console.error('Erreur lors de la récupération des working_times:', error);
@@ -61,16 +62,13 @@ export default {
       const date = new Date(datetime);
       return date.toLocaleString();
     },
-    calculateDuration(start, end) {
-      const startTime = new Date(start);
-      const endTime = new Date(end);
-      const durationMs = endTime - startTime;
-      const durationHours = (durationMs / (1000 * 60 * 60)).toFixed(2); // Convertir en heures
-      return durationHours;
+    calculateDuration(totalTimeInMinutes) {
+      const totalTimeInHours = (totalTimeInMinutes / 60).toFixed(2); // Convertir les minutes en heures
+      return totalTimeInHours;
     },
   },
   mounted() {
-    this.fetchWorkingTimes();
+    this.getWorkingTimes();
   },
 };
 </script>

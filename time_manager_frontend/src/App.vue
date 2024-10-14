@@ -10,13 +10,20 @@ import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste l
 
 <template>
   <header>
-
   </header>
 
-  <main class="">
+  <main>
     <WorkingTimeActionContainer />
-    <WorkingTimesUsersContainer />
-    <WorkingTimesChart/>
+    <AccountDetails 
+      v-if="selectedEmployeeId" 
+      :selectedEmployeeId="selectedEmployeeId" 
+      @user-updated="onUserUpdated" 
+    /> 
+    <UserList 
+      :key="userListKey"
+      :employees="userData" 
+      @show-account-details="setSelectedEmployeeId" 
+    />
   </main>
 
   <div>
@@ -26,44 +33,39 @@ import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste l
 
 
 
-<style scoped>
-header {
-  line-height: 1.5;
-}
+<script setup>
+import { ref, onMounted } from 'vue';
+import AccountDetails from './components/AccountDetails.vue';
+import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue';
+import UserList from './components/UserList.vue';
+import userService from './userService';
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
+const userID = ref(6);
+const userData = ref([]);
+const selectedEmployeeId = ref(null);
+const userListKey = ref(0);
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
-
-<script>
-export default {
-  components: {
-    WorkingTimeShow
-  },
-  data() {
-    return {
-      user_id: 1 // Exemple, remplacez-le par l'ID de l'utilisateur que vous souhaitez
-    };
-  }
+const setSelectedEmployeeId = (employeeId) => {
+  selectedEmployeeId.value = employeeId;
+  console.log(`Selected employee ID: ${employeeId}`);
 };
+  
+const onUserUpdated = () => {
+  userListKey.value += 1;
+};
+
+const fetchEmployees = () => {
+  userService.getUser(userID.value)
+    .then(user => {
+      console.log('User data:', user);
+      userData.value = user.employees || [];
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération des employés:', error);
+    });
+};
+
+onMounted(() => {
+  fetchEmployees();
+});
 </script>

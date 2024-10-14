@@ -7,7 +7,7 @@ import Dropdown from './Dropdown.vue';
     <div class="border-b">
       <!-- Bouton pour afficher le temps de travail d'un utilisateur -->
       <button @click="setFormMode('show')" 
-              :class="['focus:outline-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
+              :class="['focus:outl<ine-none m-2 border border-purple-800 bg-white focus:text-white focus:bg-purple-800 hover:bg-purple-800 hover:text-white focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2', 
               formMode === 'show' ? 'bg-purple-800 text-white' : '']">
         Afficher
       </button>
@@ -20,15 +20,30 @@ import Dropdown from './Dropdown.vue';
       <p class="mb-2">ID de l'utilisateur</p>
       <input v-model="userId" type="text" class="w-full p-2 border rounded-md" placeholder="Entrer l'ID de l'utilisateur">
       <!-- Bouton pour déclencher la récupération du workingTime -->
-
         <button @click="showWorkingTime" class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800">
           Afficher
         </button>
         <!-- Affichage des temps de travail -->
 
           <div v-if="workingTime">
-            <p><strong>Début :</strong> {{ workingTime.start }}</p>
-            <p><strong>Fin :</strong> {{ workingTime.end }}</p>
+            <table class="min-w-full bg-white">
+            <thead class="border-b">
+            <tr>
+              <th class="text-left px-4 py-2 text-gray-600">Session</th>
+              <th class="text-left px-4 py-2 text-gray-600">Start</th>
+              <th class="text-left px-4 py-2 text-gray-600">End</th>
+              <th class="text-left px-4 py-2 text-gray-600">Duration (hrs)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(wt, index) in workingTimes" :key="wt.id" class="border-b">
+              <td class="px-4 py-2">{{ `Session ${index + 1}` }}</td>
+              <td class="px-4 py-2">{{ formatDateTime(wt.start) }}</td>
+              <td class="px-4 py-2">{{ formatDateTime(wt.end) }}</td>
+              <td class="px-4 py-2">{{ calculateDuration(wt.start, wt.end) }}</td>
+            </tr>
+            </tbody>
+          </table>
           </div>
 
 
