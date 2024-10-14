@@ -1,6 +1,6 @@
 name: Elixir CI
 
-on:  #déclenche les taches sur un push ou un pull_request sur la branche main
+on:  # déclenche les taches sur un push ou un pull_request sur la branche main
   push:
     branches:
       - main
@@ -9,9 +9,9 @@ on:  #déclenche les taches sur un push ou un pull_request sur la branche main
       - main
 
 
-jobs:  #chaque job est une étape indépendante du pipeline
+jobs:  # chaque job est une étape indépendante du pipeline
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
 
     services: #démarre le conteneur
@@ -49,6 +49,7 @@ jobs:  #chaque job est une étape indépendante du pipeline
       run: |
         mix ecto.create
         mix ecto.migrate
+
 
     - name: Run tests
       env:
