@@ -23,6 +23,7 @@ defmodule TimeManagerApiWeb.Router do
     # Routes pour tester
     post "/test/:id", TestController, :update_working_time
 
+    get "/users", UserController, :paginated_users
     resources "/users", UserController, except: [:new, :edit]
 
     # Routes pour les clocks

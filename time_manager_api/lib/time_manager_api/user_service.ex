@@ -31,6 +31,25 @@ defmodule TimeManagerApi.UserService do
     |> Repo.one()
   end
 
+  def get_users(id, limit, offset) do
+    query = from(u in User,
+                 where: u.id == ^id,
+                 limit: ^limit,
+                 offset: ^offset)
+
+    Repo.all(query)
+  end
+
+  def get_paginated_employees(limit, offset) do
+    from(u in User,
+      order_by: [asc: u.id],  # Option de tri
+      limit: ^limit,
+      offset: ^offset
+    )
+    |> Repo.all()
+  end
+
+
   # Mettre à jour un utilisateur
   def update_user(%User{} = user, attrs) do
     user

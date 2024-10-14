@@ -151,8 +151,10 @@ defmodule TimeManagerApiWeb.UserController do
     limit = String.to_integer(limit)
     offset = String.to_integer(offset)
 
-    users = Accounts.get_paginated_employees(limit, offset)
-    render(conn, :index, users: users)
+    users = UserService.get_paginated_employees(limit, offset)
+    conn
+    |> put_status(:ok) # Indique que la requête a réussi
+    |> json(%{message: "Paginated users", result: true, users: users}) # Renvoyer la liste paginée d'utilisateurs
   end
 
   # Action sans offset/limit par défaut (valeurs par défaut)
