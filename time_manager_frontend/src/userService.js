@@ -14,7 +14,7 @@ export default {
   },
 
   updateUser(userID, user) {
-    return axios.put(`${API_URL}/${userID}`, { user })
+    return axios.put(`${API_URL}/${userID}`, user)
       .then(response => response.data)
       .catch(error => {
         console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
