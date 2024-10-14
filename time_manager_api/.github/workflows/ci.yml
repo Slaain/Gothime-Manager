@@ -1,6 +1,5 @@
 name: Elixir CI
 
-
 on:  #déclenche les taches sur un push ou un pull_request sur la branche main
   push:
     branches:
