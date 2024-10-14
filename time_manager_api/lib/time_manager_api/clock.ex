@@ -11,6 +11,7 @@ defmodule TimeManagerApi.Clock do
     timestamps(type: :utc_datetime)
   end
 
+
   @doc false
   def changeset(clock, attrs) do
     clock
