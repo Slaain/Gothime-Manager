@@ -8,7 +8,6 @@ on:  # déclenche les taches sur un push ou un pull_request sur la branche main
     branches:
       - main
 
-
 jobs:  # chaque job est une étape indépendante du pipeline
   build:
     runs-on: ubuntu-latest
