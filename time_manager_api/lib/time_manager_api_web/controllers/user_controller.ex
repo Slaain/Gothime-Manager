@@ -139,7 +139,6 @@ defmodule TimeManagerApiWeb.UserController do
     render(conn, :index, users: users)
   end
 
-
   # Action sans offset/limit par défaut (valeurs par défaut)
   def paginated_users(conn, _params) do
     users = Accounts.get_paginated_users(10, 0) # Par défaut, 10 utilisateurs, offset 0
