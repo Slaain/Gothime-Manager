@@ -49,6 +49,13 @@ defmodule TimeManagerApi.UserService do
     |> Repo.all()
   end
 
+  # Compte le nombre total d'utilisateurs
+  def count_users do
+    from(u in User, select: count(u.id))
+    |> Repo.one()
+  end
+
+
 
   # Mettre à jour un utilisateur
   def update_user(%User{} = user, attrs) do
