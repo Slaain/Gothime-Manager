@@ -8,9 +8,11 @@ on:  #déclenche les taches sur un push ou un pull_request sur la branche main
     branches:
       - main
 
+
 jobs:  #chaque job est une étape indépendante du pipeline
   build:
     runs-on: windows-latest
+
 
     services: #démarre le conteneur
       postgres:
@@ -31,14 +33,17 @@ jobs:  #chaque job est une étape indépendante du pipeline
     - name: Checkout the code
       uses: actions/checkout@v3
 
+
     - name: Set up Elixir
       uses: actions/setup-elixir@v1
       with:
         otp-version: '26.x'
         elixir-version: '1.15.x'
 
+
     - name: Install dependencies
       run: mix deps.get
+
 
     - name: Setup database
       run: |
