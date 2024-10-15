@@ -1,20 +1,5 @@
 import Config
-
-# Charge les variables d'environnement depuis le fichier .env
-# Dotenv.load()
-
-# Configure your database
-config :time_manager_api, TimeManagerApi.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "time_manager_api_dev",
-  port: String.to_integer(System.get_env("PGPORT") || "5432"),
-  stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
-
-
+ 
 # Logger configuration
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
