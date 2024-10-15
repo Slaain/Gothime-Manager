@@ -34,10 +34,10 @@ jobs:  # chaque job est une étape indépendante du pipeline
 
 
     - name: Set up Elixir
-      uses: actions/setup-elixir@v1
+      uses: erlef/setup-beam@v1.5
       with:
-        otp-version: '26.x'
-        elixir-version: '1.15.x'
+        otp-version: '27.0'
+        elixir-version: '1.17.3'
 
 
     - name: Install dependencies
