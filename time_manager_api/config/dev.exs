@@ -1,14 +1,14 @@
 import Config
 
 # Charge les variables d'environnement depuis le fichier .env
-Dotenv.load()
+# Dotenv.load()
 
 # Configure your database
 config :time_manager_api, TimeManagerApi.Repo,
-  username: System.get_env("PGUSER"),
-  password: System.get_env("PGPASSWORD"),
-  database: System.get_env("PGDATABASE"),
-  hostname: System.get_env("PGHOST"),
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "time_manager_api_dev",
   port: String.to_integer(System.get_env("PGPORT") || "5432"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
