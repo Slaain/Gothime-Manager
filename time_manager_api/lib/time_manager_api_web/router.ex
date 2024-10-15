@@ -31,5 +31,17 @@ defmodule TimeManagerApiWeb.Router do
 
     # Route pour les requêtes OPTIONS
     match :options, "/*_path", TimeManagerApiWeb.CORSController, :options
-  end
+
+
+  # Group routes
+  get "/groups", GroupController, :index      # Liste des groupes
+  post "/groups", GroupController, :create    # Créer un groupe
+  get "/groups/:id", GroupController, :show   # Afficher un groupe spécifique
+    delete "/groups/:id", GroupController, :delete
+
+
+    # Routes pour gérer les utilisateurs dans les groupes
+  post "/groups/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
+  delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
+end
 end
