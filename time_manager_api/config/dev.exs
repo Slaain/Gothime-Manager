@@ -1,7 +1,5 @@
 import Config
 
-# Charge les variables d'environnement depuis le fichier .env
-Dotenv.load()
 
 # Configure your database
 config :time_manager_api, TimeManagerApi.Repo,
