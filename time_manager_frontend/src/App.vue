@@ -1,76 +1,140 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import WorkingTimeShow from './components/WorkingTimeShow.vue';
-import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue'
-import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue'
-import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste le chemin si nécessaire
-
-
-</script>
-
 <template>
-  <header></header>
-  <main>
-    <!-- Pass the userID and listen for updates -->
-    <UserList
-      :key="userListKey"
-      :employees="userData"
-      :userID="userID"
-      @updateUserId="updateUserId"
-      @fetchEmployees="fetchEmployees"
-    />
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-gray-900 text-white">
+      <div class="logo flex items-center justify-center py-6">
+        <img src="./assets/avatar.png" alt="Vue Logo" class="w-12 h-12">
+      </div>
+      <nav class="nav flex flex-col space-y-4 text-center">
+        <button class="p-2 rounded-md bg-green-600 hover:bg-green-700">Dashboard</button>
+        <button class="p-2 rounded-md bg-gray-700 hover:bg-gray-800">Charts</button>
+        <button class="p-2 rounded-md bg-gray-700 hover:bg-gray-800">Users</button>
+        <button class="p-2 rounded-md bg-gray-700 hover:bg-gray-800">Settings</button>
+      </nav>
+    </aside>
 
-    <!-- Pass the selected user ID to other child components -->
-    <WorkingTimesUsersContainer :userID="userID" />
-    <!-- <Test :testValue="userID" /> -->
-  </main>
+    <!-- Main Content -->
+    <main class="main-content flex-1 bg-gray-800 p-6">
+      <!-- Header -->
+      <header class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-white">Dashboard</h1>
+        <div class="user-info text-white flex items-center space-x-4">
+          <span>ADMIN</span>
+          <img src="./assets/avatar.png" alt="User Avatar" class="w-10 h-10 rounded-full">
+        </div>
+      </header>
 
-  <div>
-    <WorkingTimeShow :userId="user_id" />
+      <!-- LineChart Section -->
+      <section class="line-chart bg-gray-700 p-6 rounded-lg shadow-lg mb-6">
+        <h2 class="text-xl text-white mb-4">Working Hours Line Chart</h2>
+        <LineChart />
+      </section>
+
+      <!-- Charts Section -->
+      <section class="charts grid grid-cols-3 gap-6 mb-6">
+        <div class="chart bg-gray-700 p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl text-white mb-4">Performance</h2>
+          <div class="h-40">
+            <apexchart :options="chartOptions" :series="series"></apexchart>
+          </div>
+        </div>
+
+        <div class="chart bg-gray-700 p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl text-white mb-4">Monthly Stats</h2>
+          <div class="h-40">
+            <apexchart :options="chartOptions" :series="series"></apexchart>
+          </div>
+        </div>
+
+        <div class="chart bg-gray-700 p-4 rounded-lg shadow-lg">
+          <h2 class="text-xl text-white mb-4">Comparison</h2>
+          <div class="h-40">
+            <apexchart :options="chartOptions" :series="series"></apexchart>
+          </div>
+        </div>
+      </section>
+
+      <!-- Users List Section -->
+      <section class="users p-0">
+        <h2 class="text-xl text-white mb-4">Users List</h2>
+        <div class="overflow-x-auto">
+          <UserList />
+        </div>
+      </section>
+    </main>
   </div>
 </template>
 
+<script>
+import UserList from './components/UserList.vue';  // Import de ton composant personnalisé
+import LineChart from './components/LineChart.vue';  // Import du nouveau composant LineChart
 
+export default {
+  name: "Dashboard",
+  components: {
+    UserList,  // Enregistrement du composant
+    LineChart, // Enregistrement du LineChart
+  },
+  data() {
+    return {
+      chartOptions: {
+        chart: {
+          id: 'basic-bar',
+        },
+        xaxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        },
+      },
+      series: [{
+        name: "series-1",
+        data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
+      }],
+    };
+  },
 
-<script setup>
-import { ref, onMounted } from "vue";
-import UserList from "./components/UserList.vue";
-import WorkingTimeActionContainer from "./components/WorkingTimeActionContainer.vue";
-import WorkingTimesUsersContainer from "./components/WorkingTimesUsersContainer.vue";
-import Test from "./components/Test.vue";
-import userService from "./userService";
-
-// Define the user ID to pass to children
-const userID = ref(null); // Will be updated by the UserList selection
-const workingTimeID = ref(null); // Will be updated by the WorkingTimesUsersContainer selection
-const userData = ref([]); // List of users
-const userListKey = ref(0); // To trigger re-rendering when user data changes
-
-// Method to handle updating the selected user ID from UserList
-const updateUserId = (newId) => {
-  userID.value = newId;
-  console.log(`Updated userID in parent: ${userID.value}`);
 };
-
-// Method to handle updating the selected working time ID from WorkingTimesUsersContainer
-const updateWorkingTimeId = (newId) => {
-  workingTimeID.value = newId;
-  console.log(`Updated workingTimeID in parent: ${workingTimeID.value}`);
-};
-
-// Fetch user data from API
-const fetchEmployees = () => {
-  userService
-    .getUsers()
-    .then((response) => {
-      userData.value = response.data || [];
-    })
-    .catch((error) => {
-      console.error("Error fetching employees:", error);
-    });
-};
-
-onMounted(() => {
-  fetchEmployees();
-});
 </script>
+
+<style scoped>
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #2D3748;
+  padding: 20px;
+}
+
+.main-content {
+  flex: 1;
+  background-color: #1A202C;
+  padding: 20px;
+}
+
+.chart {
+  background-color: #2D3748;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.line-chart {
+  background-color: #2D3748;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%; /* Prendre toute la largeur */
+}
+
+table {
+  width: 100%;
+}
+
+table thead th {
+  padding-bottom: 10px;
+}
+
+table tbody td {
+  padding: 10px 0;
+}
+</style>

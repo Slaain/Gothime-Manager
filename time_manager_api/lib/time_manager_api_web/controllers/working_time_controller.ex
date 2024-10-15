@@ -11,6 +11,13 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
 
   action_fallback TimeManagerApiWeb.FallbackController
 
+  # GET /api/workingtimes
+  def index(conn, _params) do
+    working_times = Repo.all(WorkingTime)
+    render(conn, "index.json", workingtimes: working_times)
+  end
+
+
   # GET (ALL): /api/workingtime/:userID?start=XXX&end=YYY
   def index(conn, %{"userID" => user_id, "start" => start, "end" => end_time}) do
     workingtimes = Timesheet.list_workingtimes_for_user_in_range(user_id, start, end_time)
@@ -30,7 +37,6 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
     # Rendre la réponse JSON avec les informations de chaque working_time et utilisateur
     render(conn, "get_all.json", workingtimes: working_times_with_user_info)
   end
-
 
   # POST: /api/workingtime/:userID
   # Exemple de body de requête POST
