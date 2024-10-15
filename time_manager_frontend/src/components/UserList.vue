@@ -185,11 +185,17 @@
               <th
                 class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
               ></th>
+              <th
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+              ></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(employee, index) in employees" :key="index">
-              <td class="p-4 border-b border-slate-200">
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-slate-200': employee.id === userID }"
+              >
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
                     <p class="text-sm font-semibold text-slate-700">
@@ -199,12 +205,18 @@
                   </div>
                 </div>
               </td>
-              <td class="p-4 border-b border-slate-200">
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-slate-200': employee.id === userID }"
+              >
                 <p class="text-sm text-slate-500">
                   {{ employee.status || "N/A" }}
                 </p>
               </td>
-              <td class="p-4 border-b border-slate-200">
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-slate-200': employee.id === userID }"
+              >
                 <button
                   @click.stop="
                     openUpdateUserModal(
@@ -218,12 +230,26 @@
                   Edit
                 </button>
               </td>
-              <td class="p-4 border-b border-slate-200">
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-slate-200': employee.id === userID }"
+              >
                 <button
                   @click.stop="openUserDeleteModal(employee.id)"
                   class="text-sm text-red-600 hover:underline"
                 >
                   Delete
+                </button>
+              </td>
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-slate-200': employee.id === userID }"
+              >
+                <button
+                  @click.stop="$emit('updateUserId', employee.id)"
+                  class="text-sm text-green-600 hover:underline"
+                >
+                  Select
                 </button>
               </td>
             </tr>
@@ -262,15 +288,16 @@ import userService from "../userService";
 import { useToast } from "vue-toastification";
 import CreateUserModal from "./modal/CreateUserModal.vue";
 
-// Propriété réactive pour contrôler la visibilité de la modale
-
 // Méthode pour ouvrir la modale
 
 export default {
+  props: ["userID"],
+  emits: ["updateUserId", "fetchEmployees"],
   setup() {
     const toast = useToast();
     return { toast };
   },
+
   name: "EmployeeList",
   data() {
     return {
@@ -328,7 +355,11 @@ export default {
       this.error = "";
       this.showUpdateUserModal = false;
     },
-
+    selectUser(id) {
+      this.selectedUserId = id;
+      console.log("Selected user ID:", this.selectedUserId);
+      // console.log("userId : ", userID);
+    },
     // params in english
     showSuccessToast(message = "Successful operation") {
       this.toast.success(message);
@@ -348,8 +379,6 @@ export default {
       console.log("this.$toast : ", this.$toast);
 
       if (userData.user.username === "" || userData.user.email === "") {
-        // alert("Please fill in all fields.");
-        // this.showErrorToast("Please fill in all fields.");
         this.error = "Please fill in all fields.";
         return;
       }
@@ -364,14 +393,12 @@ export default {
           this.newUser.email = "";
           this.error = "";
           this.showCreateUserModal = false;
-          console.log("User created successfully:", response);
+          this.fetchEmployees();
 
           if (response.result) {
             // succes toaster
             this.showSuccessToast(response.message);
           } else {
-            // error toaster
-            // this.showErrorToast(response.message);
             this.error = response.message;
           }
         })

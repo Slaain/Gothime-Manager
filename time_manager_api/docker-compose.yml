@@ -1,8 +1,8 @@
-version: '3.8'
+version: '4.8'
 
 services:
   db:
-    image: postgres:14
+    image: postgres:latest
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres  # Correspond au fichier dev.exs

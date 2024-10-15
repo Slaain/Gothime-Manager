@@ -56,6 +56,19 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
       |> halt()
     end
 
+         # Ajouter les secondes si elles sont absentes
+  start_time = if String.length(start_time) == 16 do
+    start_time <> ":00Z"
+  else
+    start_time
+  end
+
+  end_time = if String.length(end_time) == 16 do
+    end_time <> ":00Z"
+  else
+    end_time
+  end
+
     # Vérifier si le paramètre start est au bon format
     case NaiveDateTime.from_iso8601(start_time) do
       {:ok, _} -> :ok  # Continue si c'est au bon format
@@ -106,6 +119,7 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
       start_time = params["start"]
       end_time = params["end"]
 
+
       # Vérifier si les paramètres start et end sont présents
       if is_nil(start_time) or is_nil(end_time) do
         conn
@@ -113,6 +127,19 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
         |> json(%{message: "Les paramètres start et end sont requis"})
         |> halt()
       end
+
+      # Ajouter les secondes si elles sont absentes
+  start_time = if String.length(start_time) == 16 do
+    start_time <> ":00Z"
+  else
+    start_time
+  end
+
+  end_time = if String.length(end_time) == 16 do
+    end_time <> ":00Z"
+  else
+    end_time
+  end
 
       # Vérifier si le paramètre start est au bon format
       case NaiveDateTime.from_iso8601(start_time) do

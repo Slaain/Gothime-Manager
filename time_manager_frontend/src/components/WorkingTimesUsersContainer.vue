@@ -1,7 +1,18 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
-      <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">Working Times Overview</h2>
+  <div
+    class="flex flex-col items-center justify-center min-h-screen bg-gray-100"
+  >
+    <div class="relative w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
+      <h2 class="mb-6 text-3xl font-semibold text-center text-gray-800">
+        Working Times Overview
+      </h2>
+
+      <button
+        @click="openCreateWorkingtimeModal"
+        class="absolute px-4 py-2 text-white bg-blue-500 rounded-md top-2 right-2 hover:bg-blue-600"
+      >
+        Add Working Time
+      </button>
 
       <div v-if="loading" class="text-center text-gray-500">Loading...</div>
 
@@ -13,48 +24,210 @@
         <div v-else>
           <table class="min-w-full bg-white">
             <thead class="border-b">
-            <tr>
-              <th class="text-left px-4 py-2 text-gray-600">Session</th>
-              <th class="text-left px-4 py-2 text-gray-600">Start</th>
-              <th class="text-left px-4 py-2 text-gray-600">End</th>
-              <th class="text-left px-4 py-2 text-gray-600">Duration (hrs)</th>
-            </tr>
+              <tr>
+                <th class="px-4 py-2 text-left text-gray-600">
+                  Session {{ userID }}
+                </th>
+                <th class="px-4 py-2 text-left text-gray-600">Start</th>
+                <th class="px-4 py-2 text-left text-gray-600">End</th>
+                <th class="px-4 py-2 text-left text-gray-600">
+                  Duration (hrs)
+                </th>
+                <th class="px-4 py-2 text-left text-gray-600"></th>
+                <th class="px-4 py-2 text-left text-gray-600"></th>
+              </tr>
             </thead>
             <tbody>
-            <tr v-for="(wt, index) in workingTimes" :key="wt.id" class="border-b">
-              <td class="px-4 py-2">{{ `Session ${index + 1}` }}</td>
-              <td class="px-4 py-2">{{ formatDateTime(wt.start) }}</td>
-              <td class="px-4 py-2">{{ formatDateTime(wt.end) }}</td>
-              <td class="px-4 py-2">{{ calculateDuration(wt.total_time) }}</td>
-            </tr>
+              <tr
+                v-for="(wt, index) in workingTimes"
+                :key="wt.id"
+                class="border-b"
+              >
+                <td class="px-4 py-2">{{ `Session ${index + 1}` }}</td>
+                <td class="px-4 py-2">{{ formatDateTime(wt.start) }}</td>
+                <td class="px-4 py-2">{{ formatDateTime(wt.end) }}</td>
+                <td class="px-4 py-2">
+                  {{ calculateDuration(wt.total_time) }}
+                </td>
+                <td class="px-4 py-2">
+                  <button
+                    @click="openUpdateWorkingtimeModal(wt.id)"
+                    class="px-4 text-sm text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    @click.stop="openDeleteWorkingtimeModal(wt.id)"
+                    class="px-4 py-2 text-sm text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- Modal to update working time -->
+    <div
+      v-if="showUpdateWorkingtimeModal"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="px-12 py-4 bg-white">
+        <h2 class="mb-4 text-lg font-bold">Modifier le temps de travail</h2>
+        <!-- Dropdown et input pour la modification -->
+        <p class="mb-2">User</p>
+        <Dropdown class="w-full" />
+        <div class="w-full">
+          <p>Start time</p>
+          <input
+            type="datetime-local"
+            v-model="startTime"
+            class="w-full px-2 py-2 border border-black rounded-lg"
+          />
+        </div>
+        <div class="w-full">
+          <p>End time</p>
+          <input
+            type="datetime-local"
+            v-model="endTime"
+            class="w-full px-2 py-2 border border-black rounded-lg"
+          />
+        </div>
+        <button
+          @click="updateWorkingTime"
+          class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800"
+        >
+          Update
+        </button>
+        <button
+          @click="closeUpdateWorkingtimeModal"
+          class="w-full px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal to delete working time -->
+    <div
+      v-if="showDeleteWorkingtimeModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="w-1/2 px-8 py-4 bg-white">
+        <p class="text-xl font-extrabold text-zinc-950">Delete Working Time</p>
+        <p>Are you sure you want to delete this working time?</p>
+        <button
+          @click="deleteWorkingTime"
+          class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
+        >
+          Delete
+        </button>
+        <button
+          @click="closeDeleteWorkingtimeModal"
+          class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal to create working time -->
+    <div
+      v-if="showCreateWorkingtimeModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="w-1/2 px-8 py-4 bg-white">
+        <h2 class="mb-4 text-lg font-bold">Add Working Time</h2>
+        <!-- Dropdown and input for creation -->
+        <h2 class="mb-4 text-lg font-bold">Modifier le temps de travail</h2>
+        <!-- Dropdown et input pour la modification -->
+        <p class="mb-2">User</p>
+        <Dropdown class="w-full" />
+        <div class="w-full">
+          <p>Start time</p>
+          <input
+            type="datetime-local"
+            v-model="startTime"
+            class="w-full px-2 py-2 border border-black rounded-lg"
+          />
+        </div>
+        <div class="w-full">
+          <p>End time</p>
+          <input
+            type="datetime-local"
+            v-model="endTime"
+            class="w-full px-2 py-2 border border-black rounded-lg"
+          />
+        </div>
+        <button
+          @click="createWorkingTime"
+          class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800"
+        >
+          Create
+        </button>
+        <button
+          @click="closeCreateWorkingtimeModal"
+          class="w-full px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
+import { useToast } from "vue-toastification";
 
 export default {
+  props: ["userID"],
+
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
+
   data() {
     return {
       workingTimes: [],
       loading: true,
+      showUpdateWorkingtimeModal: false,
+      showDeleteWorkingtimeModal: false,
+      startTime: "", // Variable pour l'heure de début
+      endTime: "", // Variable pour l'heure de fin
+      showCreateWorkingtimeModal: false,
+      selectedWorkingTimeID: null,
     };
+  },
+  watch: {
+    userID(newUserID) {
+      if (newUserID) {
+        console.log("UserID a changé :", newUserID);
+        // console.log("this.userID : ", this.userID);
+
+        this.getWorkingTimes(); // Appel de la méthode pour mettre à jour les données
+      }
+    },
   },
   methods: {
     async getWorkingTimes() {
+      console.log("allo : ", this.userID);
       try {
-        const userID = 1; // ID de l'utilisateur
-        const response = await axios.get(`http://localhost:4000/api/workingtimes/${userID}`);
+        const response = await axios.get(
+          `http://localhost:4000/api/workingtimes/${this.userID}`
+        );
         this.workingTimes = response.data.data;
-        console.log("aled : ", this.workingTimes)
+        console.log("aled : ", this.workingTimes);
         this.loading = false;
       } catch (error) {
-        console.error('Erreur lors de la récupération des working_times:', error);
+        console.error(
+          "Erreur lors de la récupération des working_times:",
+          error
+        );
         this.loading = false;
       }
     },
@@ -62,9 +235,128 @@ export default {
       const date = new Date(datetime);
       return date.toLocaleString();
     },
+    deleteWorkingTime() {
+      axios
+        .delete(
+          `http://localhost:4000/api/workingtime/${this.selectedWorkingTimeID}`
+        )
+        .then((response) => {
+          console.log("Réponse :", response.data);
+          this.toast.success(response.data.message);
+          this.getWorkingTimes();
+          this.closeDeleteWorkingtimeModal();
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la requête :", error);
+        });
+    },
     calculateDuration(totalTimeInMinutes) {
       const totalTimeInHours = (totalTimeInMinutes / 60).toFixed(2); // Convertir les minutes en heures
       return totalTimeInHours;
+    },
+    createWorkingTime() {
+      // Ajouter ici la logique pour ajouter un temps de travail
+      console.log("start time: ", this.startTime);
+      console.log("end time: ", this.endTime);
+
+      axios
+        .post(
+          `http://localhost:4000/api/workingtime/${this.userID}`,
+          {
+            start: this.startTime,
+            end: this.endTime,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json", // Assurez-vous que c'est compatible avec ce que votre serveur attend
+            },
+          }
+        )
+        .then((response) => {
+          console.log("Réponse :", response.data);
+          this.toast.success(response.data.message);
+          this.getWorkingTimes();
+          this.closeCreateWorkingtimeModal();
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la requête :", error);
+        });
+    },
+    updateWorkingTime() {
+      // Ajouter ici la logique pour modifier un temps de travail
+
+      console.log("start time: ", this.startTime);
+
+      axios
+        .put(
+          `http://localhost:4000/api/workingtime/${this.selectedWorkingTimeID}`,
+          {
+            start: this.startTime,
+            end: this.endTime,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json", // Assurez-vous que c'est compatible avec ce que votre serveur attend
+            },
+          }
+        )
+        .then((response) => {
+          console.log("Réponse :", response.data);
+          this.toast.success(response.data.message);
+          this.getWorkingTimes();
+          this.closeUpdateWorkingtimeModal();
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la requête :", error);
+        });
+    },
+    getWorkingTime() {
+      console.log("getWorkingTime : ", this.userID);
+
+      axios
+        .get(
+          `http://localhost:4000/api/workingtime/${this.userID}/${this.selectedWorkingTimeID}`
+        )
+        .then((response) => {
+          // Assigner les données reçues à startTime et endTime
+          const workingTimeData = response.data;
+
+          console.log("Données récupérées :", workingTimeData.data);
+
+          this.startTime = workingTimeData.data.start;
+          this.endTime = workingTimeData.data.end;
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la requête :", error);
+        });
+    },
+    openUpdateWorkingtimeModal(workingTimeID) {
+      this.showUpdateWorkingtimeModal = true;
+      this.selectedWorkingTimeID = workingTimeID;
+      this.getWorkingTime();
+    },
+    openDeleteWorkingtimeModal(workingTimeID) {
+      this.showDeleteWorkingtimeModal = true;
+      this.selectedWorkingTimeID = workingTimeID;
+    },
+    openCreateWorkingtimeModal() {
+      this.showCreateWorkingtimeModal = true;
+    },
+    closeUpdateWorkingtimeModal() {
+      this.showUpdateWorkingtimeModal = false;
+      this.selectedWorkingTimeID = null;
+      this.startTime = "";
+      this.endTime = "";
+    },
+    closeDeleteWorkingtimeModal() {
+      this.showDeleteWorkingtimeModal = false;
+      this.selectedWorkingTimeID = null;
+    },
+    closeCreateWorkingtimeModal() {
+      this.showCreateWorkingtimeModal = false;
+      this.selectedWorkingTimeID = null;
+      this.startTime = "";
+      this.endTime = "";
     },
   },
   mounted() {

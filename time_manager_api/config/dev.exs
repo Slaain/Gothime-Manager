@@ -1,14 +1,19 @@
 import Config
 
+# Charge les variables d'environnement depuis le fichier .env
+Dotenv.load()
+
 # Configure your database
 config :time_manager_api, TimeManagerApi.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "time_manager_api_dev",
+  username: System.get_env("PGUSER"),
+  password: System.get_env("PGPASSWORD"),
+  database: System.get_env("PGDATABASE"),
+  hostname: System.get_env("PGHOST"),
+  port: String.to_integer(System.get_env("PGPORT") || "5432"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
+
 
 # Logger configuration
 config :logger, :console,
@@ -18,6 +23,8 @@ config :logger, :console,
 
 # Configuration du serveur Phoenix
 config :time_manager_api, TimeManagerApiWeb.Endpoint,
+  # Binding to loopback ipv4 address prevents access from other machines.
+  # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
   check_origin: false,
   code_reloader: true,
