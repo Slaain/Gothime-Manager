@@ -53,7 +53,8 @@ defmodule TimeManagerApi.MixProject do
       {:gettext, "~> 0.26.1"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+       {:dotenv, "~> 3.0", only: [:dev, :test]}
     ]
   end
 
