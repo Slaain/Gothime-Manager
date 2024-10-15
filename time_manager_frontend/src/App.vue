@@ -1,3 +1,13 @@
+<script setup>
+import HelloWorld from './components/HelloWorld.vue'
+import WorkingTimeShow from './components/WorkingTimeShow.vue';
+import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue'
+import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue'
+import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste le chemin si nécessaire
+
+
+</script>
+
 <template>
   <header></header>
   <main>
@@ -14,7 +24,13 @@
     <WorkingTimesUsersContainer :userID="userID" />
     <!-- <Test :testValue="userID" /> -->
   </main>
+
+  <div>
+    <WorkingTimeShow :userId="user_id" />
+  </div>
 </template>
+
+
 
 <script setup>
 import { ref, onMounted } from "vue";

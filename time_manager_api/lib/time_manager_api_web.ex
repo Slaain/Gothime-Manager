@@ -30,6 +30,10 @@ defmodule TimeManagerApiWeb do
     end
   end
 
+  use Gettext.Backend, otp_app: :time_manager_api
+
+
+
   def channel do
     quote do
       use Phoenix.Channel
