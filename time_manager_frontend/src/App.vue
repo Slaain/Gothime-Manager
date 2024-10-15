@@ -1,13 +1,3 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import WorkingTimeShow from './components/WorkingTimeShow.vue';
-import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue'
-import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue'
-import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste le chemin si nécessaire
-
-
-</script>
-
 <template>
   <header></header>
   <main>
