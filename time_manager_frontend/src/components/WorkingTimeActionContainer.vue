@@ -26,7 +26,7 @@ import Dropdown from "./Dropdown.vue";
           formMode === 'update' ? 'bg-purple-800 text-white' : '',
         ]"
       >
-        Modifier
+        Update
       </button>
     </div>
 
@@ -97,6 +97,12 @@ import Dropdown from "./Dropdown.vue";
         >
           Modifier
         </button>
+        <button
+          @click="setFormMode('')"
+          class="w-full px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   </div>
@@ -108,6 +114,7 @@ import Dropdown from "./Dropdown.vue";
 import axios from "axios";
 
 export default {
+  props: ["userID", "workingTimeID"],
   data() {
     return {
       userId: "", // Il faudra recuperer l'id de l'utilisateur selectionné

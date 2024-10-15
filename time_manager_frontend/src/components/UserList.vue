@@ -199,7 +199,7 @@
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
                     <p class="text-sm font-semibold text-slate-700">
-                      {{ employee.username }} ({{ employee.id }}) ({{ userID }})
+                      {{ employee.username }}
                     </p>
                     <p class="text-sm text-slate-500">{{ employee.email }}</p>
                   </div>
@@ -259,7 +259,6 @@
       <div class="flex items-center justify-between p-3">
         <p class="block text-sm text-slate-500">
           Page {{ currentPage }} of {{ totalPages }} ({{ totalUsers }} users)
-          {{ userID }}
         </p>
         <div class="flex gap-1">
           <button
@@ -293,7 +292,7 @@ import CreateUserModal from "./modal/CreateUserModal.vue";
 
 export default {
   props: ["userID"],
-  emits: ["updateUserId"],
+  emits: ["updateUserId", "fetchEmployees"],
   setup() {
     const toast = useToast();
     return { toast };
@@ -394,7 +393,7 @@ export default {
           this.newUser.email = "";
           this.error = "";
           this.showCreateUserModal = false;
-          console.log("User created successfully:", response);
+          this.fetchEmployees();
 
           if (response.result) {
             // succes toaster

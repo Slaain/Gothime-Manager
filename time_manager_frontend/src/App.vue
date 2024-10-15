@@ -7,10 +7,10 @@
       :employees="userData"
       :userID="userID"
       @updateUserId="updateUserId"
+      @fetchEmployees="fetchEmployees"
     />
 
     <!-- Pass the selected user ID to other child components -->
-    <!-- <WorkingTimeActionContainer :user-id="userID" /> -->
     <WorkingTimesUsersContainer :userID="userID" />
     <!-- <Test :testValue="userID" /> -->
   </main>
@@ -26,6 +26,7 @@ import userService from "./userService";
 
 // Define the user ID to pass to children
 const userID = ref(null); // Will be updated by the UserList selection
+const workingTimeID = ref(null); // Will be updated by the WorkingTimesUsersContainer selection
 const userData = ref([]); // List of users
 const userListKey = ref(0); // To trigger re-rendering when user data changes
 
@@ -33,6 +34,12 @@ const userListKey = ref(0); // To trigger re-rendering when user data changes
 const updateUserId = (newId) => {
   userID.value = newId;
   console.log(`Updated userID in parent: ${userID.value}`);
+};
+
+// Method to handle updating the selected working time ID from WorkingTimesUsersContainer
+const updateWorkingTimeId = (newId) => {
+  workingTimeID.value = newId;
+  console.log(`Updated workingTimeID in parent: ${workingTimeID.value}`);
 };
 
 // Fetch user data from API
