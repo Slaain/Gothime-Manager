@@ -22,12 +22,42 @@ defmodule TimeManagerApi.WorkingTimeService do
     |> Repo.one()
   end
 
-  # Modifier un working_time existant
-  def update_working_time(%WorkingTime{} = working_time, attrs) do
+  # Recuperer un working_time par son id
+  def get_working_time_by_id(id) do
+    WorkingTime
+    |> where([wt], wt.id == ^id)
+    |> Repo.one()
+  end
+
+  # Modifier un working_time existant SANS START
+  def update_working_time_without_start_attr(%WorkingTime{} = working_time, attrs) do
+    IO.inspect(attrs, label: "Attributes")
+
+    IO.inspect(working_time, label: "Working Time")
+    # Récupérer le total_time
+
     total_time = NaiveDateTime.diff(attrs["end"], working_time.start, :minute)
 
     # Mettre à jour le total_time
     attrs = Map.put(attrs, "total_time", total_time)
+    working_time
+    |> WorkingTime.changeset(attrs)
+    |> Repo.update()
+  end
+
+  # Modifier un working_time existant
+  def update_working_time(%WorkingTime{} = working_time, attrs) do
+    IO.inspect(attrs, label: "Attributes")
+
+    IO.inspect(working_time, label: "Working Time")
+    # Récupérer le total_time
+
+    if(attrs["total_time"] == nil) do
+      total_time = NaiveDateTime.diff(attrs["end"], attrs["start"], :minute)
+      attrs = Map.put(attrs, "total_time", total_time)
+    end
+
+    # Mettre à jour le total_time
     working_time
     |> WorkingTime.changeset(attrs)
     |> Repo.update()
@@ -38,6 +68,11 @@ defmodule TimeManagerApi.WorkingTimeService do
     %WorkingTime{}
     |> WorkingTime.changeset(attrs)
     |> Repo.insert()
+  end
+
+  # Supprimer un working_time
+  def delete_working_time(%WorkingTime{} = working_time) do
+    Repo.delete(working_time)
   end
 
 

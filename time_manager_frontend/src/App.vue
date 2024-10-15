@@ -1,55 +1,72 @@
-<template>
-  <header>
-  </header>
+<script setup>
+import HelloWorld from './components/HelloWorld.vue'
+import WorkingTimeShow from './components/WorkingTimeShow.vue';
+import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue'
+import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue'
+import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste le chemin si nécessaire
 
+
+</script>
+
+<template>
+  <header></header>
   <main>
-    <WorkingTimeActionContainer />
-    <WorkingTimesUsersContainer />
-    <WorkingTimesChart/>
-    <AccountDetails 
-      v-if="selectedEmployeeId" 
-      :selectedEmployeeId="selectedEmployeeId" 
-      @user-updated="onUserUpdated" 
-    /> 
-    <UserList 
+    <!-- Pass the userID and listen for updates -->
+    <UserList
       :key="userListKey"
-      :employees="userData" 
-      @show-account-details="setSelectedEmployeeId" 
+      :employees="userData"
+      :userID="userID"
+      @updateUserId="updateUserId"
+      @fetchEmployees="fetchEmployees"
     />
+
+    <!-- Pass the selected user ID to other child components -->
+    <WorkingTimesUsersContainer :userID="userID" />
+    <!-- <Test :testValue="userID" /> -->
   </main>
+
+  <div>
+    <WorkingTimeShow :userId="user_id" />
+  </div>
 </template>
 
+
+
 <script setup>
-import { ref, onMounted } from 'vue';
-import AccountDetails from './components/AccountDetails.vue';
-import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue';
-import WorkingTimesChart from "@/components/WorkingTimesChart.vue";
-import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue';
-import UserList from './components/UserList.vue';
-import userService from './userService';
+import { ref, onMounted } from "vue";
+import UserList from "./components/UserList.vue";
+import WorkingTimeActionContainer from "./components/WorkingTimeActionContainer.vue";
+import WorkingTimesUsersContainer from "./components/WorkingTimesUsersContainer.vue";
+import Test from "./components/Test.vue";
+import userService from "./userService";
 
-const userID = ref(6);
-const userData = ref([]);
-const selectedEmployeeId = ref(null);
-const userListKey = ref(0);
+// Define the user ID to pass to children
+const userID = ref(null); // Will be updated by the UserList selection
+const workingTimeID = ref(null); // Will be updated by the WorkingTimesUsersContainer selection
+const userData = ref([]); // List of users
+const userListKey = ref(0); // To trigger re-rendering when user data changes
 
-const setSelectedEmployeeId = (employeeId) => {
-  selectedEmployeeId.value = employeeId;
-  console.log(`Selected employee ID: ${employeeId}`);
-};
-  
-const onUserUpdated = () => {
-  userListKey.value += 1;
+// Method to handle updating the selected user ID from UserList
+const updateUserId = (newId) => {
+  userID.value = newId;
+  console.log(`Updated userID in parent: ${userID.value}`);
 };
 
+// Method to handle updating the selected working time ID from WorkingTimesUsersContainer
+const updateWorkingTimeId = (newId) => {
+  workingTimeID.value = newId;
+  console.log(`Updated workingTimeID in parent: ${workingTimeID.value}`);
+};
+
+// Fetch user data from API
 const fetchEmployees = () => {
-  userService.getUser(userID.value)
-    .then(user => {
-      console.log('User data:', user);
-      userData.value = user.employees || [];
+  userService
+    .getUsers()
+    .then((response) => {
+      userData.value = response.data || [];
     })
-    .catch(error => {
-      console.error('Erreur lors de la récupération des employés:', error);
+    .catch((error) => {
+      console.error("Error fetching employees:", error);
     });
 };
 

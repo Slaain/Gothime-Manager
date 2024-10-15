@@ -10,6 +10,7 @@ defmodule TimeManagerApi.WorkingTime do
     timestamps(type: :utc_datetime)
   end
 
+
   def changeset(working_time, attrs) do
     working_time
     |> cast(attrs, [:start, :end, :user_id, :total_time])

@@ -33,7 +33,7 @@ defmodule TimeManagerApiWeb.ClockController do
       new_working_time_created = case last_working_time do
         %WorkingTime{start: _start, end: nil} ->
           # Si un working_time est en cours, mettre à jour l'heure de fin et basculer le statut de la clock
-          WorkingTimeService.update_working_time(last_working_time, %{"end" => truncated_time})
+          WorkingTimeService.update_working_time_without_start_attr(last_working_time, %{"end" => truncated_time})
           ClockService.toggle_status(clock)
           false  # Aucun nouveau working_time créé
 
