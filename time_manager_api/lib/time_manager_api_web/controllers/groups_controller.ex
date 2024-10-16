@@ -90,4 +90,29 @@ defmodule TimeManagerApiWeb.GroupController do
           |> json(%{message: "Error deleting group"})
       end
     end
+  def update(conn, %{"id" => id, "group" => group_params}) do
+    group = Repo.get!(Group, id)
+
+    changeset =
+      group
+      |> Group.changeset(%{
+        name: Map.get(group_params, "name", group.name),
+        start_date: Map.get(group_params, "start_date", group.start_date),
+        end_date: Map.get(group_params, "end_date", group.end_date)
+      })
+
+    case Repo.update(changeset) do
+      {:ok, updated_group} ->
+        conn
+        |> put_status(:ok)
+        |> json(%{group: %{id: updated_group.id, name: updated_group.name, start_date: updated_group.start_date, end_date: updated_group.end_date}})
+
+      {:error, changeset} ->
+        errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, _opts} -> msg end)
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{errors: errors})
+    end
   end
+
+end
