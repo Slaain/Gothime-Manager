@@ -194,7 +194,7 @@
             <tr v-for="(employee, index) in employees" :key="index">
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
@@ -205,7 +205,10 @@
                   </div>
                 </div>
               </td>
-              <td class="p-4 border-b border-slate-200">
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
+              >
                 <!-- Toggle button for Clock In/Out -->
                 <label class="switch">
                   <input
@@ -218,7 +221,7 @@
               </td>
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <button
                   @click.stop="
@@ -235,7 +238,7 @@
               </td>
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <button
                   @click.stop="openUserDeleteModal(employee.id)"
@@ -246,10 +249,10 @@
               </td>
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <button
-                  @click.stop="$emit('updateUserId', employee.id)"
+                  @click.stop="selectUser(employee.id)"
                   class="text-sm text-green-600 hover:underline"
                 >
                   Select
@@ -380,6 +383,11 @@ export default {
     },
 
     selectUser(id) {
+      this.$emit("updateUserId", id);
+      if (this.selectedUserId === id) {
+        this.selectedUserId = null;
+        return;
+      }
       this.selectedUserId = id;
       console.log("Selected user ID:", this.selectedUserId);
       // console.log("userId : ", userID);
@@ -600,6 +608,7 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(14px);
 }
+
 .glassmorphism-bg-white {
   position: relative;
   background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */

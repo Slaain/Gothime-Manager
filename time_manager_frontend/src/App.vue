@@ -71,13 +71,10 @@
           </div>
         </section>
 
-        <section
-          v-if="selectedUserId"
-          class="p-6 mt-6 bg-gray-700 rounded-lg shadow-lg working-time-container"
-        >
-          <h2 class="mb-4 text-xl text-white">
+        <section v-if="selectedUserId" class="w-full mt-6">
+          <!-- <h2 class="mb-4 text-xl text-white">
             Working Times for User {{ selectedUserId }}
-          </h2>
+          </h2> -->
           <WorkingTimeUserContainer :userID="selectedUserId" />
         </section>
       </main>
