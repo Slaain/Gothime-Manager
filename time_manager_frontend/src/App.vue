@@ -41,16 +41,17 @@
           <LineChart />
         </section>
 
+
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
-            <h2 class="mb-4 text-xl text-white">Performance</h2>
+            <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
             <div class="h-40">
               <apexchart :options="chartOptions" :series="series"></apexchart>
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
-            <h2 class="mb-4 text-xl text-white">Monthly Stats</h2>
+            <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
             <div class="h-40">
               <apexchart :options="chartOptions" :series="series"></apexchart>
             </div>
@@ -95,7 +96,7 @@ export default {
   components: {
     UserList, // Enregistrement du composant
     LineChart, // Enregistrement du LineChart
-    WorkingTimeUserContainer, // Enregistrement du WorkingTimeUserContainer
+    WorkingTimeUserContainer,  // Enregistrement du WorkingTimeUserContainer
   },
   data() {
     return {
