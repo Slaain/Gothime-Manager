@@ -58,9 +58,9 @@
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
-            <h2 class="mb-4 text-xl text-white">Comparison</h2>
-            <div class="h-40">
-              <apexchart :options="chartOptions" :series="series"></apexchart>
+            <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
+            <div class="h-40 flex items-center justify-center working-times-number">
+              {{ workingTimesThisMonth }}
             </div>
           </div>
         </section>
@@ -87,6 +87,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import UserList from "./components/UserList.vue"; // Import de ton composant personnalisé
 import LineChart from "./components/LineChart.vue"; // Import du nouveau composant LineChart
 import WorkingTimeUserContainer from "./components/WorkingTimesUsersContainer.vue"; // Assurez-vous d'importer ce composant
@@ -100,6 +101,7 @@ export default {
   },
   data() {
     return {
+      workingTimesThisMonth: 0, // Initialisation avec une valeur par défaut
       chartOptions: {
         chart: {
           id: "basic-bar",
@@ -130,7 +132,18 @@ export default {
       selectedUserId: null, // Variable pour stocker l'ID de l'utilisateur sélectionné
     };
   },
+  mounted() {
+    this.getWorkingTimesThisMonth(); // Appel de la méthode pour récupérer le count lors du montage du composant
+  },
   methods: {
+    async getWorkingTimesThisMonth() {
+      try {
+        const response = await axios.get('http://localhost:4000/api/workingtimes/count');
+        this.workingTimesThisMonth = response.data.count; // Assigner le nombre retourné par l'API
+      } catch (error) {
+        console.error("Erreur lors de la récupération des working times", error);
+      }
+    },
     // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
     selectUser(userId) {
       console.log(userId);
@@ -141,6 +154,21 @@ export default {
 </script>
 
 <style scoped>
+
+.working-times-number {
+  font-size: 5rem;
+  color: transparent; /* Texte transparent */
+  -webkit-text-stroke: 2px #fdcb12; /* Contour jaune */
+  border-radius: 10px;
+  transition: all 0.3s ease; /* Transition pour l'effet smooth */
+}
+
+.chart:hover .working-times-number {
+  color: #fdcb12; /* Le texte devient entièrement jaune */
+  -webkit-text-stroke: 0px; /* Retire le contour au hover */
+}
+
+
 .glassmorphism {
   position: relative;
   background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */
