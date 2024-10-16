@@ -321,24 +321,25 @@ export default {
   },
   methods: {
 
-    toggleClock(userID) {
-    return userService
-      .toggleClock(userID)
-      .then((response) => {
-        this.showSuccessToast("Clock action successful!");
-        this.fetchEmployees(); // Optionally refresh the list after the clock action
-      })
-      .catch((error) => {
-        console.error("Error during clock action:", error);
-        this.showErrorToast("Failed to toggle clock.");
-      });
-  },
-
   // Handle the toggle switch when clock in/out is triggered
-  handleClockToggle(employee) {
-    console.log(`Toggling clock for user: ${employee.id}`);
-    this.toggleClock(employee.id);
-  },
+    handleClockToggle(employee) {
+        // On fait un POST vers /api/clocks/:user_id
+        this.toggleClock(employee.id);
+    },
+
+    // Méthode pour faire le POST vers /api/clocks/:user_id
+    toggleClock(userID) {
+      userService
+        .toggleClock(userID)
+        .then((response) => {
+          this.showSuccessToast("Clock action successful!");
+          this.fetchEmployees(); // Rafraîchir la liste si nécessaire
+        })
+        .catch((error) => {
+          console.error("Error during clock action:", error);
+          this.showErrorToast("Failed to toggle clock.");
+        });
+    },
 
     openUserModal() {
       this.showCreateUserModal = true;
@@ -374,7 +375,6 @@ export default {
       this.error = "";
       this.showUpdateUserModal = false;
     },
-
 
     selectUser(id) {
       this.selectedUserId = id;
@@ -495,14 +495,14 @@ export default {
     fetchEmployees() {
       const offset = (this.currentPage - 1) * this.limit;
 
-      console.log(
-        `Fetching employees with limit ${this.limit} and offset ${offset}`
-      );
+      console.log(`Fetching employees with limit ${this.limit} and offset ${offset}`);
       userService
         .getUsers(this.limit, offset)
         .then((data) => {
-          console.log("Employees data:", data);
-          this.employees = data.users;
+          this.employees = data.users.map(user => ({
+            ...user,
+            isWorking: user.clock ? user.clock.status : false // Set the clock status
+          }));
           this.totalPages = data.total_pages;
           this.totalUsers = data.total_users;
         })
@@ -510,6 +510,7 @@ export default {
           console.error("Erreur lors de la récupération des employés:", error);
         });
     },
+
     nextPage() {
       console.log("Next page");
       if (this.currentPage < this.totalPages) {
