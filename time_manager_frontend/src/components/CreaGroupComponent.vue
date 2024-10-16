@@ -25,6 +25,7 @@
               <th class="p-4 border-y border-slate-200 bg-slate-50">Group</th>
               <th class="p-4 border-y border-slate-200 bg-slate-50"></th>
               <th class="p-4 border-y border-slate-200 bg-slate-50"></th>
+              <th class="p-4 border-y border-slate-200 bg-slate-50"></th>
             </tr>
             </thead>
             <tbody>
@@ -33,12 +34,16 @@
                 :key="index"
                 :class="{'bg-gray-200': selectedGroup && selectedGroup.id === group.id}"
                 class="cursor-pointer"
-                @click="selectGroup(group)"
             >
               <td class="p-4 border-b border-slate-200">{{ group.name }}</td>
               <td class="p-4 border-b border-slate-200">
-                <button class="text-sm text-green-600 hover:underline">
+                <button @click="selectGroup(group)" class="text-sm text-green-600 hover:underline">
                   Select
+                </button>
+              </td>
+              <td class="p-4 border-b border-slate-200">
+                <button @click="openEditModal(group)" class="text-sm text-yellow-600 hover:underline">
+                  Edit
                 </button>
               </td>
               <td class="p-4 border-b border-slate-200">
@@ -63,7 +68,6 @@
             <li
                 v-for="(user, index) in selectedGroupUsers"
                 :key="index"
-
                 class="flex justify-between items-center border-b p-2"
             >
               <span>{{ user.username }} ({{ user.email }})</span>
@@ -96,6 +100,30 @@
               Create
             </button>
             <button @click="closeGroupModal" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modale de modification du groupe -->
+      <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="w-1/2 px-8 py-4 bg-white rounded-lg shadow-md">
+          <h3 class="text-lg font-semibold text-slate-800 mb-4">Edit Work Group</h3>
+          <label class="block text-sm font-bold mt-2">Group Name</label>
+          <input v-model="editGroup.name" type="text" class="w-full p-2 border border-gray-300 rounded" />
+
+          <label class="block text-sm font-bold mt-2">Start Date and Time</label>
+          <input v-model="editGroup.start_date" type="datetime-local" class="w-full p-2 border border-gray-300 rounded" />
+
+          <label class="block text-sm font-bold mt-2">End Date and Time</label>
+          <input v-model="editGroup.end_date" type="datetime-local" class="w-full p-2 border border-gray-300 rounded" />
+
+          <div class="flex justify-end gap-4 mt-4">
+            <button @click="updateGroup" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              Update
+            </button>
+            <button @click="closeEditModal" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
               Cancel
             </button>
           </div>
@@ -138,10 +166,17 @@ export default {
         start_date: "",
         end_date: "",
       },
+      editGroup: {
+        id: null,
+        name: "",
+        start_date: "",
+        end_date: "",
+      },
       selectedGroup: null,
       selectedGroupUsers: [],
       selectedUser: null,
       showGroupModal: false,
+      showEditModal: false,
       showUserModal: false,
     };
   },
@@ -183,6 +218,31 @@ export default {
     },
     closeUserModal() {
       this.showUserModal = false;
+    },
+    openEditModal(group) {
+      this.editGroup = { ...group };
+      this.showEditModal = true;
+    },
+    closeEditModal() {
+      this.showEditModal = false;
+      this.editGroup = { id: null, name: "", start_date: "", end_date: "" };
+    },
+    async updateGroup() {
+      try {
+        await axios.put(`http://localhost:4000/api/groups/${this.editGroup.id}`, {
+          group: {
+            name: this.editGroup.name,
+            start_date: this.editGroup.start_date,
+            end_date: this.editGroup.end_date,
+          }
+        });
+        // Mettre à jour la liste des groupes
+        const response = await axios.get("http://localhost:4000/api/groups");
+        this.groups = response.data.data;
+        this.closeEditModal();
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du groupe :", error);
+      }
     },
     async createGroup() {
       try {
