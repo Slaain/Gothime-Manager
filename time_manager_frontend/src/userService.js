@@ -48,11 +48,13 @@ export default {
 
   // New method for clock-in/clock-out
   toggleClock(userID) {
+    // Juste faire une requête PUT avec l'ID de l'utilisateur
     return axios.post(`${CLOCK_API_URL}/${userID}`)
       .then(response => response.data)
       .catch(error => {
         console.error('Erreur lors du basculement de l\'horloge:', error);
         throw error;
       });
-  }
+  },
+  
 };
