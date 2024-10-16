@@ -1,4 +1,5 @@
 <template>
+
   <div class="bat-container">
     <div class="dashboard">
       <!-- Sidebar -->
@@ -33,6 +34,7 @@
               alt="User Avatar"
               class="w-10 h-10 rounded-full"
             />
+
           </div>
         </header>
 
@@ -56,6 +58,7 @@
               <apexchart :options="chartOptions" :series="series"></apexchart>
             </div>
           </div>
+
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
@@ -83,21 +86,28 @@
         </section>
       </main>
     </div>
+
   </div>
 </template>
-
 <script>
+
+import UserList from './components/UserList.vue';
+import LineChart from './components/LineChart.vue';
+import WorkingTimeUserContainer from './components/WorkingTimesUsersContainer.vue';
+import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
+import BarChart from "@/components/WorkingTimesChart.vue";
 import axios from 'axios';
-import UserList from "./components/UserList.vue"; // Import de ton composant personnalisé
-import LineChart from "./components/LineChart.vue"; // Import du nouveau composant LineChart
-import WorkingTimeUserContainer from "./components/WorkingTimesUsersContainer.vue"; // Assurez-vous d'importer ce composant
+
 
 export default {
   name: "Dashboard",
   components: {
-    UserList, // Enregistrement du composant
-    LineChart, // Enregistrement du LineChart
-    WorkingTimeUserContainer,  // Enregistrement du WorkingTimeUserContainer
+
+    UserList,
+    LineChart,
+    WorkingTimeUserContainer,
+    CreaGroupComponent,
+    BarChart, // Enregistrement du BarChart
   },
   data() {
     return {
@@ -123,19 +133,27 @@ export default {
           ],
         },
       },
-      series: [
-        {
-          name: "series-1",
-          data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
-        },
-      ],
-      selectedUserId: null, // Variable pour stocker l'ID de l'utilisateur sélectionné
+      series: [{
+        name: "series-1",
+        data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
+      }],
+      selectedUserId: null,
+      showGroupComponent: false, // Variable pour contrôler l'affichage du composant CreaGroupComponent
+
     };
   },
   mounted() {
     this.getWorkingTimesThisMonth(); // Appel de la méthode pour récupérer le count lors du montage du composant
   },
   methods: {
+
+    showDashboard() {
+      this.showGroupComponent = false;
+    },
+    toggleGroupView() {
+      this.showGroupComponent = !this.showGroupComponent;
+    },
+
     async getWorkingTimesThisMonth() {
       try {
         const response = await axios.get('http://localhost:4000/api/workingtimes/count');
@@ -145,6 +163,7 @@ export default {
       }
     },
     // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
+
     selectUser(userId) {
       console.log(userId);
       this.selectedUserId = userId;
@@ -152,6 +171,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 

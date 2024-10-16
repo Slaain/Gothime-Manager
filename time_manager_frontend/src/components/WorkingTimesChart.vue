@@ -1,151 +1,133 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 via-white to-blue-50">
-    <div class="w-full max-w-5xl p-8 bg-white rounded-lg shadow-2xl">
-      <h2 class="text-4xl font-bold text-center text-blue-800 mb-8 tracking-wide">Working Times Bar Chart</h2>
-
-      <div v-if="loading" class="flex items-center justify-center h-40">
-        <!-- Animation de chargement -->
-        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
-      </div>
-
-      <div v-else>
-        <div v-if="workingTimes.length === 0" class="text-center text-gray-500">
-          No working times found.
-        </div>
-
-        <div v-else>
-          <!-- Graphique ApexCharts -->
-          <div class="flex justify-center">
-            <apexchart class="w-full" width="100%" height="400" type="bar" :options="chartOptions" :series="series"></apexchart>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="bar-chart-container">
+    <canvas id="barChart"></canvas>
   </div>
 </template>
 
 <script>
-import VueApexCharts from 'vue3-apexcharts';
-import axios from 'axios';
+import { Chart, BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
+
+// Enregistrement des composants nécessaires de Chart.js pour le Bar Chart
+Chart.register(BarController, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 export default {
-  name: 'WorkingTimesChart',
-  components: {
-    apexchart: VueApexCharts,
+  name: 'BarChart',
+  props: {
+    userID: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
-      workingTimes: [],
-      loading: true,
-      chartOptions: {
-        chart: {
-          id: 'working-time-bar',
-          toolbar: {
-            show: false, // Cache la barre d'outils
-          },
-        },
-        xaxis: {
-          categories: [],
-          labels: {
-            style: {
-              colors: '#4A5568', // Couleur des labels
-              fontSize: '14px',
-            },
-          },
-        },
-        yaxis: {
-          title: {
-            text: 'Duration (hours)',
-            style: {
-              color: '#4A5568',
-              fontSize: '16px',
-            },
-          },
-          labels: {
-            style: {
-              colors: '#4A5568',
-              fontSize: '14px',
-            },
-          },
-        },
-        fill: {
-          colors: ['#4A90E2'], // Couleur des barres
-        },
-        dataLabels: {
-          enabled: false, // Désactiver les labels sur les barres
-        },
-        plotOptions: {
-          bar: {
-            borderRadius: 5, // Ajoute des coins arrondis aux barres
-            columnWidth: '50%',
-          },
-        },
-        grid: {
-          borderColor: '#E2E8F0', // Couleur des lignes de la grille
-        },
-      },
-      series: [
-        {
-          name: 'Working Time Duration (hrs)',
-          data: [],
-        },
-      ],
+      chartInstance: null // Stocke l'instance du graphique
     };
   },
+  watch: {
+    userID: {
+      immediate: true,
+      handler(newUserID) {
+        // Appelle fetchWorkingTimes lorsque l'ID de l'utilisateur change
+        if (newUserID) {
+          this.fetchWorkingTimes(newUserID);
+        }
+      }
+    }
+  },
   methods: {
-    async getWorkingTimes() {
+    async fetchWorkingTimes(userID) {
       try {
-        const userID = 1;
-        const response = await axios.get(`http://localhost:4000/api/workingtimes/${userID}`);
-        this.workingTimes = response.data.data;
-        this.loading = false;
-        this.prepareChartData();
+        const response = await fetch(`http://localhost:4000/api/workingtimes/${userID}`);
+        const data = await response.json();
+        const transformedData = this.prepareChartData(data.data);
+
+        // Afficher les données dans le graphique
+        this.renderChart(transformedData.labels, transformedData.durations);
       } catch (error) {
-        console.error('Erreur lors de la récupération des working_times:', error);
-        this.loading = false;
+        console.error('Erreur lors de la récupération des working times:', error);
       }
     },
-    prepareChartData() {
-      const categories = this.workingTimes.map(wt => this.formatDate(wt.start));
-      const durations = this.workingTimes.map(wt => this.calculateDurationInHours(wt.start, wt.end));
-      this.chartOptions.xaxis.categories = categories;
-      this.series[0].data = durations;
+
+    prepareChartData(data) {
+      const labels = data.map(wt => this.formatDate(wt.start));
+      const durations = data.map(wt => this.calculateDurationInHours(wt.start, wt.end));
+
+      return {
+        labels: labels,
+        durations: durations,
+      };
     },
+
     formatDate(datetime) {
       const date = new Date(datetime);
       return date.toLocaleDateString();
     },
+
     calculateDurationInHours(start, end) {
       const startTime = new Date(start);
       const endTime = new Date(end);
       const durationMs = endTime - startTime;
       const durationHours = durationMs / (1000 * 60 * 60); // Convertir en heures
       return Math.round(durationHours); // Arrondir à l'entier le plus proche
-    }
+    },
 
-  },
-  mounted() {
-    this.getWorkingTimes();
-  },
+    renderChart(labels, durations) {
+      const canvas = document.getElementById('barChart');
+
+      // Vérifie que l'élément canvas est trouvé dans le DOM
+      if (!canvas) {
+        console.error('Canvas element not found');
+        return;
+      }
+
+      // Vérifie s'il existe déjà un graphique et le détruit pour éviter les erreurs
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+        this.chartInstance = null; // Réinitialise l'instance après destruction
+      }
+
+      const chartContext = canvas.getContext('2d');
+
+      // Crée une nouvelle instance de Chart
+      this.chartInstance = new Chart(chartContext, {
+        type: 'bar',
+        data: {
+          labels: labels, // Labels pour chaque barre (dates)
+          datasets: [{
+            label: 'Working Time Duration (hrs)',
+            data: durations, // Durées travaillées
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgb(75, 192, 192)',
+            borderWidth: 1,
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Dates',
+              },
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Hours Worked',
+              },
+            },
+          },
+        }
+      });
+    }
+  }
 };
 </script>
 
 <style scoped>
-h2 {
-  margin-bottom: 1.5rem;
-}
-
-.loader {
-  border-top-color: #3490dc;
-  animation: spinner 0.6s linear infinite;
-}
-
-@keyframes spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.bar-chart-container {
+  max-width: 700px;
+  margin: 0 auto;
 }
 </style>
