@@ -6,9 +6,10 @@
         <img src="./assets/avatar.png" alt="Vue Logo" class="w-12 h-12" />
       </div>
       <nav class="nav flex flex-col space-y-4 text-center">
-        <button class="p-2 rounded-md bg-green-600 hover:bg-green-700">Dashboard</button>
+        <button @click="showDashboard" class="p-2 rounded-md bg-green-600 hover:bg-green-700">Dashboard</button>
         <button class="p-2 rounded-md bg-gray-700 hover:bg-gray-800">Charts</button>
         <button class="p-2 rounded-md bg-gray-700 hover:bg-gray-800">Users</button>
+        <button @click="toggleGroupView" class="p-2 rounded-md bg-gray-700 hover:bg-gray-800">Groupe</button>
         <button class="p-2 rounded-md bg-gray-700 hover:bg-gray-800">Settings</button>
       </nav>
     </aside>
@@ -25,13 +26,19 @@
       </header>
 
       <!-- LineChart Section -->
-      <section class="line-chart bg-gray-700 p-6 rounded-lg shadow-lg mb-6">
+      <section class="line-chart bg-gray-700 p-6 rounded-lg shadow-lg mb-6" v-if="!showGroupComponent">
         <h2 class="text-xl text-white mb-4">Working Hours Line Chart</h2>
         <LineChart />
       </section>
 
+      <!-- Groupe Component Section -->
+      <section v-if="showGroupComponent" class="group-section bg-gray-700 p-6 rounded-lg shadow-lg mb-6">
+        <h2 class="text-xl text-white mb-4">Manage Groups</h2>
+        <CreaGroupComponent />
+      </section>
+
       <!-- Charts Section -->
-      <section class="charts grid grid-cols-3 gap-6 mb-6">
+      <section class="charts grid grid-cols-3 gap-6 mb-6" v-if="!showGroupComponent">
         <div class="chart bg-gray-700 p-4 rounded-lg shadow-lg">
           <h2 class="text-xl text-white mb-4">Performance</h2>
           <div class="h-40">
@@ -55,7 +62,7 @@
       </section>
 
       <!-- Users List Section -->
-      <section class="users p-0">
+      <section class="users p-0" v-if="!showGroupComponent">
         <h2 class="text-xl text-white mb-4">Users List</h2>
         <div class="overflow-x-auto">
           <UserList @updateUserId="selectUser" />
@@ -63,25 +70,33 @@
       </section>
 
       <!-- Conteneur pour le Working Time (affiché sous la liste des utilisateurs) -->
-      <section v-if="selectedUserId" class="working-time-container bg-gray-700 p-6 rounded-lg shadow-lg mt-6">
+      <section v-if="selectedUserId && !showGroupComponent" class="working-time-container bg-gray-700 p-6 rounded-lg shadow-lg mt-6">
         <h2 class="text-xl text-white mb-4">Working Times for User {{ selectedUserId }}</h2>
         <WorkingTimeUserContainer :userID="selectedUserId" />
       </section>
+      <section  class="working-time-container bg-gray-700 p-6 rounded-lg shadow-lg mt-6">
+        <h2 class="text-xl text-white mb-4">Working Times for User {{ selectedUserId }}</h2>
+        <BarChart :userID="selectedUserId" />
+      </section>
+
     </main>
   </div>
 </template>
-
 <script>
-import UserList from './components/UserList.vue';  // Import de ton composant personnalisé
-import LineChart from './components/LineChart.vue';  // Import du nouveau composant LineChart
-import WorkingTimeUserContainer from './components/WorkingTimesUsersContainer.vue'; // Assurez-vous d'importer ce composant
+import UserList from './components/UserList.vue';
+import LineChart from './components/LineChart.vue';
+import WorkingTimeUserContainer from './components/WorkingTimesUsersContainer.vue';
+import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
+import BarChart from "@/components/WorkingTimesChart.vue";
 
 export default {
   name: "Dashboard",
   components: {
-    UserList,  // Enregistrement du composant
-    LineChart, // Enregistrement du LineChart
-    WorkingTimeUserContainer, // Enregistrement du WorkingTimeUserContainer
+    UserList,
+    LineChart,
+    WorkingTimeUserContainer,
+    CreaGroupComponent,
+    BarChart, // Enregistrement du BarChart
   },
   data() {
     return {
@@ -97,11 +112,17 @@ export default {
         name: "series-1",
         data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
       }],
-      selectedUserId: null, // Variable pour stocker l'ID de l'utilisateur sélectionné
+      selectedUserId: null,
+      showGroupComponent: false, // Variable pour contrôler l'affichage du composant CreaGroupComponent
     };
   },
   methods: {
-    // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
+    showDashboard() {
+      this.showGroupComponent = false;
+    },
+    toggleGroupView() {
+      this.showGroupComponent = !this.showGroupComponent;
+    },
     selectUser(userId) {
       console.log(userId);
       this.selectedUserId = userId;
@@ -109,6 +130,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .dashboard {

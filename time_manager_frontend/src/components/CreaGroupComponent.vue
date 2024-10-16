@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-[720px] mx-auto">
     <div
-        class="relative flex flex-col w-full h-full bg-white shadow-md text-slate-700 rounded-xl bg-clip-border"
+        class="relative flex flex-col w-full h-full bg-white shadow-md text-slate-700 rounded-xl bg-clip-border px-6 py-5"
     >
       <!-- Liste des groupes -->
       <div>
