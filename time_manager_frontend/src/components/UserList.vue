@@ -205,13 +205,12 @@
                   </div>
                 </div>
               </td>
-              <td
-                class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
-              >
-                <p class="text-sm text-slate-500">
-                  {{ employee.status || "N/A" }}
-                </p>
+              <td class="p-4 border-b border-slate-200">
+                <!-- Toggle button for Clock In/Out -->
+                <label class="switch">
+                  <input type="checkbox" v-model="employee.isWorking" @change="handleClockToggle(employee)">
+                  <span class="slider round"></span>
+                </label>
               </td>
               <td
                 class="p-4 border-b border-slate-200"
@@ -321,6 +320,26 @@ export default {
     };
   },
   methods: {
+
+    toggleClock(userID) {
+    return userService
+      .toggleClock(userID)
+      .then((response) => {
+        this.showSuccessToast("Clock action successful!");
+        this.fetchEmployees(); // Optionally refresh the list after the clock action
+      })
+      .catch((error) => {
+        console.error("Error during clock action:", error);
+        this.showErrorToast("Failed to toggle clock.");
+      });
+  },
+
+  // Handle the toggle switch when clock in/out is triggered
+  handleClockToggle(employee) {
+    console.log(`Toggling clock for user: ${employee.id}`);
+    this.toggleClock(employee.id);
+  },
+
     openUserModal() {
       this.showCreateUserModal = true;
     },
@@ -355,6 +374,8 @@ export default {
       this.error = "";
       this.showUpdateUserModal = false;
     },
+
+
     selectUser(id) {
       this.selectedUserId = id;
       console.log("Selected user ID:", this.selectedUserId);
@@ -528,3 +549,49 @@ export default {
   },
 };
 </script>
+<style>
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(14px);
+}
+</style>

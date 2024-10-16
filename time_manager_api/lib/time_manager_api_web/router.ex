@@ -12,7 +12,7 @@ defmodule TimeManagerApiWeb.Router do
     # Routes pour les workingtimes
     get "/workingtimes", WorkingTimeController, :index
     get "/workingtimes/:userID/:id", WorkingTimeController, :show
-    get "/workingtimes/:userID", WorkingTimeController, :index
+    get "/workingtimes/:userID", WorkingTimeController, :indexA
 
 
     # Routes pour les workingtimes avec des routes personnalisées pour les utilisateurs
