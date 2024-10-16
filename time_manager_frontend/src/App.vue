@@ -1,12 +1,3 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import WorkingTimeShow from './components/WorkingTimeShow.vue';
-import WorkingTimeActionContainer from './components/WorkingTimeActionContainer.vue'
-import WorkingTimesUsersContainer from './components/WorkingTimesUsersContainer.vue'
-import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste le chemin si nécessaire
-
-
-</script>
 
 <template>
   <header></header>
@@ -22,6 +13,7 @@ import WorkingTimesChart from './components/WorkingTimesChart.vue';  // Ajuste l
 
     <!-- Pass the selected user ID to other child components -->
     <WorkingTimesUsersContainer :userID="userID" />
+    <CreaGroupComponent/>
     <!-- <Test :testValue="userID" /> -->
   </main>
 
@@ -37,7 +29,7 @@ import { ref, onMounted } from "vue";
 import UserList from "./components/UserList.vue";
 import WorkingTimeActionContainer from "./components/WorkingTimeActionContainer.vue";
 import WorkingTimesUsersContainer from "./components/WorkingTimesUsersContainer.vue";
-import Test from "./components/Test.vue";
+import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import userService from "./userService";
 
 // Define the user ID to pass to children
