@@ -11,6 +11,13 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
 
   action_fallback TimeManagerApiWeb.FallbackController
 
+  # GET /api/workingtimes
+  def index(conn, _params) do
+    working_times = Repo.all(WorkingTime)
+    render(conn, "index.json", workingtimes: working_times)
+  end
+
+
   # GET (ALL): /api/workingtime/:userID?start=XXX&end=YYY
   def index(conn, %{"userID" => user_id, "start" => start, "end" => end_time}) do
     workingtimes = Timesheet.list_workingtimes_for_user_in_range(user_id, start, end_time)
@@ -24,13 +31,12 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
   end
 
   # GET (ALL2): /api/workingtimes/:userID
-  def index(conn, %{"userID" => user_id}) do
+  def indexA(conn, %{"userID" => user_id}) do
     # Récupérer tous les working_times avec les informations utilisateur
     working_times_with_user_info = Timesheet.list_workingtimes_for_user(user_id)
     # Rendre la réponse JSON avec les informations de chaque working_time et utilisateur
     render(conn, "get_all.json", workingtimes: working_times_with_user_info)
   end
-
 
   # POST: /api/workingtime/:userID
   # Exemple de body de requête POST
@@ -123,17 +129,17 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
       end
 
       # Ajouter les secondes si elles sont absentes
-  start_time = if String.length(start_time) == 16 do
-    start_time <> ":00Z"
-  else
-    start_time
-  end
+    start_time = if String.length(start_time) == 16 do
+      start_time <> ":00Z"
+    else
+      start_time
+    end
 
-  end_time = if String.length(end_time) == 16 do
-    end_time <> ":00Z"
-  else
-    end_time
-  end
+    end_time = if String.length(end_time) == 16 do
+      end_time <> ":00Z"
+    else
+      end_time
+    end
 
       # Vérifier si le paramètre start est au bon format
       case NaiveDateTime.from_iso8601(start_time) do

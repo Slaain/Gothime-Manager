@@ -205,13 +205,12 @@
                   </div>
                 </div>
               </td>
-              <td
-                class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
-              >
-                <p class="text-sm text-slate-500">
-                  {{ employee.status || "N/A" }}
-                </p>
+              <td class="p-4 border-b border-slate-200">
+                <!-- Toggle button for Clock In/Out -->
+                <label class="switch">
+                  <input type="checkbox" v-model="employee.isWorking" @change="handleClockToggle(employee)">
+                  <span class="slider round"></span>
+                </label>
               </td>
               <td
                 class="p-4 border-b border-slate-200"
@@ -321,6 +320,27 @@ export default {
     };
   },
   methods: {
+
+  // Handle the toggle switch when clock in/out is triggered
+    handleClockToggle(employee) {
+        // On fait un POST vers /api/clocks/:user_id
+        this.toggleClock(employee.id);
+    },
+
+    // Méthode pour faire le POST vers /api/clocks/:user_id
+    toggleClock(userID) {
+      userService
+        .toggleClock(userID)
+        .then((response) => {
+          this.showSuccessToast("Clock action successful!");
+          this.fetchEmployees(); // Rafraîchir la liste si nécessaire
+        })
+        .catch((error) => {
+          console.error("Error during clock action:", error);
+          this.showErrorToast("Failed to toggle clock.");
+        });
+    },
+
     openUserModal() {
       this.showCreateUserModal = true;
     },
@@ -355,6 +375,7 @@ export default {
       this.error = "";
       this.showUpdateUserModal = false;
     },
+
     selectUser(id) {
       this.selectedUserId = id;
       console.log("Selected user ID:", this.selectedUserId);
@@ -474,14 +495,14 @@ export default {
     fetchEmployees() {
       const offset = (this.currentPage - 1) * this.limit;
 
-      console.log(
-        `Fetching employees with limit ${this.limit} and offset ${offset}`
-      );
+      console.log(`Fetching employees with limit ${this.limit} and offset ${offset}`);
       userService
         .getUsers(this.limit, offset)
         .then((data) => {
-          console.log("Employees data:", data);
-          this.employees = data.users;
+          this.employees = data.users.map(user => ({
+            ...user,
+            isWorking: user.clock ? user.clock.status : false // Set the clock status
+          }));
           this.totalPages = data.total_pages;
           this.totalUsers = data.total_users;
         })
@@ -489,6 +510,7 @@ export default {
           console.error("Erreur lors de la récupération des employés:", error);
         });
     },
+
     nextPage() {
       console.log("Next page");
       if (this.currentPage < this.totalPages) {
@@ -528,3 +550,49 @@ export default {
   },
 };
 </script>
+<style>
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(14px);
+}
+</style>

@@ -40,6 +40,7 @@ defmodule TimeManagerApi.UserService do
     Repo.all(query)
   end
 
+  # Récupérer la liste paginée des employés avec leur clock associée
   def get_paginated_employees(limit, offset) do
     from(u in User,
       order_by: [asc: u.id],  # Option de tri
@@ -47,6 +48,7 @@ defmodule TimeManagerApi.UserService do
       offset: ^offset
     )
     |> Repo.all()
+    |> Repo.preload(:clock)  # Précharge la clock associée
   end
 
   # Compte le nombre total d'utilisateurs

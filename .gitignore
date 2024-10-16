@@ -34,5 +34,7 @@ time_manager_api-*.tar
 npm-debug.log
 /assets/node_modules/
 
-./deps/**
+./time_manager_api//deps/**
+
+/deps
 
