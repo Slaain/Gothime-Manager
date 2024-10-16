@@ -1,16 +1,13 @@
-// src/userService.js
 import axios from 'axios';
 
 const API_URL = 'http://localhost:4000/api/users';
+const CLOCK_API_URL = 'http://localhost:4000/api/clocks'; // Assuming clocks are managed separately
 
 export default {
+  // Existing user methods
   createUser(user) {
     return axios.post(API_URL, user)
-      .then(response => response.data)
-      // .catch(error => {
-      //   console.error('Erreur lors de la création de l\'utilisateur:', error);
-      //   throw error;
-      // });
+      .then(response => response.data);
   },
 
   updateUser(userID, user) {
@@ -18,18 +15,16 @@ export default {
       .then(response => response.data)
       .catch(error => {
         console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
-        throw error; 
+        throw error;
       });
   },
-  
-  
 
   getUser(userID) {
     return axios.get(`${API_URL}/${userID}`)
       .then(response => response.data)
       .catch(error => {
         console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-        throw error; 
+        throw error;
       });
   },
 
@@ -41,12 +36,23 @@ export default {
         throw error;
       });
   },
+
   getUsers(limit, offset) {
     return axios.get(`${API_URL}?limit=${limit}&offset=${offset}`)
       .then(response => response.data)
       .catch(error => {
         console.error('Erreur lors de la récupération des utilisateurs:', error);
-        throw error; 
+        throw error;
       });
   },
+
+  // New method for clock-in/clock-out
+  toggleClock(userID) {
+    return axios.post(`${CLOCK_API_URL}/${userID}`)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Erreur lors du basculement de l\'horloge:', error);
+        throw error;
+      });
+  }
 };
