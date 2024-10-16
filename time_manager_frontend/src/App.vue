@@ -33,26 +33,27 @@
       <!-- Charts Section -->
       <section class="charts grid grid-cols-3 gap-6 mb-6">
         <div class="chart bg-gray-700 p-4 rounded-lg shadow-lg">
-          <h2 class="text-xl text-white mb-4">Performance</h2>
-          <div class="h-40">
-            <apexchart :options="chartOptions" :series="series"></apexchart>
+          <h2 class="text-xl text-white mb-4">Working Times This Month</h2>
+          <div class="h-40 flex items-center justify-center text-white text-2xl">
+            {{ workingTimesThisMonth }}
           </div>
         </div>
 
         <div class="chart bg-gray-700 p-4 rounded-lg shadow-lg">
-          <h2 class="text-xl text-white mb-4">Monthly Stats</h2>
-          <div class="h-40">
-            <apexchart :options="chartOptions" :series="series"></apexchart>
+          <h2 class="text-xl text-white mb-4">Users Worked This Month</h2>
+          <div class="h-40 flex items-center justify-center text-white text-2xl">
+            {{ usersWorkingThisMonth }}
           </div>
         </div>
 
         <div class="chart bg-gray-700 p-4 rounded-lg shadow-lg">
-          <h2 class="text-xl text-white mb-4">Comparison</h2>
-          <div class="h-40">
-            <apexchart :options="chartOptions" :series="series"></apexchart>
+          <h2 class="text-xl text-white mb-4">Users Currently Working</h2>
+          <div class="h-40 flex items-center justify-center text-white text-2xl">
+            {{ usersCurrentlyWorking }}
           </div>
         </div>
       </section>
+
 
       <!-- Users List Section -->
       <section class="users p-0">
@@ -81,7 +82,7 @@ export default {
   components: {
     UserList,  // Enregistrement du composant
     LineChart, // Enregistrement du LineChart
-    WorkingTimeUserContainer, // Enregistrement du WorkingTimeUserContainer
+    WorkingTimeUserContainer,  // Enregistrement du WorkingTimeUserContainer
   },
   data() {
     return {

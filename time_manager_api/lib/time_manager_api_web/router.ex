@@ -9,29 +9,40 @@ defmodule TimeManagerApiWeb.Router do
   scope "/api", TimeManagerApiWeb do
     pipe_through :api
 
-    # Routes pour les workingtimes
-    get "/workingtimes", WorkingTimeController, :index
-    get "/workingtimes/:userID/:id", WorkingTimeController, :show
-    get "/workingtimes/:userID", WorkingTimeController, :indexA
+    # Scope pour les workingtimes
+    scope "/workingtimes" do
+      get "/count", WorkingTimeController, :count
+      get "/", WorkingTimeController, :index
+      get "/:userID", WorkingTimeController, :indexA
+      get "/:userID/:id", WorkingTimeController, :show
+    end
 
+    # Scope pour les workingtimes avec des routes personnalisées pour les utilisateurs
+    scope "/workingtime" do
+      get "/:userID", WorkingTimeController, :index
+      get "/:userID/:id", WorkingTimeController, :show
+      post "/:userID", WorkingTimeController, :create
+      put "/:id", WorkingTimeController, :update
+      delete "/:id", WorkingTimeController, :delete
+    end
 
-    # Routes pour les workingtimes avec des routes personnalisées pour les utilisateurs
-    get "/workingtime/:userID", WorkingTimeController, :index
-    get "/workingtime/:userID/:id", WorkingTimeController, :show
-    post "/workingtime/:userID", WorkingTimeController, :create
-    put "/workingtime/:id", WorkingTimeController, :update
-    delete "/workingtime/:id", WorkingTimeController, :delete
+    # Scope pour les tests
+    scope "/test" do
+      post "/:id", TestController, :update_working_time
+    end
 
-    # Routes pour tester
-    post "/test/:id", TestController, :update_working_time
+    # Scope pour les utilisateurs
+    scope "/users" do
+      get "/", UserController, :paginated_users
+      resources "/", UserController, except: [:new, :edit]
+    end
 
-    get "/users", UserController, :paginated_users
-    resources "/users", UserController, except: [:new, :edit]
+    # Scope pour les clocks
+    scope "/clocks" do
+      post "/:user_id", ClockController, :beep
+    end
 
-    # Routes pour les clocks
-    post "/clocks/:user_id", ClockController, :beep
-
-    # Route pour les requêtes OPTIONS
+    # Route pour les requêtes OPTIONS (utilisées pour le CORS)
     match :options, "/*_path", TimeManagerApiWeb.CORSController, :options
   end
 end
