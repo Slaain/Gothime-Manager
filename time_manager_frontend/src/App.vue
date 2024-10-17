@@ -17,6 +17,9 @@
           <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
             Users
           </button>
+          <button @click="toggleGroupView" class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
+            Groupe
+          </button>
           <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
             Settings
           </button>
@@ -67,12 +70,16 @@
             </div>
           </div>
         </section>
-
+        <section v-if="showGroupComponent" class="group-section bg-gray-700 p-6 rounded-lg shadow-lg mb-6">
+          <h2 class="text-xl text-white mb-4">Manage Groups</h2>
+          <CreaGroupComponent />
+        </section>
         <section class="p-0 users">
           <h2 class="mb-4 text-xl text-white">Users List</h2>
           <div class="overflow-x-auto">
             <UserList @updateUserId="selectUser" />
           </div>
+
         </section>
 
         <section v-if="selectedUserId" class="w-full mt-6">
