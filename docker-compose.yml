@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  db: # Service pour la base de données PostgreSQL
     image: postgres:latest
     restart: always
     environment:
@@ -11,17 +11,15 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432" # ou "8081:8080"
-    networks:
-      - my_network
+      - "5432:5432" 
   
-  phoenix:
+  phoenix: # Service pour le back
     build: ./time_manager_api
     container_name: phoenix
-    command: mix phx.server
-    working_dir: /app
+    command: sh entrypoint.sh
+    working_dir: /app/time_manager_api
     volumes:
-      - ./time_manager_ap:/app
+      - ./time_manager_api:/app
     ports:
       - "4000:4000"
     environment:
@@ -32,11 +30,34 @@ services:
       DB_POOL_SIZE: 10
     depends_on:
       - db    
-    networks:
-      - my_network
+  frontend:  # Service pour le frontend
+    build:
+      context: ./time_manager_frontend
+      dockerfile: Dockerfile  # Spécifie le Dockerfile à utiliser pour construire l'image frontend
+    ports:
+      - "5173:5173"  # Redirige le port Vite vers l'hôte
+    depends_on:
+      - phoenix  # Assure que le service backend "phoenix" soit démarré avant ce service
+    volumes:
+      - ./time_manager_frontend:/app  # Monte le répertoire local du frontend pour permettre le hot-reload
+      - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
+    #environment:
+     # CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING}  # Active l'utilisation du polling pour Chokidar
+    command: npm run dev -- --host 0.0.0.0  # Commande pour démarrer le serveur de développement Vite
+    restart: unless-stopped
+
+  adminer:  # Service pour l'interface de gestion de base de données PgAdmin
+    image: adminer
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Correspond au fichier .env
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_NAME}  # Correspond à la base de données dans .env
+    ports:
+       - "8081:8080"  # Expose l'interface web de PgAdmin
+    depends_on:
+      - db  # Assure que le service "db" soit démarré avant ce service
 
 volumes:
-  db_data:
-
-networks:
-  my_network:
+  db_data:  # Correctly defined named volume for the PostgreSQL database
+  adminer_data:  # Correctly defined named volume for PgAdmin configuration

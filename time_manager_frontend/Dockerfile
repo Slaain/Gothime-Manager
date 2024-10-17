@@ -1,32 +1,22 @@
 # Utilise l'image officielle Elixir comme base
-FROM elixir:1.12-alpine
+FROM node:20-alpine
 
-# Installe les dépendances nécessaires
-RUN apk update && \
-    apk --no-cache add build-base nodejs npm git postgresql-client
+# Définir le répertoire de travail dans le conteneur
+WORKDIR /app/time_manager_frontend
 
-# Installe Hex et Rebar (gestionnaires de dépendances pour Elixir)
-RUN mix local.hex --force && \
-    mix local.rebar --force
+# Copier les fichiers de configuration des dépendances
+COPY package*.json ./
 
-# Définit le répertoire de travail de l'application
-WORKDIR /app
 
-# Copie les fichiers du projet dans le conteneur
+# Installer les dépendances nécessaires
+RUN apk add --no-cache git
+RUN npm install npm@latest -g
+RUN npm install
+
 COPY . .
 
-# Installe les dépendances du projet
-RUN mix deps.get
+# Exposer le port sur lequel Vite s'exécute
+EXPOSE 5173
 
-# Compile le projet
-RUN mix compile
-
-# Crée et configure la base de données (si nécessaire)
-RUN mix ecto.create
-RUN mix ecto.migrate
-
-# Expose le port sur lequel Phoenix s'exécute
-EXPOSE 4000
-
-# Commande de démarrage de l'application Phoenix
-CMD ["mix", "phx.server"]
+# Commande de démarrage de l'application vite
+CMD ["npm", "run", "dev"]
