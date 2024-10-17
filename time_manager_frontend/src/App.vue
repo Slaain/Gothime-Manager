@@ -1,4 +1,5 @@
 <template>
+
   <div class="bat-container">
     <div class="dashboard">
       <!-- Sidebar -->
@@ -33,6 +34,7 @@
               alt="User Avatar"
               class="w-10 h-10 rounded-full"
             />
+
           </div>
         </header>
 
@@ -57,6 +59,7 @@
             </div>
           </div>
 
+
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
             <div class="h-40 flex items-center justify-center working-times-number">
@@ -72,33 +75,37 @@
           </div>
         </section>
 
-        <section
-          v-if="selectedUserId"
-          class="p-6 mt-6 bg-gray-700 rounded-lg shadow-lg working-time-container"
-        >
-          <h2 class="mb-4 text-xl text-white">
+        <section v-if="selectedUserId" class="w-full mt-6">
+          <!-- <h2 class="mb-4 text-xl text-white">
             Working Times for User {{ selectedUserId }}
-          </h2>
+          </h2> -->
           <WorkingTimeUserContainer :userID="selectedUserId" />
         </section>
       </main>
     </div>
+
   </div>
 </template>
-
 <script>
+
+import UserList from './components/UserList.vue';
+import LineChart from './components/LineChart.vue';
+import WorkingTimeUserContainer from './components/WorkingTimesUsersContainer.vue';
+import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
+import BarChart from "@/components/WorkingTimesChart.vue";
 import axios from 'axios';
-import UserList from "./components/UserList.vue"; // Import de ton composant personnalisé
-import LineChart from "./components/LineChart.vue"; // Import du nouveau composant LineChart
-import WorkingTimeUserContainer from "./components/WorkingTimesUsersContainer.vue"; // Assurez-vous d'importer ce composant
+
 import { getCurrentInstance } from 'vue';
 
 export default {
   name: "Dashboard",
   components: {
-    UserList, // Enregistrement du composant
-    LineChart, // Enregistrement du LineChart
-    WorkingTimeUserContainer,  // Enregistrement du WorkingTimeUserContainer
+
+    UserList,
+    LineChart,
+    WorkingTimeUserContainer,
+    CreaGroupComponent,
+    BarChart, // Enregistrement du BarChart
   },
   data() {
     return {
@@ -126,13 +133,13 @@ export default {
           ],
         },
       },
-      series: [
-        {
-          name: "series-1",
-          data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
-        },
-      ],
-      selectedUserId: null, // Variable pour stocker l'ID de l'utilisateur sélectionné
+      series: [{
+        name: "series-1",
+        data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
+      }],
+      selectedUserId: null,
+      showGroupComponent: false, // Variable pour contrôler l'affichage du composant CreaGroupComponent
+
     };
   },
   mounted() {
@@ -140,6 +147,14 @@ export default {
     this.getWorkingTimesThisMonth(); // Appel de la méthode pour récupérer le count lors du montage du composant
   },
   methods: {
+
+    showDashboard() {
+      this.showGroupComponent = false;
+    },
+    toggleGroupView() {
+      this.showGroupComponent = !this.showGroupComponent;
+    },
+
     async getWorkingTimesThisMonth() {
       try {
         const response = await axios.get('http://localhost:4000/api/workingtimes/count');
@@ -159,12 +174,14 @@ export default {
       }
     },
     // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
+
     selectUser(userId) {
       this.selectedUserId = userId;
     },
   },
 };
 </script>
+
 
 <style scoped>
 
