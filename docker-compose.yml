@@ -11,7 +11,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5432:5432" # ou "8081:8080"
     networks:
       - my_network
   
