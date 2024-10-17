@@ -1,19 +1,7 @@
 <template>
   <div class="max-w-md mx-auto mt-10 p-6 glassmorphism-bg-white rounded shadow-lg">
-    <h2 class="text-2xl font-semibold text-white text-center mb-6">Sign Up</h2>
-    <form @submit.prevent="handleSubmit">
-      <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-white mb-1">Username</label>
-        <input
-            v-model="form.username"
-            type="text"
-            id="username"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Username"
-        />
-      </div>
-
+    <h2 class="text-2xl font-semibold text-white text-center mb-6">Log In</h2>
+    <form @submit.prevent="handleLogin">
       <div class="mb-4">
         <label for="email" class="block text-sm font-medium text-white mb-1">Email</label>
         <input
@@ -26,7 +14,7 @@
         />
       </div>
 
-      <div class="mb-4">
+      <div class="mb-6">
         <label for="password" class="block text-sm font-medium text-white mb-1">Password</label>
         <input
             v-model="form.password"
@@ -38,33 +26,21 @@
         />
       </div>
 
-      <div class="mb-6">
-        <label for="confirmPassword" class="block text-sm font-medium text-white mb-1">Confirm Password</label>
-        <input
-            v-model="form.confirmPassword"
-            type="password"
-            id="confirmPassword"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Confirm your password"
-        />
-      </div>
-
       <button
           type="submit"
           class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
       >
-        Sign Up
+        Log In
       </button>
     </form>
 
     <p v-if="error" class="mt-4 text-red-500 text-center">{{ error }}</p>
     <p v-if="success" class="mt-4 text-green-500 text-center">{{ success }}</p>
 
-    <!-- Lien vers la page de connexion -->
+    <!-- Lien vers la page d'inscription -->
     <p class="mt-4 text-white text-center">
-      Already have an account?
-      <a href="/login" class="text-yellow-500 hover:text-yellow-600">Log in</a>
+      Don't have an account?
+      <a href="/signup" class="text-yellow-500 hover:text-yellow-600">Sign up</a>
     </p>
   </div>
 </template>
@@ -75,39 +51,34 @@ import { ref } from 'vue';
 export default {
   setup() {
     const form = ref({
-      username: '',
       email: '',
       password: '',
-      confirmPassword: '',
     });
 
     const error = ref('');
     const success = ref('');
 
-    const handleSubmit = () => {
-      if (form.value.password !== form.value.confirmPassword) {
-        error.value = 'Passwords do not match';
-        success.value = '';
+    const handleLogin = () => {
+      if (!form.value.email || !form.value.password) {
+        error.value = 'Please fill in all fields';
         return;
       }
 
-      // Simulation d'une API call pour enregistrer l'utilisateur
-      console.log('Form submitted:', form.value);
+      // Simulation d'une API call pour la connexion
+      console.log('Login submitted:', form.value);
 
       // Réinitialisation du formulaire et message de succès
       error.value = '';
-      success.value = 'Registration successful!';
-      form.value.username = '';
+      success.value = 'Login successful!';
       form.value.email = '';
       form.value.password = '';
-      form.value.confirmPassword = '';
     };
 
     return {
       form,
       error,
       success,
-      handleSubmit,
+      handleLogin,
     };
   },
 };

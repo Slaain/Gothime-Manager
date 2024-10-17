@@ -17,6 +17,11 @@ const routes = [
     component: () => import("@/views/Register.vue")
   },
   {
+    path: '/login',
+    name: 'login',
+    component: () => import("@/views/Login.vue")
+  },
+  {
     path: '/',
     redirect: '/admin' // Redirige vers /admin par défaut
   }
