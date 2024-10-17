@@ -71,9 +71,8 @@ import Dropdown from "./Dropdown.vue";
         v-if="formMode === 'update'"
         class="flex flex-col items-start justify-center w-full px-4 py-4"
       >
-        <h2 class="mb-4 text-lg font-bold">Modifier le temps de travail</h2>
+        <h2 class="mb-4 text-lg font-bold">Update working time</h2>
         <!-- Dropdown et input pour la modification -->
-        <p class="mb-2">User</p>
         <Dropdown class="w-full" />
         <div class="w-full">
           <p>Start time</p>
@@ -93,13 +92,13 @@ import Dropdown from "./Dropdown.vue";
         </div>
         <button
           @click="updateWorkingTime"
-          class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800"
+          class="w-full px-4 py-2 mt-4 text-black rounded-md bg-primaryYellow hover:bg-primaryYellow400"
         >
-          Modifier
+          Update
         </button>
         <button
           @click="setFormMode('')"
-          class="w-full px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+          class="w-full px-4 py-2 mt-2 text-black border rounded-md border-primaryYellow"
         >
           Cancel
         </button>

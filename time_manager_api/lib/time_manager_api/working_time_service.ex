@@ -75,5 +75,12 @@ defmodule TimeManagerApi.WorkingTimeService do
     Repo.delete(working_time)
   end
 
+  def count(month, year) do
+    from(w in WorkingTime,
+      where: fragment("extract(month from ?) = ?", w.start, ^month) and fragment("extract(year from ?) = ?", w.start, ^year)
+    )
+    |> Repo.aggregate(:count, :id)
+  end
+
 
 end

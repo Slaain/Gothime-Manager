@@ -1,20 +1,141 @@
 <template>
   <div class="max-w-[720px] mx-auto">
     <div
-      class="relative flex flex-col w-full h-full bg-white shadow-md text-slate-700 rounded-xl bg-clip-border"
+      v-if="showCreateUserModal"
+      id="default-modal"
+      tabindex="-1"
+      aria-hidden="true"
+      class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
+    >
+      <div class="w-1/2 px-8 py-4 bg-white">
+        <p class="text-xl font-extrabold text-zinc-950">New User</p>
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          User's Name
+          <p
+            class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
+          >
+            (30 characters maximum)
+          </p>
+        </label>
+        <input
+          v-model="newUser.username"
+          placeholder="Please enter your full name"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
+          >User's Email</label
+        >
+        <input
+          v-model="newUser.email"
+          placeholder="Please enter your email"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        <p class="h-6 text-red-600">{{ error }}</p>
+        <button
+          @click="createUser"
+          class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
+        >
+          Create User
+        </button>
+        <button
+          @click="closeUserModal"
+          class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg hover:bg-neutral-100 border-primaryYellow"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div
+      v-if="showUpdateUserModal"
+      id="default-modal"
+      tabindex="-1"
+      aria-hidden="true"
+      class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
+    >
+      <div class="w-1/2 px-8 py-4 bg-white">
+        <p class="text-xl font-extrabold text-zinc-950">Update User</p>
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          User's Name
+          <p
+            class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
+          >
+            (30 characters maximum)
+          </p>
+        </label>
+        <input
+          v-model="newUser.username"
+          placeholder="Please enter your full name"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
+          >User's Email</label
+        >
+        <input
+          v-model="newUser.email"
+          placeholder="Please enter your email"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        <p class="h-6 text-red-600">{{ error }}</p>
+        <button
+          @click="updateUser"
+          class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
+        >
+          Update
+        </button>
+        <button
+          @click="closeUpdateUserModal"
+          class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg border-primaryYellow hover:bg-neutral-100"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div
+      v-if="showDeleteUserModal"
+      id="default-modal"
+      tabindex="-1"
+      aria-hidden="true"
+      class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
+    >
+      <div class="w-1/2 px-8 py-4 bg-white">
+        <p class="text-xl font-extrabold text-zinc-950">Delete User</p>
+        <p class="text-black">Are you sure you want to delete this user?</p>
+        <p class="h-6 text-red-600">{{ error }}</p>
+        <button
+          @click="deleteEmployee"
+          class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
+        >
+          Delete
+        </button>
+        <button
+          @click="closeUserDeleteModal"
+          class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg border-primaryYellow hover:bg-neutral-100"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+    <div
+      class="relative flex flex-col w-full h-full shadow-md glassmorphism-bg-white text-neutral-100 rounded-xl bg-clip-border"
     >
       <div
-        class="relative mx-4 mt-4 overflow-hidden bg-white rounded-none text-slate-700 bg-clip-border"
+        class="relative mx-4 mt-4 overflow-hidden rounded-none text-neutral-100 bg-clip-border"
       >
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-slate-800">Employees List</h3>
-            <p class="text-slate-500">Review each person before edit</p>
+            <h3 class="text-lg font-semibold text-white">Employees List</h3>
+            <p class="text-neutral-300">Review each person before edit</p>
           </div>
           <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
             <button
               @click="openUserModal"
-              class="flex select-none items-center gap-2 rounded bg-slate-800 py-2.5 px-4 text-xs font-semibold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+              class="flex select-none items-center gap-2 rounded bg-primaryYellow hover:bg-primaryYellow400 py-2.5 px-4 text-xs font-semibold text-black shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
             >
               <svg
@@ -32,128 +153,6 @@
               Add member
             </button>
           </div>
-        </div>
-      </div>
-
-      <div
-        v-if="showCreateUserModal"
-        id="default-modal"
-        tabindex="-1"
-        aria-hidden="true"
-        class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
-      >
-        <div class="w-1/2 px-8 py-4 bg-white">
-          <p class="text-xl font-extrabold text-zinc-950">New User</p>
-          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
-            User's Name
-            <p
-              class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
-            >
-              (30 characters maximum)
-            </p>
-          </label>
-          <input
-            v-model="newUser.username"
-            placeholder="Please enter your full name"
-            class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            type="text"
-          />
-          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-            >User's Email</label
-          >
-          <input
-            v-model="newUser.email"
-            placeholder="Please enter your email"
-            class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            type="text"
-          />
-          <p class="h-6 text-red-600">{{ error }}</p>
-          <button
-            @click="createUser"
-            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
-          >
-            Create User
-          </button>
-          <button
-            @click="closeUserModal"
-            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-
-      <div
-        v-if="showUpdateUserModal"
-        id="default-modal"
-        tabindex="-1"
-        aria-hidden="true"
-        class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
-      >
-        <div class="w-1/2 px-8 py-4 bg-white">
-          <p class="text-xl font-extrabold text-zinc-950">Update User</p>
-          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
-            User's Name
-            <p
-              class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
-            >
-              (30 characters maximum)
-            </p>
-          </label>
-          <input
-            v-model="newUser.username"
-            placeholder="Please enter your full name"
-            class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            type="text"
-          />
-          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-            >User's Email</label
-          >
-          <input
-            v-model="newUser.email"
-            placeholder="Please enter your email"
-            class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            type="text"
-          />
-          <p class="h-6 text-red-600">{{ error }}</p>
-          <button
-            @click="updateUser"
-            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
-          >
-            Update
-          </button>
-          <button
-            @click="closeUpdateUserModal"
-            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-
-      <div
-        v-if="showDeleteUserModal"
-        id="default-modal"
-        tabindex="-1"
-        aria-hidden="true"
-        class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
-      >
-        <div class="w-1/2 px-8 py-4 bg-white">
-          <p class="text-xl font-extrabold text-zinc-950">Delete User</p>
-          <p>Are you sure you want to delete this user?</p>
-          <p class="h-6 text-red-600">{{ error }}</p>
-          <button
-            @click="deleteEmployee"
-            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
-          >
-            Delete
-          </button>
-          <button
-            @click="closeUserDeleteModal"
-            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
-          >
-            Cancel
-          </button>
         </div>
       </div>
 
@@ -180,13 +179,13 @@
                 </p>
               </th>
               <th
-                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
               ></th>
               <th
-                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
               ></th>
               <th
-                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
               ></th>
             </tr>
           </thead>
@@ -194,28 +193,34 @@
             <tr v-for="(employee, index) in employees" :key="index">
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
-                    <p class="text-sm font-semibold text-slate-700">
+                    <p class="text-sm font-semibold text-neutral-100">
                       {{ employee.username }}
                     </p>
-                    <p class="text-sm text-slate-500">{{ employee.email }}</p>
+                    <p class="text-sm text-neutral-300">{{ employee.email }}</p>
                   </div>
                 </div>
               </td>
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
-                <p class="text-sm text-slate-500">
-                  {{ employee.status || "N/A" }}
-                </p>
+                <!-- Toggle button for Clock In/Out -->
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    v-model="employee.isWorking"
+                    @change="handleClockToggle(employee)"
+                  />
+                  <span class="slider round"></span>
+                </label>
               </td>
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <button
                   @click.stop="
@@ -232,7 +237,7 @@
               </td>
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <button
                   @click.stop="openUserDeleteModal(employee.id)"
@@ -243,10 +248,10 @@
               </td>
               <td
                 class="p-4 border-b border-slate-200"
-                :class="{ 'bg-slate-200': employee.id === userID }"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
               >
                 <button
-                  @click.stop="$emit('updateUserId', employee.id)"
+                  @click.stop="selectUser(employee.id)"
                   class="text-sm text-green-600 hover:underline"
                 >
                   Select
@@ -262,7 +267,7 @@
         </p>
         <div class="flex gap-1">
           <button
-            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            class="bg-primaryYellow rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
             @click="previousPage"
             :disabled="currentPage === 1"
@@ -270,7 +275,7 @@
             Previous
           </button>
           <button
-            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            class="bg-primaryYellow rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
             @click="nextPage"
             :disabled="currentPage === totalPages"
@@ -321,6 +326,26 @@ export default {
     };
   },
   methods: {
+    // Handle the toggle switch when clock in/out is triggered
+    handleClockToggle(employee) {
+      // On fait un POST vers /api/clocks/:user_id
+      this.toggleClock(employee.id);
+    },
+
+    // Méthode pour faire le POST vers /api/clocks/:user_id
+    toggleClock(userID) {
+      userService
+        .toggleClock(userID)
+        .then((response) => {
+          this.showSuccessToast("Clock action successful!");
+          this.fetchEmployees(); // Rafraîchir la liste si nécessaire
+        })
+        .catch((error) => {
+          console.error("Error during clock action:", error);
+          this.showErrorToast("Failed to toggle clock.");
+        });
+    },
+
     openUserModal() {
       this.showCreateUserModal = true;
     },
@@ -355,7 +380,13 @@ export default {
       this.error = "";
       this.showUpdateUserModal = false;
     },
+
     selectUser(id) {
+      this.$emit("updateUserId", id);
+      if (this.selectedUserId === id) {
+        this.selectedUserId = null;
+        return;
+      }
       this.selectedUserId = id;
       console.log("Selected user ID:", this.selectedUserId);
       // console.log("userId : ", userID);
@@ -480,8 +511,10 @@ export default {
       userService
         .getUsers(this.limit, offset)
         .then((data) => {
-          console.log("Employees data:", data);
-          this.employees = data.users;
+          this.employees = data.users.map((user) => ({
+            ...user,
+            isWorking: user.clock ? user.clock.status : false, // Set the clock status
+          }));
           this.totalPages = data.total_pages;
           this.totalUsers = data.total_users;
         })
@@ -489,6 +522,7 @@ export default {
           console.error("Erreur lors de la récupération des employés:", error);
         });
     },
+
     nextPage() {
       console.log("Next page");
       if (this.currentPage < this.totalPages) {
@@ -528,3 +562,92 @@ export default {
   },
 };
 </script>
+<style>
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #fdcb12; /* primaryYellow */
+}
+
+input:checked + .slider:before {
+  transform: translateX(14px);
+}
+
+.glassmorphism-bg-white {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */
+  backdrop-filter: blur(10px); /* Effet de flou sur l'arrière-plan */
+  -webkit-backdrop-filter: blur(10px); /* Support pour Safari */
+  border-radius: 10px; /* Arrondi des angles */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Légère ombre pour effet de profondeur */
+  color: white;
+  overflow: hidden; /* Pour assurer que le pseudo-élément reste dans les limites du conteneur */
+}
+
+.glassmorphism-bg-white::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 2px; /* Épaisseur de la bordure */
+  border-radius: 10px; /* Même bordure arrondie */
+  background: linear-gradient(
+    to bottom right,
+    #ffffff,
+    rgba(255, 255, 255, 0.8),
+    #ffffff
+  ); /* Dégradé entièrement blanc */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none; /* Empêche les événements de la souris sur le pseudo-élément */
+}
+
+.glassmorphism-bg-white h2 {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85); /* Couleur blanche avec transparence */
+}
+
+.glassmorphism-bg-white .line-chart {
+  padding: 1rem;
+  border-radius: 8px;
+}
+</style>
