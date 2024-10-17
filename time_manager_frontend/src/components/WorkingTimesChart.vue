@@ -110,8 +110,19 @@ export default {
       ],
     };
   },
+  watch: {
+    userID: {
+      immediate: true,
+      handler(newUserID) {
+        // Appelle fetchWorkingTimes lorsque l'ID de l'utilisateur change
+        if (newUserID) {
+          this.fetchWorkingTimes(newUserID);
+        }
+      },
+    },
+  },
   methods: {
-    async getWorkingTimes() {
+    async fetchWorkingTimes(userID) {
       try {
         const userID = 1;
         const response = await axios.get(
@@ -128,20 +139,49 @@ export default {
         this.loading = false;
       }
     },
-    prepareChartData() {
-      const categories = this.workingTimes.map((wt) =>
-        this.formatDate(wt.start)
-      );
-      const durations = this.workingTimes.map((wt) =>
+    async prepareChartData() {
+      try {
+        const categories = this.workingTimes.map((wt) =>
+          this.formatDate(wt.start)
+        );
+        const durations = this.workingTimes.map((wt) =>
+          this.calculateDurationInHours(wt.start, wt.end)
+        );
+        this.chartOptions.xaxis.categories = categories;
+        this.series[0].data = durations;
+        const response = await fetch(
+          `http://localhost:4000/api/workingtimes/${userID}`
+        );
+        const data = await response.json();
+        const transformedData = this.prepareChartData(data.data);
+
+        // Afficher les données dans le graphique
+        this.renderChart(transformedData.labels, transformedData.durations);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des working times:",
+          error
+        );
+      }
+    },
+
+    prepareChartData(data) {
+      const labels = data.map((wt) => this.formatDate(wt.start));
+      const durations = data.map((wt) =>
         this.calculateDurationInHours(wt.start, wt.end)
       );
-      this.chartOptions.xaxis.categories = categories;
-      this.series[0].data = durations;
+
+      return {
+        labels: labels,
+        durations: durations,
+      };
     },
+
     formatDate(datetime) {
       const date = new Date(datetime);
       return date.toLocaleDateString();
     },
+
     calculateDurationInHours(start, end) {
       const startTime = new Date(start);
       const endTime = new Date(end);
@@ -152,6 +192,59 @@ export default {
   },
   mounted() {
     this.getWorkingTimes();
+  },
+
+  renderChart(labels, durations) {
+    const canvas = document.getElementById("barChart");
+
+    // Vérifie que l'élément canvas est trouvé dans le DOM
+    if (!canvas) {
+      console.error("Canvas element not found");
+      return;
+    }
+
+    // Vérifie s'il existe déjà un graphique et le détruit pour éviter les erreurs
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null; // Réinitialise l'instance après destruction
+    }
+
+    const chartContext = canvas.getContext("2d");
+
+    // Crée une nouvelle instance de Chart
+    this.chartInstance = new Chart(chartContext, {
+      type: "bar",
+      data: {
+        labels: labels, // Labels pour chaque barre (dates)
+        datasets: [
+          {
+            label: "Working Time Duration (hrs)",
+            data: durations, // Durées travaillées
+            backgroundColor: "rgba(75, 192, 192, 0.6)",
+            borderColor: "rgb(75, 192, 192)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Dates",
+            },
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Hours Worked",
+            },
+          },
+        },
+      },
+    });
   },
 };
 </script>
@@ -207,6 +300,11 @@ h2 {
 .glassmorphism-bg-white .line-chart {
   padding: 1rem;
   border-radius: 8px;
+}
+
+.bar-chart-container {
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 @keyframes spinner {

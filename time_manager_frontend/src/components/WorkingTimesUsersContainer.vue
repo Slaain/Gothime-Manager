@@ -63,7 +63,7 @@
     class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-50"
   >
     <div class="px-12 py-4 bg-white">
-      <h2 class="mb-4 text-lg font-bold">Modifier le temps de travail</h2>
+      <h2 class="mb-4 text-lg font-bold">Update working time</h2>
       <!-- Dropdown et input pour la modification -->
       <p class="mb-2">User</p>
       <Dropdown class="w-full" />
@@ -85,13 +85,13 @@
       </div>
       <button
         @click="updateWorkingTime"
-        class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800"
+        class="w-full px-4 py-2 mt-4 text-black bg-primaryYellow rounded-md hover:bg-primaryYellow400"
       >
         Update
       </button>
       <button
         @click="closeUpdateWorkingtimeModal"
-        class="w-full px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+        class="w-full px-4 py-2 mt-2 text-black border border-primaryYellow rounded-md hover:bg-neutral-100"
       >
         Cancel
       </button>
@@ -108,13 +108,13 @@
       <p>Are you sure you want to delete this working time?</p>
       <button
         @click="deleteWorkingTime"
-        class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
+        class="w-full py-2 mt-4 text-black transition-all bg-primaryYellow rounded-lg hover:bg-primaryYellow400"
       >
         Delete
       </button>
       <button
         @click="closeDeleteWorkingtimeModal"
-        class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
+        class="w-full py-2 mt-2 text-black transition-all border border-primaryYellow rounded-lg hover:bg-neutral-100"
       >
         Cancel
       </button>
@@ -129,7 +129,7 @@
     <div class="w-1/2 px-8 py-4 bg-white">
       <h2 class="mb-4 text-lg font-bold">Add Working Time</h2>
       <!-- Dropdown and input for creation -->
-      <h2 class="mb-4 text-lg font-bold">Modifier le temps de travail</h2>
+      <h2 class="mb-4 text-lg font-bold">Update working time</h2>
       <!-- Dropdown et input pour la modification -->
       <p class="mb-2">User</p>
       <Dropdown class="w-full" />
