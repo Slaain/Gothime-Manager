@@ -31,7 +31,7 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
   end
 
   # GET (ALL2): /api/workingtimes/:userID
-  def index(conn, %{"userID" => user_id}) do
+  def indexA(conn, %{"userID" => user_id}) do
     # Récupérer tous les working_times avec les informations utilisateur
     working_times_with_user_info = Timesheet.list_workingtimes_for_user(user_id)
     # Rendre la réponse JSON avec les informations de chaque working_time et utilisateur
@@ -57,17 +57,17 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
     end
 
          # Ajouter les secondes si elles sont absentes
-  start_time = if String.length(start_time) == 16 do
-    start_time <> ":00Z"
-  else
-    start_time
-  end
+    start_time = if String.length(start_time) == 16 do
+      start_time <> ":00Z"
+    else
+      start_time
+    end
 
-  end_time = if String.length(end_time) == 16 do
-    end_time <> ":00Z"
-  else
-    end_time
-  end
+    end_time = if String.length(end_time) == 16 do
+      end_time <> ":00Z"
+    else
+      end_time
+    end
 
     # Vérifier si le paramètre start est au bon format
     case NaiveDateTime.from_iso8601(start_time) do
@@ -129,17 +129,17 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
       end
 
       # Ajouter les secondes si elles sont absentes
-  start_time = if String.length(start_time) == 16 do
-    start_time <> ":00Z"
-  else
-    start_time
-  end
+    start_time = if String.length(start_time) == 16 do
+      start_time <> ":00Z"
+    else
+      start_time
+    end
 
-  end_time = if String.length(end_time) == 16 do
-    end_time <> ":00Z"
-  else
-    end_time
-  end
+    end_time = if String.length(end_time) == 16 do
+      end_time <> ":00Z"
+    else
+      end_time
+    end
 
       # Vérifier si le paramètre start est au bon format
       case NaiveDateTime.from_iso8601(start_time) do
@@ -212,4 +212,18 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
     |> put_status(:ok)
     |> json(%{message: "The working time has been deleted successfully", result: true})
   end
+
+  def count(conn, _params) do
+    current_time = DateTime.utc_now()
+    current_month = current_time.month
+    current_year = current_time.year
+
+    working_times_count = WorkingTimeService.count(current_month, current_year)
+
+    conn
+    |> put_status(:ok)
+    |> json(%{count: working_times_count})
+  end
+
+
 end
