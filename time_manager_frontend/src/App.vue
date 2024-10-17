@@ -1,98 +1,10 @@
 <template>
-
-  <div class="bat-container">
-    <div class="dashboard">
-      <!-- Sidebar -->
-      <aside class="text-white bg-gray-900 sidebar">
-        <div class="flex items-center justify-center py-6 logo">
-          <img src="./assets/avatar.png" alt="Vue Logo" class="w-12 h-12" />
-        </div>
-        <nav class="flex flex-col space-y-4 text-center nav">
-          <button class="p-2 bg-yellow-500 rounded-md hover:bg-yellow-700">
-            Dashboard
-          </button>
-          <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-            Charts
-          </button>
-          <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-            Users
-          </button>
-          <button @click="toggleGroupView" class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-            Groupe
-          </button>
-          <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-            Settings
-          </button>
-        </nav>
-      </aside>
-
-      <!-- Main Content -->
-      <main class="flex-1 p-6 main-content">
-        <header class="flex items-center justify-between mb-6">
-          <h1 class="text-3xl font-bold text-white">Dashboard</h1>
-          <div class="flex items-center space-x-4 text-white user-info">
-            <span>ADMIN</span>
-            <img
-              src="./assets/avatar.png"
-              alt="User Avatar"
-              class="w-10 h-10 rounded-full"
-            />
-
-          </div>
-        </header>
-
-        <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
-          <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
-          <LineChart />
-        </section>
-
-
-        <section class="grid grid-cols-3 gap-6 mb-6 charts">
-          <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
-            <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
-            <div class="h-40 flex items-center justify-center working-times-number">
-              {{ monthlyUsers }}
-            </div>
-          </div>
-          
-          <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
-            <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
-            <div class="h-40 flex items-center justify-center working-times-number">
-              {{ currentUsers }}
-            </div>
-          </div>
-
-
-          <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
-            <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
-            <div class="h-40 flex items-center justify-center working-times-number">
-              {{ workingTimesThisMonth }}
-            </div>
-          </div>
-        </section>
-        <section v-if="showGroupComponent" class="group-section bg-gray-700 p-6 rounded-lg shadow-lg mb-6">
-          <h2 class="text-xl text-white mb-4">Manage Groups</h2>
-          <CreaGroupComponent />
-        </section>
-        <section class="p-0 users">
-          <h2 class="mb-4 text-xl text-white">Users List</h2>
-          <div class="overflow-x-auto">
-            <UserList @updateUserId="selectUser" />
-          </div>
-
-        </section>
-
-        <section v-if="selectedUserId" class="w-full mt-6">
-          <!-- <h2 class="mb-4 text-xl text-white">
-            Working Times for User {{ selectedUserId }}
-          </h2> -->
-          <WorkingTimeUserContainer :userID="selectedUserId" />
-        </section>
-      </main>
-    </div>
-
+  <div class="bg-gotham-wallpaper bg-cover bg-center min-h-screen flex items-center justify-center">
+    <inscriptionForm class="w-2/3 w-full rounded-lg shadow-md" />
   </div>
 </template>
+
+
 <script>
 
 import UserList from './components/UserList.vue';
@@ -101,6 +13,7 @@ import WorkingTimeUserContainer from './components/WorkingTimesUsersContainer.vu
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import BarChart from "@/components/WorkingTimesChart.vue";
 import axios from 'axios';
+import inscriptionForm from "@/components/inscriptionForm.vue";
 
 import { getCurrentInstance } from 'vue';
 
@@ -113,6 +26,7 @@ export default {
     WorkingTimeUserContainer,
     CreaGroupComponent,
     BarChart, // Enregistrement du BarChart
+    inscriptionForm
   },
   data() {
     return {
@@ -358,4 +272,15 @@ export default {
   padding: 20px;
   border-radius: 10px;
 }
+* {
+  margin: 0;
+
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 </style>
