@@ -40,7 +40,7 @@
     <!-- Lien vers la page d'inscription -->
     <p class="mt-4 text-white text-center">
       Don't have an account?
-      <a href="/signup" class="text-yellow-500 hover:text-yellow-600">Sign up</a>
+      <a href="/register" class="text-yellow-500 hover:text-yellow-600">Sign up</a>
     </p>
   </div>
 </template>
