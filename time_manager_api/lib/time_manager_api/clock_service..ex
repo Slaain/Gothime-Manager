@@ -152,5 +152,13 @@ defmodule TimeManagerApi.ClockService do
     end
   end
 
+  def countactive() do
+    from(c in Clock,
+      where: c.status == true,    # Filtrer les clocks où le statut est à `true`
+      select: count(c.id)         # Compter le nombre de clocks correspondants
+    )
+    |> Repo.one()
+  end
+
 
 end

@@ -1,20 +1,20 @@
 <template>
   <div class="max-w-[720px] mx-auto">
     <div
-      class="relative flex flex-col w-full h-full shadow-md glassmorphism-bg-white text-neutral-100 rounded-xl bg-clip-border"
+      class="relative flex flex-col w-full h-full bg-white shadow-md text-slate-700 rounded-xl bg-clip-border"
     >
       <div
-        class="relative mx-4 mt-4 overflow-hidden rounded-none text-neutral-100 bg-clip-border"
+        class="relative mx-4 mt-4 overflow-hidden bg-white rounded-none text-slate-700 bg-clip-border"
       >
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-white">Employees List</h3>
-            <p class="text-neutral-300">Review each person before edit</p>
+            <h3 class="text-lg font-semibold text-slate-800">Employees List</h3>
+            <p class="text-slate-500">Review each person before edit</p>
           </div>
           <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
             <button
               @click="openUserModal"
-              class="flex select-none items-center gap-2 rounded bg-primaryYellow hover:bg-primaryYellow400 py-2.5 px-4 text-xs font-semibold text-black shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+              class="flex select-none items-center gap-2 rounded bg-slate-800 py-2.5 px-4 text-xs font-semibold text-white shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
             >
               <svg
@@ -70,13 +70,13 @@
           <p class="h-6 text-red-600">{{ error }}</p>
           <button
             @click="createUser"
-            class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
+            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
           >
             Create User
           </button>
           <button
             @click="closeUserModal"
-            class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg hover:bg-neutral-100 border-primaryYellow"
+            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
           >
             Cancel
           </button>
@@ -118,13 +118,13 @@
           <p class="h-6 text-red-600">{{ error }}</p>
           <button
             @click="updateUser"
-            class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
+            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
           >
             Update
           </button>
           <button
             @click="closeUpdateUserModal"
-            class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg border-primaryYellow hover:bg-neutral-100"
+            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
           >
             Cancel
           </button>
@@ -140,17 +140,17 @@
       >
         <div class="w-1/2 px-8 py-4 bg-white">
           <p class="text-xl font-extrabold text-zinc-950">Delete User</p>
-          <p class="text-black">Are you sure you want to delete this user?</p>
+          <p>Are you sure you want to delete this user?</p>
           <p class="h-6 text-red-600">{{ error }}</p>
           <button
             @click="deleteEmployee"
-            class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
+            class="w-full py-2 mt-4 text-white transition-all bg-blue-500 rounded-lg hover:bg-blue-600"
           >
             Delete
           </button>
           <button
             @click="closeUserDeleteModal"
-            class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg border-primaryYellow hover:bg-neutral-100"
+            class="w-full py-2 mt-2 text-white transition-all bg-red-500 rounded-lg hover:bg-red-600"
           >
             Cancel
           </button>
@@ -180,13 +180,13 @@
                 </p>
               </th>
               <th
-                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
               ></th>
               <th
-                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
               ></th>
               <th
-                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
               ></th>
             </tr>
           </thead>
@@ -198,21 +198,17 @@
               >
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
-                    <p class="text-sm font-semibold text-neutral-100">
+                    <p class="text-sm font-semibold text-slate-700">
                       {{ employee.username }}
                     </p>
-                    <p class="text-sm text-neutral-300">{{ employee.email }}</p>
+                    <p class="text-sm text-slate-500">{{ employee.email }}</p>
                   </div>
                 </div>
               </td>
               <td class="p-4 border-b border-slate-200">
                 <!-- Toggle button for Clock In/Out -->
                 <label class="switch">
-                  <input
-                    type="checkbox"
-                    v-model="employee.isWorking"
-                    @change="handleClockToggle(employee)"
-                  />
+                  <input type="checkbox" v-model="employee.isWorking" @change="handleClockToggle(employee)">
                   <span class="slider round"></span>
                 </label>
               </td>
@@ -265,7 +261,7 @@
         </p>
         <div class="flex gap-1">
           <button
-            class="bg-primaryYellow rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
             @click="previousPage"
             :disabled="currentPage === 1"
@@ -273,7 +269,7 @@
             Previous
           </button>
           <button
-            class="bg-primaryYellow rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
             @click="nextPage"
             :disabled="currentPage === totalPages"
@@ -324,11 +320,12 @@ export default {
     };
   },
   methods: {
-    // Handle the toggle switch when clock in/out is triggered
+
+  // Handle the toggle switch when clock in/out is triggered
     handleClockToggle(employee) {
-      // On fait un POST vers /api/clocks/:user_id
-      this.toggleClock(employee.id);
-    },
+        // On fait un POST vers /api/clocks/:user_id
+        this.toggleClock(employee.id);
+      },
 
     // Méthode pour faire le POST vers /api/clocks/:user_id
     toggleClock(userID) {
@@ -498,15 +495,13 @@ export default {
     fetchEmployees() {
       const offset = (this.currentPage - 1) * this.limit;
 
-      console.log(
-        `Fetching employees with limit ${this.limit} and offset ${offset}`
-      );
+      console.log(`Fetching employees with limit ${this.limit} and offset ${offset}`);
       userService
         .getUsers(this.limit, offset)
         .then((data) => {
-          this.employees = data.users.map((user) => ({
+          this.employees = data.users.map(user => ({
             ...user,
-            isWorking: user.clock ? user.clock.status : false, // Set the clock status
+            isWorking: user.clock ? user.clock.status : false // Set the clock status
           }));
           this.totalPages = data.total_pages;
           this.totalUsers = data.total_users;
@@ -594,52 +589,10 @@ export default {
 }
 
 input:checked + .slider {
-  background-color: #fdcb12; /* primaryYellow */
+  background-color: #4caf50;
 }
 
 input:checked + .slider:before {
   transform: translateX(14px);
-}
-.glassmorphism-bg-white {
-  position: relative;
-  background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */
-  backdrop-filter: blur(10px); /* Effet de flou sur l'arrière-plan */
-  -webkit-backdrop-filter: blur(10px); /* Support pour Safari */
-  border-radius: 10px; /* Arrondi des angles */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Légère ombre pour effet de profondeur */
-  color: white;
-  overflow: hidden; /* Pour assurer que le pseudo-élément reste dans les limites du conteneur */
-}
-
-.glassmorphism-bg-white::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  padding: 2px; /* Épaisseur de la bordure */
-  border-radius: 10px; /* Même bordure arrondie */
-  background: linear-gradient(
-    to bottom right,
-    #ffffff,
-    rgba(255, 255, 255, 0.8),
-    #ffffff
-  ); /* Dégradé entièrement blanc */
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask-composite: exclude;
-  pointer-events: none; /* Empêche les événements de la souris sur le pseudo-élément */
-}
-
-.glassmorphism-bg-white h2 {
-  font-weight: bold;
-  color: rgba(255, 255, 255, 0.85); /* Couleur blanche avec transparence */
-}
-
-.glassmorphism-bg-white .line-chart {
-  padding: 1rem;
-  border-radius: 8px;
 }
 </style>

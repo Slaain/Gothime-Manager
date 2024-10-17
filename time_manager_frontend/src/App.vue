@@ -7,7 +7,7 @@
           <img src="./assets/avatar.png" alt="Vue Logo" class="w-12 h-12" />
         </div>
         <nav class="flex flex-col space-y-4 text-center nav">
-          <button class="p-2 bg-green-600 rounded-md hover:bg-green-700">
+          <button class="p-2 bg-yellow-500 rounded-md hover:bg-yellow-700">
             Dashboard
           </button>
           <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
@@ -45,15 +45,15 @@
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
-            <div class="h-40">
-              <apexchart :options="chartOptions" :series="series"></apexchart>
+            <div class="h-40 flex items-center justify-center working-times-number">
+              {{ monthlyUsers }}
             </div>
           </div>
-
+          
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
-            <div class="h-40">
-              <apexchart :options="chartOptions" :series="series"></apexchart>
+            <div class="h-40 flex items-center justify-center working-times-number">
+              {{ currentUsers }}
             </div>
           </div>
 
@@ -91,6 +91,7 @@ import axios from 'axios';
 import UserList from "./components/UserList.vue"; // Import de ton composant personnalisé
 import LineChart from "./components/LineChart.vue"; // Import du nouveau composant LineChart
 import WorkingTimeUserContainer from "./components/WorkingTimesUsersContainer.vue"; // Assurez-vous d'importer ce composant
+import { getCurrentInstance } from 'vue';
 
 export default {
   name: "Dashboard",
@@ -101,7 +102,9 @@ export default {
   },
   data() {
     return {
+      currentUsers: 0,
       workingTimesThisMonth: 0, // Initialisation avec une valeur par défaut
+      monthlyUsers : 0,
       chartOptions: {
         chart: {
           id: "basic-bar",
@@ -133,20 +136,30 @@ export default {
     };
   },
   mounted() {
+    this.getCurrentUsers();
     this.getWorkingTimesThisMonth(); // Appel de la méthode pour récupérer le count lors du montage du composant
   },
   methods: {
     async getWorkingTimesThisMonth() {
       try {
         const response = await axios.get('http://localhost:4000/api/workingtimes/count');
-        this.workingTimesThisMonth = response.data.count; // Assigner le nombre retourné par l'API
+        this.monthlyUsers = response.data.users_count; // Assigner le nombre retourné par l'API
+        this.workingTimesThisMonth = response.data.working_times_count
       } catch (error) {
         console.error("Erreur lors de la récupération des working times", error);
       }
     },
+    async getCurrentUsers() {
+      try {
+        const response = await axios.get('http://localhost:4000/api/clocks/countactive');
+        console.log(response);
+        this.currentUsers = response.data.count;
+      } catch (error){
+        console.error("Erreur lors de la récupération des utilisateurs actifs", error);
+      }
+    },
     // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
     selectUser(userId) {
-      console.log(userId);
       this.selectedUserId = userId;
     },
   },
@@ -156,7 +169,7 @@ export default {
 <style scoped>
 
 .working-times-number {
-  font-size: 5rem;
+  font-size: 6rem;
   color: transparent; /* Texte transparent */
   -webkit-text-stroke: 2px #fdcb12; /* Contour jaune */
   border-radius: 10px;
@@ -166,6 +179,8 @@ export default {
 .chart:hover .working-times-number {
   color: #fdcb12; /* Le texte devient entièrement jaune */
   -webkit-text-stroke: 0px; /* Retire le contour au hover */
+  text-shadow: 0 0 10px rgba(253, 203, 18, 0.8), /* Ombre jaune */
+               0 0 20px rgba(253, 203, 18, 0.6); /* Ombre plus lointaine */
 }
 
 
@@ -290,7 +305,7 @@ export default {
 }
 .sidebar {
   width: 200px;
-  background-color: #2d3748;
+  background-color: #212327;
   padding: 20px;
 }
 
