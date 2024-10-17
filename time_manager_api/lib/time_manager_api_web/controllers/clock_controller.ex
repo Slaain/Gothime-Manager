@@ -152,4 +152,10 @@ defmodule TimeManagerApiWeb.ClockController do
         |> render(TimeManagerApiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def countactive(conn, _params) do
+    active_users_count = ClockService.countactive()
+    json(conn, %{count: active_users_count})
+  end
+
 end

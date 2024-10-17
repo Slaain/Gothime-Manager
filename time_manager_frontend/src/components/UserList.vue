@@ -179,13 +179,13 @@
                 </p>
               </th>
               <th
-                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
               ></th>
               <th
-                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
               ></th>
               <th
-                class="p-4 transition-colors border-y border-slate-200 bg-slate-50"
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
               ></th>
             </tr>
           </thead>
@@ -197,10 +197,10 @@
               >
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
-                    <p class="text-sm font-semibold text-neutral-100">
+                    <p class="text-sm font-semibold text-slate-700">
                       {{ employee.username }}
                     </p>
-                    <p class="text-sm text-neutral-300">{{ employee.email }}</p>
+                    <p class="text-sm text-slate-500">{{ employee.email }}</p>
                   </div>
                 </div>
               </td>
@@ -210,11 +210,7 @@
               >
                 <!-- Toggle button for Clock In/Out -->
                 <label class="switch">
-                  <input
-                    type="checkbox"
-                    v-model="employee.isWorking"
-                    @change="handleClockToggle(employee)"
-                  />
+                  <input type="checkbox" v-model="employee.isWorking" @change="handleClockToggle(employee)">
                   <span class="slider round"></span>
                 </label>
               </td>
@@ -267,7 +263,7 @@
         </p>
         <div class="flex gap-1">
           <button
-            class="bg-primaryYellow rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
             @click="previousPage"
             :disabled="currentPage === 1"
@@ -275,7 +271,7 @@
             Previous
           </button>
           <button
-            class="bg-primaryYellow rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
             type="button"
             @click="nextPage"
             :disabled="currentPage === totalPages"
@@ -326,11 +322,12 @@ export default {
     };
   },
   methods: {
-    // Handle the toggle switch when clock in/out is triggered
+
+  // Handle the toggle switch when clock in/out is triggered
     handleClockToggle(employee) {
-      // On fait un POST vers /api/clocks/:user_id
-      this.toggleClock(employee.id);
-    },
+        // On fait un POST vers /api/clocks/:user_id
+        this.toggleClock(employee.id);
+      },
 
     // Méthode pour faire le POST vers /api/clocks/:user_id
     toggleClock(userID) {
@@ -505,15 +502,13 @@ export default {
     fetchEmployees() {
       const offset = (this.currentPage - 1) * this.limit;
 
-      console.log(
-        `Fetching employees with limit ${this.limit} and offset ${offset}`
-      );
+      console.log(`Fetching employees with limit ${this.limit} and offset ${offset}`);
       userService
         .getUsers(this.limit, offset)
         .then((data) => {
-          this.employees = data.users.map((user) => ({
+          this.employees = data.users.map(user => ({
             ...user,
-            isWorking: user.clock ? user.clock.status : false, // Set the clock status
+            isWorking: user.clock ? user.clock.status : false // Set the clock status
           }));
           this.totalPages = data.total_pages;
           this.totalUsers = data.total_users;
@@ -601,7 +596,7 @@ export default {
 }
 
 input:checked + .slider {
-  background-color: #fdcb12; /* primaryYellow */
+  background-color: #4caf50;
 }
 
 input:checked + .slider:before {

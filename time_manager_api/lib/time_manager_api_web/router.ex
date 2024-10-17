@@ -41,6 +41,7 @@ defmodule TimeManagerApiWeb.Router do
     # Scope pour les clocks
     scope "/clocks" do
       post "/:user_id", ClockController, :beep
+      get "/countactive", ClockController, :countactive
     end
 
     # Route pour les requêtes OPTIONS (utilisées pour le CORS)
@@ -51,8 +52,8 @@ defmodule TimeManagerApiWeb.Router do
   get "/groups", GroupController, :index      # Liste des groupes
   post "/groups", GroupController, :create    # Créer un groupe
   get "/groups/:id", GroupController, :show   # Afficher un groupe spécifique
-    delete "/groups/:id", GroupController, :delete
-    put "/groups/:id", GroupController, :update
+  delete "/groups/:id", GroupController, :delete
+  put "/groups/:id", GroupController, :update
 
 
     # Routes pour gérer les utilisateurs dans les groupes

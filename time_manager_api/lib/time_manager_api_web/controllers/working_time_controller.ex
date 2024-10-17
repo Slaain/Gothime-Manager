@@ -218,11 +218,17 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
     current_month = current_time.month
     current_year = current_time.year
 
+    # Récupérer le nombre total de working_times et d'utilisateurs distincts
     working_times_count = WorkingTimeService.count(current_month, current_year)
+    users_count = WorkingTimeService.count_users(current_month, current_year)
 
+    # Renvoyer les deux valeurs dans la réponse JSON
     conn
     |> put_status(:ok)
-    |> json(%{count: working_times_count})
+    |> json(%{
+      working_times_count: working_times_count,
+      users_count: users_count
+    })
   end
 
 
