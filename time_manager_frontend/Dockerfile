@@ -8,15 +8,22 @@ WORKDIR /app/time_manager_frontend
 COPY package*.json ./
 
 
+
 # Installer les dépendances nécessaires
 RUN apk add --no-cache git
-RUN npm install npm@latest -g
 RUN npm install
 
 COPY . .
+
+# Installe vite globalement
+RUN npm install -g vite
+RUN npm install @vitejs/plugin-vue --save-dev
+
+
+#COPY . /app/time_manager_frontend
 
 # Exposer le port sur lequel Vite s'exécute
 EXPOSE 5173
 
 # Commande de démarrage de l'application vite
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
