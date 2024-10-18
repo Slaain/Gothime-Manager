@@ -32,9 +32,5 @@ RUN chmod +x /app/entrypoint.sh
 EXPOSE 4000
 
 # Commande pour démarrer le serveur Phoenix via entrypoint.sh
-CMD ["sh", "/app/entrypoint.sh"]
-
-# Commande pour démarrer le serveur Phoenix
-
-# CMD bash entrypoint.sh
 #CMD ["mix", "phx.server"]
+CMD ["sh", "/app/entrypoint.sh"]
