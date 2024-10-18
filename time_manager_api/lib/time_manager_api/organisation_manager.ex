@@ -5,8 +5,9 @@ defmodule TimeManagerApi.Organisation do
   @derive {Jason.Encoder, only: [:id, :name, :inserted_at, :updated_at]}
   schema "organisations" do
     field :name, :string
-    many_to_many :users, TimeManagerApi.User, join_through: "organisation_users", on_replace: :delete
+
     many_to_many :groups, TimeManagerApi.Group, join_through: "organisation_groups", on_replace: :delete
+
     timestamps(type: :utc_datetime)
   end
 
