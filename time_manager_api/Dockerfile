@@ -23,8 +23,6 @@ COPY mix.exs mix.lock ./
 # Installer les dépendances
 RUN mix deps.get
 
-# Initier la base de données
-RUN mix ecto.drop && mix ecto.create && mix ecto.migrate
 
 # Copier le reste des fichiers de l'application
 COPY . .
@@ -34,6 +32,7 @@ RUN mix compile
 
 # Exposer le port 4000 pour l'API
 EXPOSE 4000
+
 
 # Commande pour démarrer le serveur Phoenix
 CMD ["mix", "phx.server"]
