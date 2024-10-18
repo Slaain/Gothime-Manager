@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <router-view /> <!-- Cela affichera AdminDashboard ou d'autres pages selon la route -->
+    <router-view />
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: "App",
 };
 </script>
 
