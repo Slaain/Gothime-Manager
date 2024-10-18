@@ -1,8 +1,9 @@
 <template>
-
-  <div class="bat-container">
-    <div class="dashboard">
-      <!-- Sidebar -->
+  <!-- <div class="bat-container"> -->
+  <!-- <div class="dashboard"> -->
+  <LandingPage />
+  <!-- </div> -->
+  <!-- <div class="dashboard">
       <aside class="text-white bg-gray-900 sidebar">
         <div class="flex items-center justify-center py-6 logo">
           <img src="./assets/avatar.png" alt="Vue Logo" class="w-12 h-12" />
@@ -23,7 +24,6 @@
         </nav>
       </aside>
 
-      <!-- Main Content -->
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
           <h1 class="text-3xl font-bold text-white">Dashboard</h1>
@@ -62,7 +62,7 @@
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
-            <div class="h-40 flex items-center justify-center working-times-number">
+            <div class="flex items-center justify-center h-40 working-times-number">
               {{ workingTimesThisMonth }}
             </div>
           </div>
@@ -76,35 +76,31 @@
         </section>
 
         <section v-if="selectedUserId" class="w-full mt-6">
-          <!-- <h2 class="mb-4 text-xl text-white">
-            Working Times for User {{ selectedUserId }}
-          </h2> -->
           <WorkingTimeUserContainer :userID="selectedUserId" />
         </section>
       </main>
-    </div>
-
-  </div>
+    </div> -->
+  <!-- </div> -->
 </template>
-<script>
 
-import UserList from './components/UserList.vue';
-import LineChart from './components/LineChart.vue';
-import WorkingTimeUserContainer from './components/WorkingTimesUsersContainer.vue';
+<script>
+import UserList from "./components/UserList.vue";
+import LineChart from "./components/LineChart.vue";
+import WorkingTimeUserContainer from "./components/WorkingTimesUsersContainer.vue";
+import LandingPage from "./components/LandingPage.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import BarChart from "@/components/WorkingTimesChart.vue";
-import axios from 'axios';
-
+import axios from "axios";
 
 export default {
   name: "Dashboard",
   components: {
-
     UserList,
     LineChart,
     WorkingTimeUserContainer,
     CreaGroupComponent,
     BarChart, // Enregistrement du BarChart
+    LandingPage,
   },
   data() {
     return {
@@ -130,20 +126,20 @@ export default {
           ],
         },
       },
-      series: [{
-        name: "series-1",
-        data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
-      }],
+      series: [
+        {
+          name: "series-1",
+          data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
+        },
+      ],
       selectedUserId: null,
       showGroupComponent: false, // Variable pour contrôler l'affichage du composant CreaGroupComponent
-
     };
   },
   mounted() {
     this.getWorkingTimesThisMonth(); // Appel de la méthode pour récupérer le count lors du montage du composant
   },
   methods: {
-
     showDashboard() {
       this.showGroupComponent = false;
     },
@@ -153,10 +149,15 @@ export default {
 
     async getWorkingTimesThisMonth() {
       try {
-        const response = await axios.get('http://localhost:4000/api/workingtimes/count');
+        const response = await axios.get(
+          "http://localhost:4000/api/workingtimes/count"
+        );
         this.workingTimesThisMonth = response.data.count; // Assigner le nombre retourné par l'API
       } catch (error) {
-        console.error("Erreur lors de la récupération des working times", error);
+        console.error(
+          "Erreur lors de la récupération des working times",
+          error
+        );
       }
     },
     // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
@@ -171,7 +172,6 @@ export default {
 
 
 <style scoped>
-
 .working-times-number {
   font-size: 5rem;
   color: transparent; /* Texte transparent */
@@ -184,7 +184,6 @@ export default {
   color: #fdcb12; /* Le texte devient entièrement jaune */
   -webkit-text-stroke: 0px; /* Retire le contour au hover */
 }
-
 
 .glassmorphism {
   position: relative;
