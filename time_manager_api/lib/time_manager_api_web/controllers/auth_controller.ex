@@ -2,18 +2,17 @@ defmodule TimeManagerApiWeb.AuthController do
   use TimeManagerApiWeb, :controller
   alias TimeManagerApi.Accounts.User
   alias TimeManagerApi.Repo
-  alias Bcrypt  # Assurez-vous que c'est bien le module bcrypt_elixir
+  alias Bcrypt
+  alias TimeManagerApi.Guardian  # Import Guardian ici
   alias TimeManagerApi.UserService
 
   # Inscription d'un utilisateur
   def register(conn, %{"email" => email, "username" => username, "password" => password}) do
-    # Création d'un utilisateur
     case UserService.create_user(%{"email" => email, "username" => username, "password" => password}) do
       {:ok, user} ->
         json(conn, %{message: "User created successfully", user: user})
 
       {:error, changeset} ->
-        # Récupération des erreurs et des messages de validation
         errors = changeset.errors
                   |> Enum.map(fn {field, {message, _}} -> {field, message} end)
 
@@ -23,27 +22,11 @@ defmodule TimeManagerApiWeb.AuthController do
     end
   end
 
-  # Connexion d'un utilisateur
-  def login(conn, %{"email" => email, "password" => password}) do
-    user = Repo.get_by(User, email: email)
-    IO.inspect(user, label: "User retrieved")
 
-    if(user == nil) do
       conn
       |> put_status(:unauthorized)
       |> json(%{error: "Invalid credentials"})
-      |> halt()
-    end
 
-    if(check_password(user, password)) do
-      conn
-      |> put_status(:ok)
-      |> json(%{message: "Login successful", user: user})
-    else
-      conn
-      |> put_status(:unauthorized)
-      |> json(%{error: "Invalid credentials"})
-    end
 
     # case check_password(user, password) do
     #   {:ok, user} ->
@@ -60,10 +43,38 @@ defmodule TimeManagerApiWeb.AuthController do
     #     |> put_status(:unauthorized)
     #     |> json(%{error: "User not found"})
     # end
-  end
 
 
+    # Connexion d'un utilisateur
+    def login(conn, %{"email" => email, "password" => password}) do
+      user = Repo.get_by(User, email: email)
 
-  defp check_password(nil, _password), do: Bcrypt.no_user_verify() && false
-  defp check_password(user, password), do: Bcrypt.check_pass(user, password)
+      case check_password(user, password) do
+        {:ok, user} ->
+          # Génération du token JWT avec Guardian
+          {:ok, token, _claims} = Guardian.encode_and_sign(user, %{})
+
+          # Renvoyer la réponse avec le token
+          conn
+          |> json(%{message: "Login successful", user: user, token: token})
+
+        {:error, :invalid_password} ->
+          conn
+          |> put_status(:unauthorized)
+          |> json(%{error: "Invalid credentials"})
+
+        {:error, :invalid_user} ->
+          conn
+          |> put_status(:unauthorized)
+          |> json(%{error: "User not found"})
+      end
+    end
+
+    defp check_password(nil, _password), do: {:error, :invalid_user}
+    defp check_password(user, password) do
+      case Bcrypt.check_pass(user, password) do
+        {:ok, user} -> {:ok, user}
+        _ -> {:error, :invalid_password}
+      end
+    end
 end
