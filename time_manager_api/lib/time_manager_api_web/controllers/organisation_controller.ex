@@ -4,19 +4,14 @@ defmodule TimeManagerApiWeb.OrganisationController do
   #alias TimeManagerApi.OrganisationManager
   #alias TimeManagerApi.OrganisationManager.Organisation
 
-  alias TimeManagerApi.{Repo, Organisation,Group, User,OrganisationGroup, GroupUser}
+  alias TimeManagerApi.{Repo, Organisation,Group,OrganisationGroup}
 
  # Liste des organisations
  def index(conn, _params) do
-  organisations = Repo.all(Organisation) |> Repo.preload(:groups) # charge les utilisateurs associés
-  render(conn, :index, organisations: organisations)
+  organisations = Repo.all(Organisation) |> Repo.preload(:groups) # charge les groupes associés
+  render(conn, "index.json", organisations: organisations)
 
 end
-
-  def new(conn, _params) do
-    changeset = OrganisationManager.change_organisation(%Organisation{})
-    render(conn, :new, changeset: changeset)
-  end
 
   def create(conn, %{"organisation" => organisation_params}) do
     changeset = Organisation.changeset(%Organisation{}, organisation_params)
@@ -38,7 +33,7 @@ end
 
   def show(conn, %{"id" => id}) do
     organisation = Repo.get!(Organisation, id) |> Repo.preload(:groups)
-    render(conn, :show, organisation: organisation)
+    render(conn, "show.json", organisation: organisation)
   end
 
    # Ajouter un groupe dans une organisation
