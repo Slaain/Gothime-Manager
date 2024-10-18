@@ -57,6 +57,7 @@
 <script>
 import { ref } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router"; // Importation du router
 
 export default {
   setup() {
@@ -67,9 +68,12 @@ export default {
 
     const error = ref("");
     const success = ref("");
+    const router = useRouter(); // Utiliser le hook pour accéder au routeur
 
     const handleLogin = async () => {
       try {
+        console.log("aled");
+
         if (!form.value.email || !form.value.password) {
           error.value = "Please fill in all fields";
           return;
@@ -81,10 +85,12 @@ export default {
           password: form.value.password,
         });
 
-        const response = await axios.post("http://localhost:3000/api/login", {
+        const response = await axios.post("http://localhost:4000/api/login", {
           email: form.value.email,
           password: form.value.password,
         });
+
+        console.log("response : ", response.data.token);
 
         if (response.status !== 200) {
           error.value = "Invalid credentials";
@@ -96,9 +102,22 @@ export default {
         success.value = "Login successful!";
         form.value.email = "";
         form.value.password = "";
-      } catch (error) {
-        console.error(error);
-        error.value = "An error occurred";
+        localStorage.setItem("authToken", response.data.token);
+        router.push("/admin");
+      } catch (apiError) {
+        // error.value = "Invalid credentials";
+        console.log("catch : ", apiError.response.data);
+
+        // Assurez-vous que `apiError` est correctement utilisé et non `error`
+        if (apiError.response && apiError.response.data.error) {
+          console.log(true);
+          console.log(apiError.response.data.error);
+
+          error.value = apiError.response.data.error;
+          return;
+        }
+
+        console.error("err : ", apiError);
       }
     };
 
@@ -111,6 +130,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .glassmorphism-bg-white {

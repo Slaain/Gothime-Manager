@@ -23,27 +23,6 @@ defmodule TimeManagerApiWeb.AuthController do
   end
 
 
-      conn
-      |> put_status(:unauthorized)
-      |> json(%{error: "Invalid credentials"})
-
-
-    # case check_password(user, password) do
-    #   {:ok, user} ->
-    #     conn
-    #     |> json(%{message: "Login successful", user: user})
-
-    #   {:error, :invalid_password} ->
-    #     conn
-    #     |> put_status(:unauthorized)
-    #     |> json(%{error: "Invalid credentials"})
-
-    #   {:error, :invalid_user} ->
-    #     conn
-    #     |> put_status(:unauthorized)
-    #     |> json(%{error: "User not found"})
-    # end
-
 
     # Connexion d'un utilisateur
     def login(conn, %{"email" => email, "password" => password}) do
@@ -66,7 +45,7 @@ defmodule TimeManagerApiWeb.AuthController do
         {:error, :invalid_user} ->
           conn
           |> put_status(:unauthorized)
-          |> json(%{error: "User not found"})
+          |> json(%{error: "Invalid credentials"})
       end
     end
 
