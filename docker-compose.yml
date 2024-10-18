@@ -5,8 +5,8 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Correspond au fichier .env
       POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: postgres  # Correspond au fichier .env
       POSTGRES_DB: ${DB_NAME}  # Correspond à la base de données dans .env
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -19,7 +19,7 @@ services:
     command: sh entrypoint.sh
     working_dir: /app/time_manager_api
     volumes:
-      - ./time_manager_api:/app
+      - .:/time_manager_api/app
     ports:
       - "4000:4000"
     environment:
@@ -39,7 +39,7 @@ services:
     depends_on:
       - phoenix  # Assure que le service backend "phoenix" soit démarré avant ce service
     volumes:
-      - ./time_manager_frontend:/app  # Monte le répertoire local du frontend pour permettre le hot-reload
+      - .:/time_manager_frontend/app  # Monte le répertoire local du frontend pour permettre
       - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
     #environment:
      # CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING}  # Active l'utilisation du polling pour Chokidar
@@ -57,7 +57,10 @@ services:
        - "8081:8080"  # Expose l'interface web de PgAdmin
     depends_on:
       - db  # Assure que le service "db" soit démarré avant ce service
+   # volumes:
+    #  - adminer_data:/var/lib/adminer  
 
 volumes:
-  db_data:  # Correctly defined named volume for the PostgreSQL database
-  adminer_data:  # Correctly defined named volume for PgAdmin configuration
+  db_data: 
+    driver: local
+ # adminer_data:  # Correctly defined named volume for PgAdmin configuration
