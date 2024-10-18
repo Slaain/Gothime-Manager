@@ -26,17 +26,26 @@ defmodule TimeManagerApiWeb.AuthController do
   # Connexion d'un utilisateur
   def login(conn, %{"email" => email, "password" => password}) do
     user = Repo.get_by(User, email: email)
+    IO.inspect(user, label: "User retrieved")
 
     case check_password(user, password) do
-      true ->
+      {:ok, user} ->
         conn
         |> json(%{message: "Login successful", user: user})
-      false ->
+
+      {:error, :invalid_password} ->
         conn
         |> put_status(:unauthorized)
         |> json(%{error: "Invalid credentials"})
+
+      {:error, :invalid_user} ->
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{error: "User not found"})
     end
   end
+
+
 
   defp check_password(nil, _password), do: Bcrypt.no_user_verify() && false
   defp check_password(user, password), do: Bcrypt.check_pass(user, password)
