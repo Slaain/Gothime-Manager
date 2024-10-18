@@ -492,7 +492,7 @@ export default {
     },
 
     editEmployee(id) {
-      // console.log(`Editing employee with ID: ${id}`);
+       console.log(`Editing employee with ID: ${id}`);
       this.selectedUserId = id;
       this.showAccountDetails(id);
     },
