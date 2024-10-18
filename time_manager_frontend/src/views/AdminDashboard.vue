@@ -3,25 +3,7 @@
     <div class="bat-container">
       <div class="dashboard">
         <!-- Sidebar -->
-        <aside class="text-white bg-gray-900 sidebar">
-          <div class="flex items-center justify-center py-6 logo">
-            <img src="../assets/avatar.png" alt="Vue Logo" class="w-12 h-12" />
-          </div>
-          <nav class="flex flex-col space-y-4 text-center nav">
-            <button class="p-2 bg-yellow-500 rounded-md hover:bg-yellow-700">
-              Dashboard
-            </button>
-            <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-              Charts
-            </button>
-            <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-              Users
-            </button>
-            <button class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-              Settings
-            </button>
-          </nav>
-        </aside>
+        <Sidebar /> <!-- Inclusion du composant Sidebar -->
   
         <!-- Main Content -->
         <main class="flex-1 p-6 main-content">
@@ -30,7 +12,7 @@
             <div class="flex items-center space-x-4 text-white user-info">
               <span>ADMIN</span>
               <img
-                src="../assets/avatar.png"
+                src="../assets/avatar.jpg"
                 alt="User Avatar"
                 class="w-10 h-10 rounded-full"
               />
@@ -93,6 +75,7 @@
   import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
   import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
   import BarChart from "@/components/WorkingTimesChart.vue";
+  import Sidebar from '../components/Sidebar.vue';
   import axios from 'axios';
   
   import { getCurrentInstance } from 'vue';
@@ -100,12 +83,12 @@
   export default {
     name: "Dashboard",
     components: {
-  
-      UserList,
-      LineChart,
-      WorkingTimeUserContainer,
-      CreaGroupComponent,
-      BarChart, // Enregistrement du BarChart
+        Sidebar,
+        UserList,
+        LineChart,
+        WorkingTimeUserContainer,
+        CreaGroupComponent,
+        BarChart, // Enregistrement du BarChart
     },
     data() {
       return {
