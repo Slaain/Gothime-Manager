@@ -1,3 +1,4 @@
+
 defmodule TimeManagerApiWeb.UserController do
   use TimeManagerApiWeb, :controller
 
