@@ -7,6 +7,9 @@ defmodule TimeManagerApi.User do
     field :username, :string
     field :email, :string
 
+    # Un utilisateur a une seule clock
+    has_one :clock, TimeManagerApi.Clock
+
     timestamps(type: :utc_datetime)
   end
 
