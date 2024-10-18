@@ -1,6 +1,6 @@
 defmodule TimeManagerApi.UserService do
   @moduledoc """
-  The ClockService context.
+  The UserService context.
   """
 
   import Ecto.Query, warn: false
@@ -8,7 +8,7 @@ defmodule TimeManagerApi.UserService do
   require Logger
 
   alias TimeManagerApi.Repo
-  alias TimeManagerApi.User
+  alias TimeManagerApi.Accounts.User  # Corrige l'alias vers le bon module
 
   # Créer un utilisateur
   def create_user(attrs \\ %{}) do
@@ -57,8 +57,6 @@ defmodule TimeManagerApi.UserService do
     |> Repo.one()
   end
 
-
-
   # Mettre à jour un utilisateur
   def update_user(%User{} = user, attrs) do
     user
@@ -70,8 +68,4 @@ defmodule TimeManagerApi.UserService do
   def delete_user(%User{} = user) do
     Repo.delete(user)
   end
-
-
-
-
 end
