@@ -28,21 +28,38 @@ defmodule TimeManagerApiWeb.AuthController do
     user = Repo.get_by(User, email: email)
     IO.inspect(user, label: "User retrieved")
 
-    case check_password(user, password) do
-      {:ok, user} ->
-        conn
-        |> json(%{message: "Login successful", user: user})
-
-      {:error, :invalid_password} ->
-        conn
-        |> put_status(:unauthorized)
-        |> json(%{error: "Invalid credentials"})
-
-      {:error, :invalid_user} ->
-        conn
-        |> put_status(:unauthorized)
-        |> json(%{error: "User not found"})
+    if(user == nil) do
+      conn
+      |> put_status(:unauthorized)
+      |> json(%{error: "Invalid credentials"})
+      |> halt()
     end
+
+    if(check_password(user, password)) do
+      conn
+      |> put_status(:ok)
+      |> json(%{message: "Login successful", user: user})
+    else
+      conn
+      |> put_status(:unauthorized)
+      |> json(%{error: "Invalid credentials"})
+    end
+
+    # case check_password(user, password) do
+    #   {:ok, user} ->
+    #     conn
+    #     |> json(%{message: "Login successful", user: user})
+
+    #   {:error, :invalid_password} ->
+    #     conn
+    #     |> put_status(:unauthorized)
+    #     |> json(%{error: "Invalid credentials"})
+
+    #   {:error, :invalid_user} ->
+    #     conn
+    #     |> put_status(:unauthorized)
+    #     |> json(%{error: "User not found"})
+    # end
   end
 
 
