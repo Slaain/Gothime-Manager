@@ -9,6 +9,9 @@ module.exports = {
         primaryYellow: '#fdcb12', // Replace with your desired primary color
         primaryYellow400: '#edb205',
       },
+      backgroundImage: {
+        'gotham-wallpaper': "url('./assets/wallpaperGotham.png')",
+      },
     },
   },
   variants: {
