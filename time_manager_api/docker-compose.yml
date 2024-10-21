@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   db:
@@ -21,19 +21,30 @@ services:
     depends_on:
       - db
 
-  web:
+  phoenix_server:
     build:
       context: . 
       dockerfile: Dockerfile
-    command: >
-      sh -c "
-      mix ecto.create &&
-      mix ecto.migrate &&
-      mix phx.server"
+    stdin_open: true
+    tty: true
     ports:
       - "4000:4000"
     depends_on:
       - db
+  
+
+  frontend:
+    build:
+      context: ../time_manager_frontend
+      dockerfile: Dockerfile.frontend
+    command: npm run dev
+    ports:
+      - "5173:5173"
+      - "5174:5174"
+    depends_on:
+      - phoenix_server
+    volumes:
+      - ../time_manager_frontend:/app
 
 volumes:
   db_data:

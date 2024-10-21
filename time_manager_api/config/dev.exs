@@ -1,5 +1,7 @@
 import Config
 
+
+
 # Configure your database
 config :time_manager_api, TimeManagerApi.Repo,
   username: "postgres",
@@ -14,7 +16,8 @@ config :time_manager_api, TimeManagerApi.Repo,
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id],
-  colors: [enabled: false]
+  colors: [enabled: false],
+  level: :error
 
 # Configuration du serveur Phoenix
 config :time_manager_api, TimeManagerApiWeb.Endpoint,
