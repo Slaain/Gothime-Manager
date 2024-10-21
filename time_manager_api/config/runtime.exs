@@ -7,28 +7,6 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
-
-# Charger les variables d'environnement à partir du fichier .env
-
-if File.exists?(".env") do
-  for line <- File.stream!(".env") do
-    [key, value] = String.split(line, "=", parts: 2)
-    System.put_env(key, String.trim(value))
-  end
-end
-
-config :time_manager_api, TimeManagerApi.Repo,
-  username: System.get_env("DB_USERNAME"),
-  password: System.get_env("DB_PASSWORD"),
-  database: System.get_env("DB_NAME"),
-  hostname: System.get_env("DB_HOSTNAME"),
-  port: String.to_integer(System.get_env("DB_PORT") || "5432"),
-  stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
-
-
-
 # ## Using releases
 #
 # If you use `mix release`, you need to explicitly enable the server

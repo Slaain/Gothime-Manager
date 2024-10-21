@@ -6,12 +6,15 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  server: {
+    host: '0.0.0.0',  // Serveur accessible depuis d'autres machines
   },
   build: {
     rollupOptions: {
-      input: './index.html' // Assurez-vous que le chemin du fichier d'entrée est correct
-    }
-  }
+      input: './index.html', // Assurez-vous que le chemin du fichier d'entrée est correct
+    },
+  },
 });
