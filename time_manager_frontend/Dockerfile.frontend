@@ -1,20 +1,19 @@
-# Utilise l'image officielle Node.js
+# Dockerfile.frontend
 FROM node:latest
 
-# Crée et définit le répertoire de travail
 WORKDIR /app
 
-# Copie le fichier package.json et package-lock.json
-COPY package*.json ./
+# Copiez les fichiers de dépendance d'abord
+COPY package.json package-lock.json ./
 
-# Installe les dépendances
+# Installez les dépendances
 RUN npm install
 
-# Copie le reste des fichiers du projet
+
+# Copiez le reste du code
 COPY . .
 
-# Expose le port que Vite utilisera
+
 EXPOSE 5173 5174
 
-# Commande pour démarrer Vite
 CMD ["npm", "run", "dev"]
