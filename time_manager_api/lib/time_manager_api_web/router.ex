@@ -35,6 +35,7 @@ defmodule TimeManagerApiWeb.Router do
     # Scope pour les utilisateurs
     scope "/users" do
       get "/", UserController, :paginated_users
+      post "/", UserController, :create
       resources "/", UserController, except: [:new, :edit]
     end
 
@@ -63,9 +64,15 @@ defmodule TimeManagerApiWeb.Router do
   # routes pour les organisations
   get "/organisations", OrganisationController, :index
   post "/organisations", OrganisationController, :create
-  get "/organisations/:id", OrganisationController, :show  
+  get "/organisations/:id", OrganisationController, :show
   delete "/organisations/:id", OrganisationController, :delete
   put "/organisations/:id", OrganisationController, :update
+
+
+
+  #Routes pour l'authentification
+  post "/register", AuthController, :register  # Route pour l'inscription
+  post "/login", AuthController, :login        # Route pour la connexion
 
 end
 end

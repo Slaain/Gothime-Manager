@@ -9,6 +9,6 @@ defmodule TimeManagerApi.Repo.Migrations.CreateGroupsUsers do
       timestamps()
     end
 
-    create unique_index(:groups_users, [:group_id, :user_id]) # Empêche les doublons
+    create unique_index(:groups_users, [:group_id, :user_id])
   end
 end

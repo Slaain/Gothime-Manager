@@ -1,3 +1,4 @@
+
 defmodule TimeManagerApiWeb.UserController do
   use TimeManagerApiWeb, :controller
 
@@ -98,7 +99,7 @@ defmodule TimeManagerApiWeb.UserController do
     else
       conn
       |> put_status(:not_found) # Indique que la ressource n'a pas été trouvée
-      |> json(%{message: "User not found", result: false}) # Renvoyer un message d'erreur
+      |> json(%{message: "Invalid credentials", result: false}) # Renvoyer un message d'erreur
     end
 
 
@@ -120,7 +121,7 @@ defmodule TimeManagerApiWeb.UserController do
     else
       conn
       |> put_status(:not_found) # Indique que la ressource n'a pas été trouvée
-      |> json(%{message: "User not found", result: false}) # Renvoyer un message d'erreur
+      |> json(%{message: "Invalid credentials", result: false}) # Renvoyer un message d'erreur
     end
 
 
@@ -142,7 +143,7 @@ defmodule TimeManagerApiWeb.UserController do
     else
       conn
       |> put_status(:not_found) # Indique que la ressource n'a pas été trouvée
-      |> json(%{message: "User not found", result: false}) # Renvoyer un message d'erreur
+      |> json(%{message: "Invalid credentials", result: false}) # Renvoyer un message d'erreur
     end
   end
 

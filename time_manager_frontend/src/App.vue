@@ -1,16 +1,16 @@
-<template>
+  <template>
   <div id="app">
-    <router-view /> <!-- Cela affichera AdminDashboard ou d'autres pages selon la route -->
+    <router-view />
   </div>
 </template>
 
-<script>
+  <script>
 export default {
-  name: 'App'
+  name: "App",
 };
 </script>
 
-<style>
+  <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   text-align: center;

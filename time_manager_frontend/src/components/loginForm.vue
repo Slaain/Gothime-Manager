@@ -1,77 +1,124 @@
 <template>
-  <div class="max-w-md mx-auto mt-10 p-6 glassmorphism-bg-white rounded shadow-lg">
-    <h2 class="text-2xl font-semibold text-white text-center mb-6">Log In</h2>
+  <div
+    class="max-w-md p-6 mx-auto mt-10 rounded shadow-lg glassmorphism-bg-white"
+  >
+    <h2 class="mb-6 text-2xl font-semibold text-center text-white">Log In</h2>
     <form @submit.prevent="handleLogin">
       <div class="mb-4">
-        <label for="email" class="block text-sm font-medium text-white mb-1">Email</label>
+        <label for="email" class="block mb-1 text-sm font-medium text-white"
+          >Email</label
+        >
         <input
-            v-model="form.email"
-            type="email"
-            id="email"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Email"
+          v-model="form.email"
+          type="email"
+          id="email"
+          class="w-full px-3 py-2 text-white bg-gray-800 border border-gray-300 rounded focus:outline-none focus:border-primaryYellow"
+          required
+          placeholder="Email"
         />
       </div>
 
       <div class="mb-6">
-        <label for="password" class="block text-sm font-medium text-white mb-1">Password</label>
+        <label for="password" class="block mb-1 text-sm font-medium text-white"
+          >Password</label
+        >
         <input
-            v-model="form.password"
-            type="password"
-            id="password"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Password"
+          v-model="form.password"
+          type="password"
+          id="password"
+          class="w-full px-3 py-2 text-white bg-gray-800 border border-gray-300 rounded focus:outline-none focus:border-primaryYellow"
+          required
+          placeholder="Password"
         />
       </div>
 
+      <p class="h-8 mt-4 text-center text-red-500">{{ error }}</p>
+
       <button
-          type="submit"
-          class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+        type="submit"
+        class="w-full px-4 py-2 text-white transition rounded bg-primaryYellow hover:bg-primaryYellow400"
       >
         Log In
       </button>
     </form>
 
-    <p v-if="error" class="mt-4 text-red-500 text-center">{{ error }}</p>
-    <p v-if="success" class="mt-4 text-green-500 text-center">{{ success }}</p>
+    <!-- <p v-if="success" class="mt-4 text-center text-green-500">{{ success }}</p> -->
 
     <!-- Lien vers la page d'inscription -->
-    <p class="mt-4 text-white text-center">
+    <p class="mt-4 text-center text-white">
       Don't have an account?
-      <a href="/register" class="text-yellow-500 hover:text-yellow-600">Sign up</a>
+      <a href="/register" class="text-primaryYellow hover:text-primaryYellow400"
+        >Sign up</a
+      >
     </p>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router"; // Importation du router
 
 export default {
   setup() {
     const form = ref({
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     });
 
-    const error = ref('');
-    const success = ref('');
+    const error = ref("");
+    const success = ref("");
+    const router = useRouter(); // Utiliser le hook pour accéder au routeur
 
-    const handleLogin = () => {
-      if (!form.value.email || !form.value.password) {
-        error.value = 'Please fill in all fields';
-        return;
+    const handleLogin = async () => {
+      try {
+        console.log("aled");
+
+        if (!form.value.email || !form.value.password) {
+          error.value = "Please fill in all fields";
+          return;
+        }
+
+        // Simulation d'une API call pour la connexion
+        console.log("Login submitted:", {
+          email: form.value.email,
+          password: form.value.password,
+        });
+
+        const response = await axios.post("http://localhost:4000/api/login", {
+          email: form.value.email,
+          password: form.value.password,
+        });
+
+        console.log("response : ", response.data.token);
+
+        if (response.status !== 200) {
+          error.value = "Invalid credentials";
+          return;
+        }
+
+        // Réinitialisation du formulaire et message de succès
+        error.value = "";
+        success.value = "Login successful!";
+        form.value.email = "";
+        form.value.password = "";
+        localStorage.setItem("authToken", response.data.token);
+        router.push("/admin");
+      } catch (apiError) {
+        // error.value = "Invalid credentials";
+        console.log("catch : ", apiError.response.data);
+
+        // Assurez-vous que `apiError` est correctement utilisé et non `error`
+        if (apiError.response && apiError.response.data.error) {
+          console.log(true);
+          console.log(apiError.response.data.error);
+
+          error.value = apiError.response.data.error;
+          return;
+        }
+
+        console.error("err : ", apiError);
       }
-
-      // Simulation d'une API call pour la connexion
-      console.log('Login submitted:', form.value);
-
-      // Réinitialisation du formulaire et message de succès
-      error.value = '';
-      success.value = 'Login successful!';
-      form.value.email = '';
-      form.value.password = '';
     };
 
     return {
@@ -83,6 +130,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .glassmorphism-bg-white {
