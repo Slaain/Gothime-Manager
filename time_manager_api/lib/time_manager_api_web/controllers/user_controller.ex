@@ -40,7 +40,7 @@ defmodule TimeManagerApiWeb.UserController do
     # end
 
     # Vérifier si les paramètres requis sont présents et ne sont pas vide
-    required_params = ["email", "username"]
+    required_params = ["email", "username", "role"]
     Enum.each(required_params, fn param ->
       if Map.get(user_params, param) == nil do
         conn

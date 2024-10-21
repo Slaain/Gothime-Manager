@@ -45,6 +45,11 @@ defmodule TimeManagerApiWeb.Router do
       get "/countactive", ClockController, :countactive
     end
 
+    scope "/qrcode" do
+      post "/beep", QRCodeController, :beep
+      post "/generate", QRCodeController, :generate_qr
+    end
+
     # Route pour les requêtes OPTIONS (utilisées pour le CORS)
     match :options, "/*_path", TimeManagerApiWeb.CORSController, :options
 
