@@ -1,24 +1,19 @@
-# Utilise l'image officielle Elixir comme base
+# Utiliser l'image officielle Node.js
 FROM node:20-alpine
 
-# Définir le répertoire de travail dans le conteneur
-WORKDIR /app/time_manager_frontend
+# Définir le répertoire de travail
+WORKDIR /app
 
-# Copier les fichiers de configuration des dépendances
-COPY package*.json ./
+# Copier les fichiers de l'application dans l'image
+COPY . .
 
-
-
-# Installer les dépendances nécessaires
-RUN apk add --no-cache git
-RUN npm install npm@latest -g
-
+# Installer les dépendances Node.js
 RUN npm install
 
-COPY . /app/time_manager_frontend
+# Installer Vite.js
+RUN npm install -g vite
 
 # Exposer le port sur lequel Vite s'exécute
 EXPOSE 5173
 
-# Commande de démarrage de l'application vite
 CMD ["npm", "run", "dev"]

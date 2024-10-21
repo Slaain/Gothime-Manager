@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db: # Service pour la base de données PostgreSQL
     image: postgres:latest
+    container_name: postgres_db
     restart: always
     environment:
       POSTGRES_USER: ${DB_USERNAME}
@@ -13,11 +14,11 @@ services:
     ports:
       - "5432:5432" 
   
-  phoenix: # Service pour le back
-    build: ./time_manager_api
+  phoenix: # Service pour le backend
+    build:
+      context: ./time_manager_api
+      dockerfile: Dockerfile
     container_name: phoenix
-    command: sh entrypoint.sh
-    working_dir: /app/time_manager_api
     volumes:
       - .:/time_manager_api/app
     ports:
@@ -27,40 +28,32 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_HOSTNAME: ${DB_HOSTNAME}
       DB_NAME: ${DB_NAME}
-      DB_POOL_SIZE: 10
+      DB_PORT: ${DB_PORT}
     depends_on:
-      - db    
+      - db  
+    command: ["sh", "./entrypoint.sh"]
+
   frontend:  # Service pour le frontend
     build:
       context: ./time_manager_frontend
       dockerfile: Dockerfile  # Spécifie le Dockerfile à utiliser pour construire l'image frontend
+    container_name: vite_frontend
     ports:
       - "5173:5173"  # Redirige le port Vite vers l'hôte
     depends_on:
-      - phoenix  # Assure que le service backend "phoenix" soit démarré avant ce service
+     - phoenix  # Assure que le service backend "phoenix" soit démarré avant ce service
     volumes:
       - .:/time_manager_frontend/app  # Monte le répertoire local du frontend pour permettre
-      - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
-    #environment:
-     # CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING}  # Active l'utilisation du polling pour Chokidar
-    command: npm run dev -- --host 0.0.0.0  # Commande pour démarrer le serveur de développement Vite
-    restart: unless-stopped
+     # - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
 
   adminer:  # Service pour l'interface de gestion de base de données PgAdmin
-    image: adminer
+    image: adminer:latest
+    container_name: adminer
     restart: always
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Correspond au fichier .env
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_DB: ${DB_NAME}  # Correspond à la base de données dans .env
     ports:
-       - "8081:8080"  # Expose l'interface web de PgAdmin
+      - "8080:8080" # Expose l'interface web de PgAdmin
     depends_on:
       - db  # Assure que le service "db" soit démarré avant ce service
-   # volumes:
-    #  - adminer_data:/var/lib/adminer  
 
 volumes:
-  db_data: 
-    driver: local
- # adminer_data:  # Correctly defined named volume for PgAdmin configuration
+  db_data:

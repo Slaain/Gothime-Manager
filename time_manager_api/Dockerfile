@@ -1,36 +1,35 @@
-# Utilisez l'image officielle Elixir
-FROM elixir:1.17.3-alpine
+# Utiliser l'image officielle Elixir
+FROM elixir:latest
 
-# Installer Git
-RUN apk add --no-cache git
+# Installer les dépendances pour Node.js et PostgreSQL
+RUN apt-get update && \
+    apt-get install -y nodejs npm postgresql-client
 
-# Définir le répertoire de travail dans le conteneur
-WORKDIR /app/time_manager_api
-COPY . /app/time_manager_api
+# Définir le répertoire de travail
+WORKDIR /app
 
-# Copier les fichiers mix pour installer les dépendances
-COPY mix.exs mix.lock ./
-
-
-# Installer Hex et Rebar pour gérer les dépendances Elixir
-RUN mix local.hex --force && \
-    mix local.rebar --force && \
-    mix deps.get
-
-# Copier tout le code source du backend dans le conteneur
+# Copier les fichiers de l'application dans l'image
 COPY . .
 
-# Compiler l'application
-RUN mix compile
+# Installer Hex et Rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
 
-# Copier le script entrypoint.sh depuis le backend et donner les permissions d'exécution
-COPY entrypoint.sh /app/entrypoint.sh
+# Installer les dépendances Phoenix
+RUN mix deps.get
 
-RUN chmod +x /app/entrypoint.sh
+# Étape 6: Installation des dépendances JS (Node.js) et Webpack dans le dossier assets
+WORKDIR /app/assets
+RUN npm install && npm install -g webpack webpack-cli
+
+
+# Étape 7: Revenir au dossier racine et exécuter le fichier entrypoint.sh
+WORKDIR /app
 
 # Exposez le port utilisé par Phoenix (par défaut 4000)
 EXPOSE 4000
 
-# Commande pour démarrer le serveur Phoenix via entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+# Exécuter le fichier entrypoint.sh
 CMD ["mix", "phx.server"]
-#CMD ["sh", "/app/entrypoint.sh"]

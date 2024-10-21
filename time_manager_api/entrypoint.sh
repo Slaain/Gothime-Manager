@@ -1,31 +1,27 @@
-# Vérifiez la présence du fichier .env
-if [ ! -f ".env" ]; then
-  echo "Erreur: Le fichier .env est manquant."
-  echo "Le conteneur Phoenix ne peut pas démarrer sans le fichier .env."
+# Vérifier la présence d'un fichier .env et arrêter le conteneur Phoenix si absent
+if [ ! -f .env ]; then
+  echo ".env file not found. Stopping the Phoenix container."
   exit 1
 fi
-
-# Charger les variables d'environnement du fichier .env
-export $(grep -v '^#' .env | xargs)
-
-# Attendre que la base de données soit utilisable
-echo "Attente de la disponibilité de la base de données à l'adresse $DB_HOSTNAME..."
-until pg_isready -h $DB_HOSTNAME -p 5432 -U $DB_USERNAME; do
+ 
+# Charger les variables d'environnement
+export $(cat .env | xargs)
+# Attendre que le conteneur de la base de données soit utilisable
+echo "Waiting for the database container to be ready..."
+until pg_isready -h $DB_HOSTNAME -p $DB_PORT -U $DB_USERNAME -d $DB_NAME -w; do
   sleep 1
 done
+echo "Database is ready."
 
-echo "La base de données est prête !"
-
-# Vérifier si la base de données existe, sinon la créer
-DB_EXISTS=$(PGPASSWORD=$DB_PASSWORD psql -h $DB_HOSTNAME -U $DB_USERNAME -lqt | cut -d \| -f 1 | grep -w $DB_NAME | wc -l)
-
-if [ $DB_EXISTS -eq 0 ]; then
-  echo "La base de données $DB_NAME n'existe pas. Création en cours..."
+# Vérifier la présence de la base de données et la créer si nécessaire
+echo "Checking if the database exists..."
+if ! psql -h $DB_HOSTNAME -p $DB_PORT -U $DB_USERNAME -d $DB_NAME -c '\q'; then
+  echo "Database not found. Creating database..."
   mix ecto.create
 else
-  echo "La base de données $DB_NAME existe déjà."
+  echo "Database exists."
 fi
 
-# Lancer l'application Phoenix
-echo "Démarrage de l'application Phoenix..."
-exec mix phx.server
+# 4. Lancer l'application
+echo "Starting the Phoenix application..."
+mix phx.server
