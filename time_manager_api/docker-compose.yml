@@ -25,11 +25,8 @@ services:
     build:
       context: . 
       dockerfile: Dockerfile
-    command: >
-      sh -c "
-      mix ecto.create &&
-      mix ecto.migrate &&
-      mix phx.server"
+    stdin_open: true
+    tty: true
     ports:
       - "4000:4000"
     depends_on:

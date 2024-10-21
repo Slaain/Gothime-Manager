@@ -54,9 +54,9 @@ defmodule TimeManagerApi.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      #  {:dotenv, "~> 3.0", only: [:dev, :test]}
       {:guardian, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
+      {:dotenv, "~> 3.1.0"}
     ]
   end
 
