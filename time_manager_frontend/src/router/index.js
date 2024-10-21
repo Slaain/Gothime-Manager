@@ -28,7 +28,7 @@ const routes = [
   {
     path: '/organisations',
     name: 'OrganisationList',
-    component: () => import("@/views/OrganisationList.vue"),
+    component: () => import("@/views/Organisation.vue"),
     meta: { requiresAuth: true, role: 'admin' }
   }
 ];
