@@ -28,7 +28,8 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/admin' // Redirige vers /admin par défaut
+    name: 'Home',
+    component: () => import("@/views/LandingPage.vue")
   }
 ];
 
