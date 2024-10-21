@@ -1,6 +1,6 @@
 defmodule TimeManagerApiWeb.AuthController do
   use TimeManagerApiWeb, :controller
-  alias TimeManagerApi.Accounts.User
+  alias TimeManagerApi.User
   alias TimeManagerApi.Repo
   alias Bcrypt
   alias TimeManagerApi.Guardian  # Import Guardian ici

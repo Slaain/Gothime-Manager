@@ -3,7 +3,7 @@ defmodule TimeManagerApiWeb.UserController do
   use TimeManagerApiWeb, :controller
 
   alias TimeManagerApi.Accounts
-  alias TimeManagerApi.Accounts.User
+  alias TimeManagerApi.User
   alias TimeManagerApi.UserService
 
   action_fallback TimeManagerApiWeb.FallbackController

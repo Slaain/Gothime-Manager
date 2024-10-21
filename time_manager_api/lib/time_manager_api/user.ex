@@ -1,4 +1,4 @@
-defmodule TimeManagerApi.Accounts.User do
+defmodule TimeManagerApi.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias Bcrypt
