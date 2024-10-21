@@ -1,13 +1,15 @@
-defmodule TimeManagerApi.User do
+defmodule TimeManagerApi.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Bcrypt
 
-  @derive {Jason.Encoder, only: [:id, :username, :email, :inserted_at, :updated_at, :clock]} # Ajoute :clock pour inclure la clock dans le JSON
+  @derive {Jason.Encoder, only: [:id, :username, :email, :inserted_at, :updated_at]}
   schema "users" do
     field :username, :string
     field :email, :string
+    field :password, :string, virtual: true
+    field :password_hash, :string
 
-    # Un utilisateur a une seule clock
     has_one :clock, TimeManagerApi.Clock
     has_many :user_role_organisations, TimeManagerApi.UserRoleOrganisation, on_delete: :delete_all
 
@@ -18,8 +20,17 @@ defmodule TimeManagerApi.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email])
-    |> validate_required([:username, :email])
+    |> cast(attrs, [:username, :email, :password])
+    |> validate_required([:username, :email, :password])
+    |> validate_length(:password, min: 6)
     |> unique_constraint(:email)
+    |> put_password_hash()
+  end
+
+  defp put_password_hash(changeset) do
+    case get_change(changeset, :password) do
+      nil -> changeset
+      password -> put_change(changeset, :password_hash, Bcrypt.hash_pwd_salt(password))  # Utilisation correcte
+    end
   end
 end

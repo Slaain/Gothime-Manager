@@ -61,6 +61,10 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :time_manager_api, TimeManagerApi.Guardian,
+  issuer: "time_manager_api",
+  secret_key: "JEi6Qjnn+edMIQ6DUL1oIbAwXF+9f2tbSWmDda8uyPD1q3XpkdqN+NP5pbnwkP8W"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

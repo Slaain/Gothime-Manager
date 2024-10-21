@@ -4,7 +4,7 @@ import Config
 config :time_manager_api, TimeManagerApi.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "localhost",
+  hostname: "db",
   database: "time_manager_api_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
@@ -18,7 +18,7 @@ config :logger, :console,
 
 # Configuration du serveur Phoenix
 config :time_manager_api, TimeManagerApiWeb.Endpoint,
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {0, 0, 0, 0}, port: 4000],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,

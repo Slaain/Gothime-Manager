@@ -23,13 +23,8 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/admin' // Redirige vers /admin par défaut
-  },
-  {
-    path: '/organisations',
-    name: 'OrganisationList',
-    component: () => import("@/views/Organisation.vue"),
-    meta: { requiresAuth: true, role: 'admin' }
+    name: 'Home',
+    component: () => import("@/views/LandingPage.vue")
   }
 ];
 
