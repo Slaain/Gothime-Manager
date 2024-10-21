@@ -7,7 +7,7 @@ const routes = [
     component: () => import("@/views/AdminDashboard.vue")
   },
   {
-    path: '/manager',
+    path: '/manager/:organisationId',
     name: 'ManagerDashboard',
     component: () => import("@/views/ManagerDashboard.vue")
   },
