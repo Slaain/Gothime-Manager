@@ -45,7 +45,7 @@ defmodule TimeManagerApiWeb.AuthController do
         {:error, :invalid_user} ->
           conn
           |> put_status(:unauthorized)
-          |> json(%{error: "User not found"})
+          |> json(%{error: "Invalid credentials"})
       end
     end
 

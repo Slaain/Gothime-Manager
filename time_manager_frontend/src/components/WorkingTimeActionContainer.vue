@@ -62,7 +62,7 @@ import Dropdown from "./Dropdown.vue";
           @click="createWorkingTime"
           class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800"
         >
-          Enregistrer
+          Create
         </button>
       </div>
 

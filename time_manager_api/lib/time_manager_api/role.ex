@@ -5,10 +5,11 @@ defmodule TimeManagerApi.Role do
   schema "roles" do
     field :name, :string
 
-    timestamps()
+    has_many :user_role_organisations, TimeManagerApi.UserRoleOrganisation
+
+    timestamps(type: :utc_datetime)
   end
 
-  @doc false
   def changeset(role, attrs) do
     role
     |> cast(attrs, [:name])

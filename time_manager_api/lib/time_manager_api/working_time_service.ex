@@ -12,7 +12,6 @@ defmodule TimeManagerApi.WorkingTimeService do
   alias TimeManagerApi.WorkingTime
   alias TimeManagerApi.ClockService
 
-
   # Récupérer le dernière working_time d'un utilisateur
   def get_last_working_time_by_user(user_id) do
     WorkingTime
@@ -92,8 +91,5 @@ defmodule TimeManagerApi.WorkingTimeService do
       )
       |> Repo.aggregate(:count, :user_id)
     end
-  
-
-
 
 end
