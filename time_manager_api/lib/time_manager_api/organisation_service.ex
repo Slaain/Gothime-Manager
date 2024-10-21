@@ -1,5 +1,5 @@
-defmodule TimeManagerApiOrganisationService do
-  alias TimeManagerApi.{Repo,Organisation}
+defmodule TimeManagerApi.OrganisationService do
+  alias TimeManagerApi.{Repo, Organisation}
 
   def list_organisations do
     Repo.all(Organisation)
@@ -23,7 +23,7 @@ defmodule TimeManagerApiOrganisationService do
     |> Repo.update()
   end
 
-  def delete_Organisation(organisation) do
+  def delete_organisation(organisation) do
     Repo.delete(organisation)
   end
 end
