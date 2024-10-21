@@ -1,106 +1,120 @@
 <template>
-  <div class="max-w-md mx-auto mt-10 p-6 glassmorphism-bg-white rounded shadow-lg">
-    <h2 class="text-2xl font-semibold text-white text-center mb-6">Sign Up</h2>
+  <div
+    class="max-w-md p-6 mx-auto mt-10 rounded shadow-lg glassmorphism-bg-white"
+  >
+    <h2 class="mb-6 text-2xl font-semibold text-center text-white">Sign Up</h2>
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-white mb-1">Username</label>
+        <label for="username" class="block mb-1 text-sm font-medium text-white"
+          >Username</label
+        >
         <input
-            v-model="form.username"
-            type="text"
-            id="username"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Username"
+          v-model="form.username"
+          type="text"
+          id="username"
+          class="w-full px-3 py-2 text-white bg-gray-800 border border-gray-300 rounded focus:outline-none focus:border-primaryYellow"
+          required
+          placeholder="Username"
         />
       </div>
 
       <div class="mb-4">
-        <label for="email" class="block text-sm font-medium text-white mb-1">Email</label>
+        <label for="email" class="block mb-1 text-sm font-medium text-white"
+          >Email</label
+        >
         <input
-            v-model="form.email"
-            type="email"
-            id="email"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Email"
+          v-model="form.email"
+          type="email"
+          id="email"
+          class="w-full px-3 py-2 text-white bg-gray-800 border border-gray-300 rounded focus:outline-none focus:border-primaryYellow"
+          required
+          placeholder="Email"
         />
       </div>
 
       <div class="mb-4">
-        <label for="password" class="block text-sm font-medium text-white mb-1">Password</label>
+        <label for="password" class="block mb-1 text-sm font-medium text-white"
+          >Password</label
+        >
         <input
-            v-model="form.password"
-            type="password"
-            id="password"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Password"
+          v-model="form.password"
+          type="password"
+          id="password"
+          class="w-full px-3 py-2 text-white bg-gray-800 border border-gray-300 rounded focus:outline-none focus:border-primaryYellow"
+          required
+          placeholder="Password"
         />
       </div>
 
       <div class="mb-6">
-        <label for="confirmPassword" class="block text-sm font-medium text-white mb-1">Confirm Password</label>
+        <label
+          for="confirmPassword"
+          class="block mb-1 text-sm font-medium text-white"
+          >Confirm Password</label
+        >
         <input
-            v-model="form.confirmPassword"
-            type="password"
-            id="confirmPassword"
-            class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white focus:outline-none focus:border-yellow-500"
-            required
-            placeholder="Confirm your password"
+          v-model="form.confirmPassword"
+          type="password"
+          id="confirmPassword"
+          class="w-full px-3 py-2 text-white bg-gray-800 border border-gray-300 rounded focus:outline-none focus:border-primaryYellow"
+          required
+          placeholder="Confirm your password"
         />
       </div>
 
+      <p class="h-8 mt-4 text-center text-red-500">{{ error }}</p>
       <button
-          type="submit"
-          class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+        type="submit"
+        class="w-full px-4 py-2 text-white transition rounded bg-primaryYellow hover:bg-primaryYellow400"
       >
         Sign Up
       </button>
     </form>
 
-    <p v-if="error" class="mt-4 text-red-500 text-center">{{ error }}</p>
-    <p v-if="success" class="mt-4 text-green-500 text-center">{{ success }}</p>
+    <!-- <p v-if="success" class="mt-4 text-center text-green-500">{{ success }}</p> -->
 
     <!-- Lien vers la page de connexion -->
-    <p class="mt-4 text-white text-center">
+    <p class="mt-4 text-center text-white">
       Already have an account?
-      <a href="/login" class="text-yellow-500 hover:text-yellow-600">Log in</a>
+      <a href="/login" class="text-primaryYellow hover:text-primaryYellow400"
+        >Log in</a
+      >
     </p>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 export default {
   setup() {
     const form = ref({
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     });
 
-    const error = ref('');
-    const success = ref('');
+    const error = ref("");
+    const success = ref("");
 
     const handleSubmit = () => {
       if (form.value.password !== form.value.confirmPassword) {
-        error.value = 'Passwords do not match';
-        success.value = '';
+        error.value = "Passwords do not match";
+        success.value = "";
         return;
       }
 
       // Simulation d'une API call pour enregistrer l'utilisateur
-      console.log('Form submitted:', form.value);
+      console.log("Form submitted:", form.value);
 
       // Réinitialisation du formulaire et message de succès
-      error.value = '';
-      success.value = 'Registration successful!';
-      form.value.username = '';
-      form.value.email = '';
-      form.value.password = '';
-      form.value.confirmPassword = '';
+      error.value = "";
+      success.value = "Registration successful!";
+      form.value.username = "";
+      form.value.email = "";
+      form.value.password = "";
+      form.value.confirmPassword = "";
     };
 
     return {
