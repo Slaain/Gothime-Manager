@@ -6,6 +6,7 @@ config :time_manager_api, TimeManagerApi.Repo,
   password: "postgres",
   hostname: "db",
   database: "time_manager_api_dev",
+  port: "5432",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

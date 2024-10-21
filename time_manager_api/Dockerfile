@@ -1,9 +1,13 @@
 # Utiliser l'image officielle Elixir
 FROM elixir:latest
 
-# Installer les dépendances pour Node.js et PostgreSQL
+# Installer les dépendances pour Node.js, PostgreSQL et netcat-openbsd
 RUN apt-get update && \
-    apt-get install -y nodejs npm postgresql-client
+    apt-get install -y nodejs npm postgresql-client netcat-openbsd
+
+# Installer Node.js et npm
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+    apt-get install -y nodejs
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -18,15 +22,18 @@ RUN mix local.hex --force && \
 # Installer les dépendances Phoenix
 RUN mix deps.get
 
-# Étape 6: Installation des dépendances JS (Node.js) et Webpack dans le dossier assets
-WORKDIR /app/assets
-RUN npm install && npm install -g webpack webpack-cli
+# Installer les dépendances Node.js et Webpack
+RUN cd assets && \
+    npm install && \
+    npm install -g webpack webpack-cli
 
-# Étape 7: Revenir au dossier racine et exécuter le fichier entrypoint.sh
-WORKDIR /app
-
-# Exposez le port utilisé par Phoenix (par défaut 4000)
+# Exposer le port pour Phoenix
 EXPOSE 4000
 
-# Exécuter le fichier entrypoint.sh
-CMD ["mix", "phx.server"]
+
+# Copier le script wait-for-it.sh dans l'image
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+RUN chmod +x /usr/local/bin/wait-for-it.sh  # Rendre le script exécutable
+
+# Remplacer l'exécution par le script wait-for-it.sh
+CMD ["wait-for-it.sh", "db:5432", "--", "mix ecto.migrate && mix phx.server"]
