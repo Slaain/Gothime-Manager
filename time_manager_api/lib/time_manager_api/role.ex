@@ -1,4 +1,4 @@
-defmodule YourApp.Role do
+defmodule TimeManagerApi.Role do
   use Ecto.Schema
   import Ecto.Changeset
 

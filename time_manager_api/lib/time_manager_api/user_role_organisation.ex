@@ -1,4 +1,4 @@
-defmodule YourApp.UserRoleOrganisation do
+defmodule TimeManagerApi.UserRoleOrganisation do
   use Ecto.Schema
   import Ecto.Changeset
 
