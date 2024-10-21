@@ -11,8 +11,6 @@ WORKDIR /app
 # Copier les fichiers de l'application dans l'image
 COPY . .
 
-
-
 # Installer Hex et Rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
@@ -20,23 +18,15 @@ RUN mix local.hex --force && \
 # Installer les dépendances Phoenix
 RUN mix deps.get
 
-# Étape Installation des dépendances JS (Node.js) et Webpack dans le dossier assets
+# Étape 6: Installation des dépendances JS (Node.js) et Webpack dans le dossier assets
 WORKDIR /app/assets
 RUN npm install && npm install -g webpack webpack-cli
 
-
-# Étape Revenir au dossier racine et exécuter le fichier entrypoint.sh
+# Étape 7: Revenir au dossier racine et exécuter le fichier entrypoint.sh
 WORKDIR /app
-
-# Compiler le projet
-RUN mix compile
-
 
 # Exposez le port utilisé par Phoenix (par défaut 4000)
 EXPOSE 4000
-
-
-#RUN chmod +x ./entrypoint.sh
 
 # Exécuter le fichier entrypoint.sh
 CMD ["mix", "phx.server"]

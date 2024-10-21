@@ -1,4 +1,4 @@
-version: '3.8'
+version: '2.29.2'
 
 services:
   db: # Service pour la base de données PostgreSQL
@@ -6,9 +6,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORB_NAD: postgres 
-      POSTGRES_DB: time_manager_api_dev
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DB_NAME}  # Correspond à la base de données dans .env
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
@@ -19,20 +19,19 @@ services:
       context: ./time_manager_api
       dockerfile: Dockerfile
     container_name: phoenix
-    command: mix ecto.create && mix ecto.migrate && mix phx.server
+    command: mix ecto.create && mix ecto.migrate
     volumes:
       - .:/time_manager_api/app
     ports:
       - "4000:4000"
     environment:
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      DB_HOSTNAME: db
-      DB_NAME: time_manager_api_dev
-      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOSTNAME: ${DB_HOSTNAME}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: ${DB_PORT}
     depends_on:
-      - db 
-    # command: ["sh", "./entrypoint.sh"]
+      - db  
 
   frontend:  # Service pour le frontend
     build:
@@ -45,14 +44,14 @@ services:
      - phoenix  # Assure que le service backend "phoenix" soit démarré avant ce service
     volumes:
       - .:/time_manager_frontend/app  # Monte le répertoire local du frontend pour permettre
-      - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
+     # - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
 
   adminer:  # Service pour l'interface de gestion de base de données PgAdmin
     image: adminer:latest
     container_name: adminer
     restart: always
     ports:
-      - "8081:8080" # Expose l'interface web de PgAdmin
+      - "8080:8080" # Expose l'interface web de PgAdmin
     depends_on:
       - db  # Assure que le service "db" soit démarré avant ce service
 
