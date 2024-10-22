@@ -1,7 +1,7 @@
 # priv/repo/seeds.exs
 
 alias TimeManagerApi.Repo
-alias TimeManagerApi.Accounts.User
+alias TimeManagerApi.User
 alias TimeManagerApi.Clock
 alias TimeManagerApi.WorkingTime
 alias TimeManagerApi.Task
@@ -62,6 +62,9 @@ for _ <- 1..100 do
   end
 end
 
+
+
+
 # Create groups
 for _ <- 1..5 do
   group = %Group{
@@ -87,13 +90,21 @@ for user <- Repo.all(User) do
   group = Repo.one!(from g in Group, order_by: fragment("RANDOM()"), limit: 1)
   role = Repo.one!(from r in Role, order_by: fragment("RANDOM()"), limit: 1)
 
-  user_role_org = %UserRoleOrganisation{
-    user_id: user.id,
-    role_id: role.id,
-    organisation_ids: [group.id]
-  }
+  existing_user_role = Repo.get_by(UserRoleOrganisation, user_id: user.id, role_id: role.id)
 
-  Repo.insert!(user_role_org)
+  if existing_user_role do
+    IO.puts("UserRoleOrganisation already exists for User ID: #{user.id} and Role ID: #{role.id}")
+  else
+    user_role_org = %UserRoleOrganisation{
+      user_id: user.id,
+      role_id: role.id,
+      organisation_ids: [group.id]
+    }
+
+    Repo.insert!(user_role_org)
+    IO.puts("Inserted UserRoleOrganisation for User ID: #{user.id} and Role ID: #{role.id}")
+  end
 end
+
 
 IO.puts("100 users seeded successfully!")
