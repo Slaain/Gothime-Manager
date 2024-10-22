@@ -57,6 +57,8 @@ defmodule TimeManagerApi.MixProject do
       #  {:dotenv, "~> 3.0", only: [:dev, :test]}
       {:guardian, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
+      {:joken, "~> 2.0-rc0"}
+
     ]
   end
 

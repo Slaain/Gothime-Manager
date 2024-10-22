@@ -1,5 +1,3 @@
-# in your app: `lib/time_manager_api/qrcode/qrcode.ex`
-
 defmodule TimeManagerApi.QRCode do
   use Ecto.Schema
   import Ecto.Changeset

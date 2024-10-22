@@ -49,6 +49,16 @@ defmodule TimeManagerApiWeb.AuthController do
       end
     end
 
+    # decrypt le token
+    def decrypt_token(conn, %{"token" => token}) do
+      case Guardian.decode_and_verify(token) do
+        {:ok, claims} ->
+          conn
+          |> json(%{message: "Token decoded successfully", claims: claims})
+        end
+      end
+
+
     defp check_password(nil, _password), do: {:error, :invalid_user}
     defp check_password(user, password) do
       case Bcrypt.check_pass(user, password) do

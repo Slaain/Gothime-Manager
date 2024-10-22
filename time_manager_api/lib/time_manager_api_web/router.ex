@@ -4,11 +4,26 @@ defmodule TimeManagerApiWeb.Router do
   pipeline :api do
     plug TimeManagerApiWeb.Plugs.CORS  # Utilise le plug CORS ici
     plug :accepts, ["json"]
+    plug TimeManagerApiWeb.Plugs.AssignCurrentUser  # Assigne l'utilisateur si un token est présent
+
+  end
+
+  pipeline :checkManager do
+    plug TimeManagerApiWeb.Plugs.CheckManagerRole
   end
 
   scope "/api", TimeManagerApiWeb do
     pipe_through :api
 
+
+    scope "/qrcode" do
+      post "/beep", QRCodeController, :beep
+      get "/:organizationId", QRCodeController, :get_token
+
+      pipe_through :checkManager
+      post "/generate/:organizationId", QRCodeController, :generate_qr
+      post "/test", QRCodeController, :test
+    end
 
     # Scope pour les workingtimes
     scope "/workingtimes" do
@@ -41,14 +56,10 @@ defmodule TimeManagerApiWeb.Router do
 
     # Scope pour les clocks
     scope "/clocks" do
-      post "/:user_id", ClockController, :beep
+      post "/:organization_id/:user_id", ClockController, :beep
       get "/countactive", ClockController, :countactive
     end
 
-    scope "/qrcode" do
-      post "/beep", QRCodeController, :beep
-      post "/generate", QRCodeController, :generate_qr
-    end
 
     # Route pour les requêtes OPTIONS (utilisées pour le CORS)
     match :options, "/*_path", TimeManagerApiWeb.CORSController, :options
@@ -78,6 +89,8 @@ defmodule TimeManagerApiWeb.Router do
   #Routes pour l'authentification
   post "/register", AuthController, :register  # Route pour l'inscription
   post "/login", AuthController, :login        # Route pour la connexion
+  post "/decrypt_token", AuthController, :decrypt_token  # Route pour décrypter le token
+
 
 end
 end
