@@ -109,7 +109,7 @@ export default function Camera() {
             ) : (
               <>
                 <View style={styles.qrCodeSlot}>
-                  <Image source={require('../assets/images/qr-code.png')} style={styles.qrCodeImage} />
+                  <Image source={require('../../assets/images/qr-code.png')} style={styles.qrCodeImage} />
                 </View>
 
                 <TextInput

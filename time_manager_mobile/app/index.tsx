@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
-import { storeToken } from '../../components/asyncStorage'; // Chemin relatif vers asyncStorage.tsx
+import { storeToken } from '../components/asyncStorage'; // Chemin relatif vers asyncStorage.tsx
 import {useRouter} from 'expo-router' ; // Utilisation de la route
 
 export default function HomeScreen() {
@@ -54,7 +54,7 @@ export default function HomeScreen() {
                     </View>
 
                     <Image
-                        source={require('../../assets/images/logo.png')}
+                        source={require('../assets/images/logo.png')}
                         style={styles.logo}
                         resizeMode="contain"
                     />
