@@ -56,7 +56,6 @@ for _ <- 1..100 do
       total_time: NaiveDateTime.diff(end_time, start_time)
     }
 
-    print(workingtime)
 
     Repo.insert!(workingtime)
   end
