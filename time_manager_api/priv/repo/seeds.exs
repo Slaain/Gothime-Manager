@@ -67,7 +67,7 @@ for _ <- 1..5 do
   Repo.insert!(group)
 end
 
-for role_name <- ["admin", "manager", "user"] do
+for role_name <- ["admin", "manager", "employee"] do
   role = %Role{
     name: role_name
   }
@@ -92,6 +92,3 @@ for user <- Repo.all(User) do
     Repo.insert!(user_role_org)
   end
 end
-
-
-IO.puts("10 users seeded successfully!")
