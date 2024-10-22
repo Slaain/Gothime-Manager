@@ -3,27 +3,32 @@ import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { storeToken } from '../../components/asyncStorage'; // Chemin relatif vers asyncStorage.tsx
+import {useRouter} from 'expo-router'
 
 export default function HomeScreen() {
     const [email, SetEmail] = useState('');
     const [password, SetPassword] = useState('');
 
     const handleLogin = async () => {
-        console.log('Tentative de connexion...');
         try {
             const response = await axios.post('http://10.79.216.151:4000/api/login', {
                 email,
                 password,
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             });
+            console.log('Connexion réussie:', response.data);
             const { token, user } = response.data;
             await storeToken(token);
-            console.log('Connexion réussie:', user);
             Alert.alert('Login Successful', 'You are now logged in!');
+            console.log('Connexion réussie:', user);
         } catch (error) {
-            console.error('Erreur lors de la connexion:', error);
-            Alert.alert('Login Failed', 'Please check your credentials.');
+            console.error('Erreur lors de la connexion: ', error);
+            Alert.alert('Login Failed', 'Please check your email or passward.');
         }
-    };
+    }; // Ferme correctement la fonction handleLogin
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
