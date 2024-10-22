@@ -1,7 +1,7 @@
 defmodule TimeManagerApi.Guardian do
   use Guardian, otp_app: :time_manager_api
 
-  alias TimeManagerApi.Accounts.User
+  alias TimeManagerApi.User
   alias TimeManagerApi.Repo
 
   # Définition de la fonction pour encoder et signer un token

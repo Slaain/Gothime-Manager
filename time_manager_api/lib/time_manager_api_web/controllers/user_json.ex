@@ -1,5 +1,5 @@
 defmodule TimeManagerApiWeb.UserJSON do
-  alias TimeManagerApi.Accounts.User
+  alias TimeManagerApi.User
 
   @doc """
   Renders a list of users.
