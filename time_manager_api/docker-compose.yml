@@ -25,6 +25,10 @@ services:
     build:
       context: . 
       dockerfile: Dockerfile
+    command: >
+      sh -c "
+      mix ecto.drop &&
+      mix ecto.setup"
     stdin_open: true
     tty: true
     ports:
