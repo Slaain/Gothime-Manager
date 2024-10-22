@@ -8,7 +8,7 @@ defmodule TimeManagerApi.UserService do
   require Logger
 
   alias TimeManagerApi.Repo
-  alias TimeManagerApi.Accounts.User  # Corrige l'alias vers le bon module
+  alias TimeManagerApi.User  # Corrige l'alias vers le bon module
 
   # Créer un utilisateur
   def create_user(attrs \\ %{}) do

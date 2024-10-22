@@ -15,20 +15,30 @@ Faker.start()
 
 # Create users
 for _ <- 1..100 do
-  user = %User{
+  password = Faker.String.base64() # Générer un mot de passe aléatoire
+
+  user_attrs = %{
     username: Faker.Internet.user_name(),
     email: Faker.Internet.email(),
-    password_hash: Faker.String.base64()
+    password: password  # Passer le mot de passe ici
   }
 
-  Repo.insert!(user)
+  # Créer un changeset pour l'utilisateur
+  changeset = User.changeset(%User{}, user_attrs)
+
+  IO.puts("Inserting user with username: #{user_attrs.username}")
+
+  # Insérer l'utilisateur et récupérer l'utilisateur inséré avec son ID
+  user = Repo.insert!(changeset)
+
+  IO.puts("Inserted user with ID: #{user.id}")
 
   # Create clocks for the user
   for _ <- 1..5 do
     clock = %Clock{
       time: Faker.DateTime.backward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second),  # Remove microseconds
       status: Enum.random([true, false]),
-      user_id: user.id
+      user_id: user.id  # Utiliser l'ID de l'utilisateur inséré
     }
 
     Repo.insert!(clock)
@@ -42,9 +52,11 @@ for _ <- 1..100 do
     workingtime = %WorkingTime{
       start: start_time,
       end: end_time,
-      user_id: user.id,
+      user_id: user.id,  # Utiliser l'ID de l'utilisateur inséré
       total_time: NaiveDateTime.diff(end_time, start_time)
     }
+
+    print(workingtime)
 
     Repo.insert!(workingtime)
   end
