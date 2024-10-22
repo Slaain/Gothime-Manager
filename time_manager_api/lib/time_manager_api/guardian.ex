@@ -15,4 +15,6 @@ defmodule TimeManagerApi.Guardian do
       user -> {:ok, user}
     end
   end
+
+
 end

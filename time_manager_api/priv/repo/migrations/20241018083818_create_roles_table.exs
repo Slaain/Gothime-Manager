@@ -1,4 +1,4 @@
-defmodule YourApp.Repo.Migrations.CreateRolesTable do
+defmodule TimeManagerApi.Repo.Migrations.CreateRolesTable do
   use Ecto.Migration
 
   def change do
