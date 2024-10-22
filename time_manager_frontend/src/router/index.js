@@ -13,6 +13,12 @@ const routes = [
     props: true,
   },
   {
+    path: '/manager/:organisationId/groups',
+    name: 'GroupsPage',
+    component: () => import("http://localhost:4000/api/organisations/1e"),
+    props: true,
+  },
+  {
     path: '/register',
     name: 'Register',
     component: () => import("@/views/Register.vue")

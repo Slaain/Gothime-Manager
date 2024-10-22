@@ -1,72 +1,252 @@
 <template>
-  <div class="dashboard-container">
-    <header class="dashboard-header">
-      <h1>{{ managerName }}'s Organisation</h1>
-    </header>
+  <div class="bat-container">
+    <div class="dashboard">
+      <Sidebar />
 
-    <!-- Organisation Details -->
-    <section class="organisation-details">
-      <h2>Organisation: {{ organisationName }}</h2>
-      <p>Groupes dans l'organisation :</p>
-      <ul>
-        <li v-for="group in groups" :key="group.id">
-          {{ group.name }} - {{ group.description }}
-        </li>
-      </ul>
-    </section>
+      <!-- Main Content -->
+      <main class="flex-1 p-6 main-content">
+        <header class="flex items-center justify-between mb-6">
+          <h1 class="text-3xl font-bold text-white">Organisation's Dashboard</h1>
+          <div class="flex items-center space-x-4 text-white user-info">
+            <span>Manager</span>
+          </div>
+        </header>
 
-    <!-- Groupes et utilisateurs -->
-    <section class="group-users">
-      <h2>Utilisateurs par groupe</h2>
-      <div v-for="group in groups" :key="group.id" class="group-card">
-        <h3>{{ group.name }}</h3>
-        <ul>
-          <li v-for="user in group.users" :key="user.id">
-            {{ user.name }} - Heures travaillées : {{ user.workingTime }}
-          </li>
-        </ul>
-      </div>
-    </section>
+        <section class="grid grid-cols-3 gap-6 mb-6 charts">
+          <router-link to="/manager/${organisationId}/groups" class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
+            <h2 class="mb-4 text-xl text-white">All groups of the organisations</h2>
+          </router-link>
+        </section>
+      </main>
+    </div>
+
   </div>
 </template>
-
 <script>
+
+import UserList from '../components/UserList.vue';
+import LineChart from '../components/LineChart.vue';
+import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
+import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
+import BarChart from "@/components/WorkingTimesChart.vue";
+import Sidebar from '../components/Sidebar.vue';
 import axios from 'axios';
 
+import { getCurrentInstance } from 'vue';
+
 export default {
-  data() {
-    return {
-      managerName: 'Nom du Manager',
-      organisationName: '',
-      groups: [], // Assurez-vous d'utiliser 'groups' au lieu de 'groupes'
-    };
+  name: "Dashboard",
+  components: {
+      Sidebar,
+      UserList,
+      LineChart,
+      WorkingTimeUserContainer,
+      CreaGroupComponent,
+      BarChart, // Enregistrement du BarChart
   },
+  
   methods: {
-    async fetchOrganisationData() {
+
+    showDashboard() {
+      this.showGroupComponent = false;
+    },
+    toggleGroupView() {
+      this.showGroupComponent = !this.showGroupComponent;
+    },
+
+    async getWorkingTimesThisMonth() {
       try {
-        const orgId = this.$route.params.organisationId; 
-        const response = await axios.get(`/api/organisations/${orgId}/details`); // Changez l'URL si nécessaire
-        this.organisationName = response.data.organisation.name; // Ajustez selon la structure de la réponse
-        this.groups = response.data.organisation.groups; // Inclure les utilisateurs dans chaque groupe
+        const response = await axios.get('http://localhost:4000/api/workingtimes/count');
+        this.monthlyUsers = response.data.users_count; // Assigner le nombre retourné par l'API
+        this.workingTimesThisMonth = response.data.working_times_count
       } catch (error) {
-        console.error('Erreur lors de la récupération des données :', error);
+        console.error("Erreur lors de la récupération des working times", error);
       }
     },
-  },
-  mounted() {
-    this.fetchOrganisationData();
+    async getCurrentUsers() {
+      try {
+        const response = await axios.get('http://localhost:4000/api/clocks/countactive');
+        console.log(response);
+        this.currentUsers = response.data.count;
+      } catch (error){
+        console.error("Erreur lors de la récupération des utilisateurs actifs", error);
+      }
+    },
+    // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
+
+    selectUser(userId) {
+      this.selectedUserId = userId;
+    },
   },
 };
 </script>
 
+
 <style scoped>
-.dashboard-container {
-  /* Styles pour la mise en page principale */
+
+.working-times-number {
+  font-size: 6rem;
+  color: transparent; /* Texte transparent */
+  -webkit-text-stroke: 2px #fdcb12; /* Contour jaune */
+  border-radius: 10px;
+  transition: all 0.3s ease; /* Transition pour l'effet smooth */
 }
-.organisation-details, .group-users {
-  /* Styles pour chaque section */
+
+.chart:hover .working-times-number {
+  color: #fdcb12; /* Le texte devient entièrement jaune */
+  -webkit-text-stroke: 0px; /* Retire le contour au hover */
+  text-shadow: 0 0 10px rgba(253, 203, 18, 0.8), /* Ombre jaune */
+               0 0 20px rgba(253, 203, 18, 0.6); /* Ombre plus lointaine */
 }
-.group-card {
-  /* Styles pour les cartes des groupes */
+
+.glassmorphism {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */
+  backdrop-filter: blur(10px); /* Effet de flou sur l'arrière-plan */
+  -webkit-backdrop-filter: blur(10px); /* Support pour Safari */
+  border-radius: 10px; /* Arrondi des angles */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Légère ombre pour effet de profondeur */
+  color: white;
+  overflow: hidden; /* Pour assurer que le pseudo-élément reste dans les limites du conteneur */
+}
+
+.glassmorphism::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 2px; /* Épaisseur de la bordure */
+  border-radius: 10px; /* Même bordure arrondie */
+  background: linear-gradient(
+    to bottom right,
+    #ffffff,
+    rgba(255, 255, 255, 0.5),
+    #fdcb12
+  ); /* Dégradé de la bordure */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none; /* Empêche les événements de la souris sur le pseudo-élément */
+}
+
+.glassmorphism h2 {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85); /* Couleur blanche avec transparence */
+}
+
+.glassmorphism .line-chart {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.glassmorphism-bg-white {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */
+  backdrop-filter: blur(10px); /* Effet de flou sur l'arrière-plan */
+  -webkit-backdrop-filter: blur(10px); /* Support pour Safari */
+  border-radius: 10px; /* Arrondi des angles */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Légère ombre pour effet de profondeur */
+  color: white;
+  overflow: hidden; /* Pour assurer que le pseudo-élément reste dans les limites du conteneur */
+}
+
+.glassmorphism-bg-white::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 2px; /* Épaisseur de la bordure */
+  border-radius: 10px; /* Même bordure arrondie */
+  background: linear-gradient(
+    to bottom right,
+    #ffffff,
+    rgba(255, 255, 255, 0.8),
+    #ffffff
+  ); /* Dégradé entièrement blanc */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none; /* Empêche les événements de la souris sur le pseudo-élément */
+}
+
+.glassmorphism-bg-white h2 {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85); /* Couleur blanche avec transparence */
+}
+
+.glassmorphism-bg-white .line-chart {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.bat-container {
+  background: #333333;
+  background-image: url("../assets/images/bat.png");
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  background-position: 0 0;
+}
+.bat-container::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../assets/images/noise.png"); /* Image PNG du bruit */
+  background-repeat: repeat;
+  opacity: 0.1; /* Ajuste l'opacité du bruit */
+  pointer-events: none;
+  z-index: 1; /* Met le bruit au-dessus des chauves-souris */
+}
+
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background-image: url("../assets/images/noise.png"); /* Image PNG du bruit */
+  z-index: 2; /* S'assurer que le contenu reste au-dessus */
+}
+
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: 200px;
+  background-color: #212327;
+  padding: 20px;
+}
+
+.main-content {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+}
+
+.chart {
+  /* background-color: #2d3748; */
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.line-chart {
+  /* background-color: #2d3748; */
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  color: white;
+}
+
+.working-time-container {
+  /* background-color: #2d3748; */
+  padding: 20px;
+  border-radius: 10px;
 }
 </style>

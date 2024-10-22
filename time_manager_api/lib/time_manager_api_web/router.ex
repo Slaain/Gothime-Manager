@@ -49,30 +49,30 @@ defmodule TimeManagerApiWeb.Router do
     match :options, "/*_path", TimeManagerApiWeb.CORSController, :options
 
 
-  # Group routes
-  get "/groups", GroupController, :index      # Liste des groupes
-  post "/groups", GroupController, :create    # Créer un groupe
-  get "/groups/:id", GroupController, :show   # Afficher un groupe spécifique
-  delete "/groups/:id", GroupController, :delete
-  put "/groups/:id", GroupController, :update
+    # Group routes
+    get "/groups", GroupController, :index      # Liste des groupes
+    post "/groups", GroupController, :create    # Créer un groupe
+    get "/groups/:id", GroupController, :show   # Afficher un groupe spécifique
+    delete "/groups/:id", GroupController, :delete
+    put "/groups/:id", GroupController, :update
 
 
-    # Routes pour gérer les utilisateurs dans les groupes
-  post "/groups/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
-  delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
+      # Routes pour gérer les utilisateurs dans les groupes
+    post "/groups/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
+    delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
 
-  # routes pour les organisations
-  get "/organisations", OrganisationController, :index
-  post "/organisations", OrganisationController, :create
-  get "/organisations/:id", OrganisationController, :show
-  delete "/organisations/:id", OrganisationController, :delete
-  put "/organisations/:id", OrganisationController, :update
-  get "/organisations/:id/details", OrganisationController, :show_with_users
+    # routes pour les organisations
+    get "/organisations", OrganisationController, :index
+    post "/organisations", OrganisationController, :create
+    get "/organisations/:id", OrganisationController, :show
+    delete "/organisations/:id", OrganisationController, :delete
+    put "/organisations/:id", OrganisationController, :update
+    get "/organisations/:id/details", OrganisationController, :show_with_users
 
 
-  #Routes pour l'authentification
-  post "/register", AuthController, :register  # Route pour l'inscription
-  post "/login", AuthController, :login        # Route pour la connexion
+    #Routes pour l'authentification
+    post "/register", AuthController, :register  # Route pour l'inscription
+    post "/login", AuthController, :login        # Route pour la connexion
 
-end
+  end
 end
