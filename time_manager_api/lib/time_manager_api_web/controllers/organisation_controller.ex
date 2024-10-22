@@ -11,7 +11,7 @@ defmodule TimeManagerApiWeb.OrganisationController do
   organisations = Repo.all(Organisation) |> Repo.preload(:groups) # charge les groupes associés
   render(conn, "index.json", organisations: organisations)
 
-end
+  end
 
   def create(conn, %{"organisation" => organisation_params}) do
     changeset = Organisation.changeset(%Organisation{}, organisation_params)
@@ -31,30 +31,38 @@ end
   end
 
 
-  def show(conn, %{"id" => id}) do
-    organisation = Repo.get!(Organisation, id) |> Repo.preload(:groups)
+  def show(conn, %{"id" => organisation_id}) do
+    organisation = Repo.get!(Organisation, organisation_id) |> Repo.preload(:groups)
     render(conn, "show.json", organisation: organisation)
   end
 
-   # Ajouter un groupe dans une organisation
-   def add_group(conn, %{"organisation_id" => organisation_id, "group_id" => group_id}) do
+  #récupérer les détails d'une organisation, y compris les groupes et les utilisateurs qui ont travaillé dans chaque groupe
+  def show_with_users(conn, %{"id" => organisation_id}) do
+    organisation = Repo.get!(Organisation, organisation_id)|> Repo.preload(groups: :users)
+    # Précharger les groupes et leurs utilisateurs
+    render(conn, "show_with_users.json", organisation: organisation)
+  end
 
-    # Rechercher le groupe et l'organisation
-    group = Repo.get!(Group, group_id)
-    organisation = Repo.get!(Organisation, organisation_id)
 
-    # Insérer dans la table de jointure avec les timestamps
-    now = NaiveDateTime.utc_now()
+  # Ajouter un groupe dans une organisation
+  def add_group(conn, %{"organisation_id" => organisation_id, "group_id" => group_id}) do
 
-    case Repo.insert_all("organisation_groups", [%{organisation_id: organisation.id, group_id: group.id, inserted_at: now, updated_at: now}]) do
-      {1, _} ->  # Vérifie si l'insertion a réussi
-        conn
-        |> put_status(:ok)
-        |> json(%{message: "Group added to organisation", organisation: organisation})
-      _ ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{message: "Error adding group"})
+  # Rechercher le groupe et l'organisation
+  group = Repo.get!(Group, group_id)
+  organisation = Repo.get!(Organisation, organisation_id)
+
+  # Insérer dans la table de jointure avec les timestamps
+  now = NaiveDateTime.utc_now()
+
+  case Repo.insert_all("organisation_groups", [%{organisation_id: organisation.id, group_id: group.id, inserted_at: now, updated_at: now}]) do
+    {1, _} ->  # Vérifie si l'insertion a réussi
+      conn
+      |> put_status(:ok)
+      |> json(%{message: "Group added to organisation", organisation: organisation})
+    _ ->
+      conn
+      |> put_status(:unprocessable_entity)
+      |> json(%{message: "Error adding group"})
     end
   end
 

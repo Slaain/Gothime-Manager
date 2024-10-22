@@ -67,7 +67,7 @@ defmodule TimeManagerApiWeb.Router do
   get "/organisations/:id", OrganisationController, :show
   delete "/organisations/:id", OrganisationController, :delete
   put "/organisations/:id", OrganisationController, :update
-
+  get "/organisations/:id/details", OrganisationController, :show_with_users
 
 
   #Routes pour l'authentification

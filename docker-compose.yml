@@ -26,7 +26,7 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - .:/time_manager_api/app
+      - .:/time_manager_api/app/
     environment:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
@@ -50,7 +50,7 @@ services:
     depends_on:
      - phoenix  # Assure que le service backend "phoenix" soit démarré avant ce service
     volumes:
-      - ./time_manager_frontend:/app  # Monte le répertoire local du frontend pour permettre
+      - ./time_manager_frontend:/app
       - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
  
   adminer:  # Service pour l'interface de gestion de base de données PgAdmin

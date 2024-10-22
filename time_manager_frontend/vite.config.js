@@ -11,6 +11,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',  // Serveur accessible depuis d'autres machines
+    port: 5173,
   },
   build: {
     rollupOptions: {

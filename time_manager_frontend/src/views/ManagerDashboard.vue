@@ -1,45 +1,72 @@
 <template>
-  <div class="manager-dashboard">
-    <h1>Manager Dashboar for {{ organizationName }}</h1>
-    <p>Bienvenue sur le tableau de bord de l'organisation {{ organizationName }}.</p>
-    <WorkingTimesChart /> <!-- Exemple de composant affichant des statistiques de travail -->
-  
-  <div v-for="employee in employees" :key="employee.id">
-    <p>{{ employee.name }} - Heures travaillées : {{ employee.workingHours }}</p>
+  <div class="dashboard-container">
+    <header class="dashboard-header">
+      <h1>{{ managerName }}'s Organisation</h1>
+    </header>
+
+    <!-- Organisation Details -->
+    <section class="organisation-details">
+      <h2>Organisation: {{ organisationName }}</h2>
+      <p>Groupes dans l'organisation :</p>
+      <ul>
+        <li v-for="group in groups" :key="group.id">
+          {{ group.name }} - {{ group.description }}
+        </li>
+      </ul>
+    </section>
+
+    <!-- Groupes et utilisateurs -->
+    <section class="group-users">
+      <h2>Utilisateurs par groupe</h2>
+      <div v-for="group in groups" :key="group.id" class="group-card">
+        <h3>{{ group.name }}</h3>
+        <ul>
+          <li v-for="user in group.users" :key="user.id">
+            {{ user.name }} - Heures travaillées : {{ user.workingTime }}
+          </li>
+        </ul>
+      </div>
+    </section>
   </div>
-</div>
 </template>
 
 <script>
-import WorkingTimesChart from '@/components/WorkingTimesChart.vue';
+import axios from 'axios';
 
 export default {
-  props: ['organizationId'],
   data() {
     return {
-      organizationName: '',
-      employees: [],
+      managerName: 'Nom du Manager',
+      organisationName: '',
+      groups: [], // Assurez-vous d'utiliser 'groups' au lieu de 'groupes'
     };
   },
-  mounted() {
-    this.getOrganizationData();
-  },
   methods: {
-    async getOrganizationData() {
+    async fetchOrganisationData() {
       try {
-        const response = await axios.get(`http://localhost:4000/api/organizations/${this.organizationId}`);
-        this.organizationName = response.data.name;
-        this.employees = response.data.employees;
+        const orgId = this.$route.params.organisationId; 
+        const response = await axios.get(`/api/organisations/${orgId}/details`); // Changez l'URL si nécessaire
+        this.organisationName = response.data.organisation.name; // Ajustez selon la structure de la réponse
+        this.groups = response.data.organisation.groups; // Inclure les utilisateurs dans chaque groupe
       } catch (error) {
-        console.error("Erreur lors de la récupération des données de l'organisation", error);
+        console.error('Erreur lors de la récupération des données :', error);
       }
-    }
-  }
+    },
+  },
+  mounted() {
+    this.fetchOrganisationData();
+  },
 };
 </script>
 
 <style scoped>
-.manager-dashboard {
-  padding: 20px;
+.dashboard-container {
+  /* Styles pour la mise en page principale */
+}
+.organisation-details, .group-users {
+  /* Styles pour chaque section */
+}
+.group-card {
+  /* Styles pour les cartes des groupes */
 }
 </style>

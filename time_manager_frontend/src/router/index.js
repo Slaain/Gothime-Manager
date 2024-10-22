@@ -9,7 +9,8 @@ const routes = [
   {
     path: '/manager/:organisationId',
     name: 'ManagerDashboard',
-    component: () => import("@/views/ManagerDashboard.vue")
+    component: () => import("@/views/ManagerDashboard.vue"),
+    props: true,
   },
   {
     path: '/register',
