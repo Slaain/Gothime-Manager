@@ -7,6 +7,7 @@
 # General application configuration
 import Config
 
+
 config :time_manager_api,
   ecto_repos: [TimeManagerApi.Repo],
   generators: [timestamp_type: :utc_datetime]
