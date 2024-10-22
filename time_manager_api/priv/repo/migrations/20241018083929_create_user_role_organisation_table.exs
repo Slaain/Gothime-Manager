@@ -1,4 +1,4 @@
-defmodule YourApp.Repo.Migrations.CreateUserRoleOrganisationTable do
+defmodule M.Repo.Migrations.CreateUserRoleOrganisationTable do
   use Ecto.Migration
 
   def change do

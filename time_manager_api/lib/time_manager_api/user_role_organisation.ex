@@ -5,8 +5,8 @@ defmodule TimeManagerApi.UserRoleOrganisation do
   schema "user_role_organisation" do
     field :organisation_ids, {:array, :integer}, default: []
 
-    belongs_to :user, YourApp.User
-    belongs_to :role, YourApp.Role
+    belongs_to :user, TimeManagerApi.User
+    belongs_to :role, TimeManagerApi.Role
 
     timestamps()
   end

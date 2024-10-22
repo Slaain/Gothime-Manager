@@ -103,7 +103,7 @@ export default class DOMPatch {
     let externalFormTriggered = null
 
     function morph(targetContainer, source, withChildren=false){
-      morphdom(targetContainer, source, {
+      let morphCallbacks = {
         // normally, we are running with childrenOnly, as the patch HTML for a LV
         // does not include the LV attrs (data-phx-session, etc.)
         // when we are patching a live component, we do want to patch the root element as well;
@@ -129,19 +129,25 @@ export default class DOMPatch {
           if(streamAt === 0){
             parent.insertAdjacentElement("afterbegin", child)
           } else if(streamAt === -1){
-            parent.appendChild(child)
+            let lastChild = parent.lastElementChild
+            if(lastChild && !lastChild.hasAttribute(PHX_STREAM_REF)){
+              let nonStreamChild = Array.from(parent.children).find(c => !c.hasAttribute(PHX_STREAM_REF))
+              parent.insertBefore(child, nonStreamChild)
+            } else {
+              parent.appendChild(child)
+            }
           } else if(streamAt > 0){
             let sibling = Array.from(parent.children)[streamAt]
             parent.insertBefore(child, sibling)
           }
         },
         onBeforeNodeAdded: (el) => {
-          DOM.maybeAddPrivateHooks(el, phxViewportTop, phxViewportBottom)
+          DOM.maintainPrivateHooks(el, el, phxViewportTop, phxViewportBottom)
           this.trackBefore("added", el)
 
           let morphedEl = el
           // this is a stream item that was kept on reset, recursively morph it
-          if(!isJoinPatch && this.streamComponentRestore[el.id]){
+          if(this.streamComponentRestore[el.id]){
             morphedEl = this.streamComponentRestore[el.id]
             delete this.streamComponentRestore[el.id]
             morph.call(this, morphedEl, el, true)
@@ -188,8 +194,15 @@ export default class DOMPatch {
           this.maybeReOrderStream(el, false)
         },
         onBeforeElUpdated: (fromEl, toEl) => {
+          // if we are patching the root target container and the id has changed, treat it as a new node
+          // by replacing the fromEl with the toEl, which ensures hooks are torn down and re-created
+          if(fromEl.id && fromEl.isSameNode(targetContainer) && fromEl.id !== toEl.id){
+            morphCallbacks.onNodeDiscarded(fromEl)
+            fromEl.replaceWith(toEl)
+            return morphCallbacks.onNodeAdded(toEl)
+          }
           DOM.syncPendingAttrs(fromEl, toEl)
-          DOM.maybeAddPrivateHooks(toEl, phxViewportTop, phxViewportBottom)
+          DOM.maintainPrivateHooks(fromEl, toEl, phxViewportTop, phxViewportBottom)
           DOM.cleanChildNodes(toEl, phxUpdate)
           if(this.skipCIDSibling(toEl)){
             // if this is a live component used in a stream, we may need to reorder it
@@ -272,7 +285,8 @@ export default class DOMPatch {
             return fromEl
           }
         }
-      })
+      }
+      morphdom(targetContainer, source, morphCallbacks)
     }
 
     this.trackBefore("added", container)
@@ -434,8 +448,7 @@ export default class DOMPatch {
   transitionPendingRemoves(){
     let {pendingRemoves, liveSocket} = this
     if(pendingRemoves.length > 0){
-      liveSocket.transitionRemoves(pendingRemoves)
-      liveSocket.requestDOMUpdate(() => {
+      liveSocket.transitionRemoves(pendingRemoves, false, () => {
         pendingRemoves.forEach(el => {
           let child = DOM.firstPhxChild(el)
           if(child){ liveSocket.destroyViewByEl(child) }
@@ -450,11 +463,8 @@ export default class DOMPatch {
     if(!(fromEl instanceof HTMLSelectElement) || fromEl.multiple){ return false }
     if(fromEl.options.length !== toEl.options.length){ return true }
 
-    let fromSelected = fromEl.selectedOptions[0]
-    let toSelected = toEl.selectedOptions[0]
-    if(fromSelected && fromSelected.hasAttribute("selected")){
-      toSelected.setAttribute("selected", fromSelected.getAttribute("selected"))
-    }
+    // keep the current value
+    toEl.value = fromEl.value
 
     // in general we have to be very careful with using isEqualNode as it does not a reliable
     // DOM tree equality check, but for selection attributes and options it works fine

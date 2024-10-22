@@ -1,6 +1,6 @@
 defmodule TimeManagerApiWeb.AuthController do
   use TimeManagerApiWeb, :controller
-  alias TimeManagerApi.Accounts.User
+  alias TimeManagerApi.User
   alias TimeManagerApi.Repo
   alias Bcrypt
   alias TimeManagerApi.Guardian  # Import Guardian ici
@@ -48,6 +48,16 @@ defmodule TimeManagerApiWeb.AuthController do
           |> json(%{error: "Invalid credentials"})
       end
     end
+
+    # decrypt le token
+    def decrypt_token(conn, %{"token" => token}) do
+      case Guardian.decode_and_verify(token) do
+        {:ok, claims} ->
+          conn
+          |> json(%{message: "Token decoded successfully", claims: claims})
+        end
+      end
+
 
     defp check_password(nil, _password), do: {:error, :invalid_user}
     defp check_password(user, password) do
