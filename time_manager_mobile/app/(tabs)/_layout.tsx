@@ -14,12 +14,12 @@ export default function TabLayout() {
                 tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
                 headerShown: false,
             }}>
-            <Tabs.Screen
+             <Tabs.Screen
                 name="index"
                 options={{
-                    title: 'Home',
+                    title: 'QR CODE',
                     tabBarIcon: ({ color, focused }) => (
-                        <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+                        <TabBarIcon name={focused ? 'camera' : 'camera-outline'} color={color} />
                     ),
                     tabBarStyle: { display: 'none' }, // Masque la Tab Bar sur l'écran d'accueil
                 }}
@@ -27,10 +27,11 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="explore"
                 options={{
-                    title: 'Explore',
+                    title: 'Working Times',
                     tabBarIcon: ({ color, focused }) => (
-                        <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+                        <TabBarIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} />
                     ),
+                    // Masque la Tab Bar sur l'écran d'accueil
                 }}
             />
         </Tabs>

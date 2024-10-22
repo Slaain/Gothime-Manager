@@ -3,11 +3,12 @@ import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, KeyboardAvo
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { storeToken } from '../../components/asyncStorage'; // Chemin relatif vers asyncStorage.tsx
-import {useRouter} from 'expo-router'
+import {useRouter} from 'expo-router' ; // Utilisation de la route
 
 export default function HomeScreen() {
     const [email, SetEmail] = useState('');
     const [password, SetPassword] = useState('');
+    const router = useRouter();
 
     const handleLogin = async () => {
         try {
@@ -24,6 +25,11 @@ export default function HomeScreen() {
             await storeToken(token);
             Alert.alert('Login Successful', 'You are now logged in!');
             console.log('Connexion réussie:', user);
+
+            router.push({
+                pathname: '/explore', // Change this to your new screen's path
+                params: { email },  // Pass the email as a parameter
+            });
         } catch (error) {
             console.error('Erreur lors de la connexion: ', error);
             Alert.alert('Login Failed', 'Please check your email or passward.');
