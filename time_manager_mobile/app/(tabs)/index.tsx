@@ -28,7 +28,7 @@ export default function HomeScreen() {
 
             router.push({
                 pathname: '/explore', // Change this to your new screen's path
-                params: { email },  // Pass the email as a parameter
+                params: { email,userId: user.id,userName: user.username },  // Pass the email as a parameter
             });
         } catch (error) {
             console.error('Erreur lors de la connexion: ', error);
