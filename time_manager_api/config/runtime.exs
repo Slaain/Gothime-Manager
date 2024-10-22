@@ -17,6 +17,24 @@ import Config
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 
+# Charger les variables d'environnement depuis le fichier .env
+# if File.exists?(".env") do
+#   for line <- File.stream!(".env") do
+#     [key, value] = String.split(line, "=", parts: 2)
+#     System.put_env(String.trim(key), String.trim(value))
+#   end
+# end
+
+# # Configuration de la base de données PostgreSQL
+# config :time_manager_api, TimeManagerApi.Repo,
+#   username: System.get_env("DB_USERNAME"),
+#   password: System.get_env("DB_PASSWORD"),
+#   hostname: System.get_env("DB_HOSTNAME"),
+#   database: System.get_env("DB_NAME"),
+#   port: String.to_integer(System.get_env("DB_PORT") || "5432"),
+#   pool_size: String.to_integer(System.get_env("DB_POOL_SIZE") || "10"),
+#   ssl: true
+
 
 if System.get_env("PHX_SERVER") do
   config :time_manager_api, TimeManagerApiWeb.Endpoint, server: true

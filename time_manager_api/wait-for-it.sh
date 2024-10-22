@@ -7,4 +7,4 @@ until PGPASSWORD=postgres psql -h db -U postgres -c '\q'; do
 done
 
 >&2 echo "Postgres is up - executing command"
-exec mix phx.server  # Remplacez cette ligne par la commande que vous voulez exécuter
+exec mix phx.server  

@@ -27,6 +27,9 @@ RUN cd assets && \
     npm install && \
     npm install -g webpack webpack-cli
 
+# Copier le fichier .env dans le conteneur
+COPY .env .env
+
 # Exposer le port pour Phoenix
 EXPOSE 4000
 
@@ -36,4 +39,4 @@ COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 RUN chmod +x /usr/local/bin/wait-for-it.sh  # Rendre le script exécutable
 
 # Remplacer l'exécution par le script wait-for-it.sh
-CMD ["wait-for-it.sh", "db:5432", "--", "mix ecto.migrate && mix phx.server"]
+CMD ["wait-for-it.sh", "db:5432", "--", "mix", "phx.server"]

@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: time_manager_api_dev  # Correspond à la base de données dans .env
+      POSTGRES_DB: db  # Correspond à la base de données dans .env
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
@@ -17,29 +17,28 @@ services:
       timeout: 5s
       retries: 5
 
-
   phoenix: # Service pour le backend
     build:
       context: ./time_manager_api
       dockerfile: Dockerfile
     container_name: phoenix
-    #commande: mix ecto.create && mix ecto.migrate
     restart: always
     ports:
       - "4000:4000"
     volumes:
       - .:/time_manager_api/app
     environment:
-      DB_USERNAME:  postgres
-      DB_PASSWORD:  postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
       DB_HOSTNAME: db
       DB_NAME: time_manager_api_dev
       DB_PORT: 5432
     depends_on:
       db:
         condition: service_healthy
-     
-
+    command: >
+      sh -c "mix ecto.create && mix ecto.migrate && mix phx.server"
+   
   frontend:  # Service pour le frontend
     build:
       context: ./time_manager_frontend
@@ -54,7 +53,6 @@ services:
       - ./time_manager_frontend:/app  # Monte le répertoire local du frontend pour permettre
       - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
  
-
   adminer:  # Service pour l'interface de gestion de base de données PgAdmin
     image: adminer:latest
     container_name: adminer
@@ -63,7 +61,6 @@ services:
       - "8080:8080" # Expose l'interface web de PgAdmin
     depends_on:
       - db  # Assure que le service "db" soit démarré avant ce service
-
 
 volumes:
   db_data:
