@@ -265,7 +265,19 @@ defmodule Phoenix.LiveView.Diff do
 
         {diff, new_components, :noop} =
           write_component(socket, cid, components, fn component_socket, component ->
-            {Utils.maybe_call_update!(component_socket, component, updated_assigns), :noop}
+            telemetry_metadata = %{
+              socket: component_socket,
+              component: component,
+              assigns_sockets: updated_assigns
+            }
+
+            sockets =
+              :telemetry.span([:phoenix, :live_component, :update], telemetry_metadata, fn ->
+                {Utils.maybe_call_update!(component_socket, component, updated_assigns),
+                 telemetry_metadata}
+              end)
+
+            {sockets, :noop}
           end)
 
         {diff, new_components}
@@ -326,9 +338,20 @@ defmodule Phoenix.LiveView.Diff do
     socket = mount_component(socket, component, mount_assigns)
     assigns = maybe_call_preload!(component, assigns)
 
-    socket
-    |> Utils.maybe_call_update!(component, assigns)
-    |> component_to_rendered(component, assigns[:id])
+    telemetry_metadata = %{
+      socket: socket,
+      component: component,
+      assigns_sockets: assigns
+    }
+
+    :telemetry.span([:phoenix, :live_component, :update], telemetry_metadata, fn ->
+      result =
+        socket
+        |> Utils.maybe_call_update!(component, assigns)
+        |> component_to_rendered(component, assigns[:id])
+
+      {result, telemetry_metadata}
+    end)
   end
 
   defp component_to_rendered(socket, component, id) do
@@ -693,11 +716,11 @@ defmodule Phoenix.LiveView.Diff do
        ) do
     diffs = maybe_put_events(diffs, socket)
 
-    {new_pending, diffs, compnents} =
+    {new_pending, diffs, components} =
       render_component(socket, component, id, cid, new?, cids, diffs, components)
 
     pending = Map.merge(pending, new_pending, fn _, v1, v2 -> v2 ++ v1 end)
-    zip_components(sockets, metadata, component, cids, {pending, diffs, compnents})
+    zip_components(sockets, metadata, component, cids, {pending, diffs, components})
   end
 
   defp zip_components([], [], _component, _cids, acc) do
@@ -905,7 +928,8 @@ defmodule Phoenix.LiveView.Diff do
       socket
       | assigns: Map.put(assigns, :__changed__, %{}),
         private: private,
-        fingerprints: prints
+        fingerprints: prints,
+        redirected: nil
     }
   end
 
