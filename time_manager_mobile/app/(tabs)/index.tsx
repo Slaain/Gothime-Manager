@@ -9,17 +9,18 @@ export default function HomeScreen() {
     const [password, SetPassword] = useState('');
 
     const handleLogin = async () => {
+        console.log('Tentative de connexion...');
         try {
-            const response = await axios.post('http://localhost:8000/', {
+            const response = await axios.post('http://10.79.216.151:4000/api/login', {
                 email,
                 password,
             });
             const { token, user } = response.data;
             await storeToken(token);
+            console.log('Connexion réussie:', user);
             Alert.alert('Login Successful', 'You are now logged in!');
-            console.log(user);
         } catch (error) {
-            console.error("Error during connection", error);
+            console.error('Erreur lors de la connexion:', error);
             Alert.alert('Login Failed', 'Please check your credentials.');
         }
     };
