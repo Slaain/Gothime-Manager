@@ -1,6 +1,7 @@
 defmodule TimeManagerApi.MixProject do
   use Mix.Project
 
+
   def project do
     [
       app: :time_manager_api,
@@ -32,6 +33,7 @@ defmodule TimeManagerApi.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:config_env, "~> 0.2.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
@@ -53,8 +55,7 @@ defmodule TimeManagerApi.MixProject do
       {:gettext, "~> 0.26.1"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
-      {:bandit, "~> 1.5"},
-      #  {:dotenv, "~> 3.0", only: [:dev, :test]}
+      {:bandit, "~> 1.5"}
       {:guardian, "~> 2.0"},
       #{:bcrypt_elixir, "~> 2.0"},
     ]

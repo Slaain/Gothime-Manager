@@ -1,38 +1,42 @@
 # Utiliser l'image officielle Elixir
-FROM elixir:1.17.3
+FROM elixir:latest
 
-# Installer Hex et Rebar pour gérer les dépendances Elixir
+# Installer les dépendances pour Node.js, PostgreSQL et netcat-openbsd
+RUN apt-get update && \
+    apt-get install -y nodejs npm postgresql-client netcat-openbsd
+
+# Installer Node.js et npm
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+    apt-get install -y nodejs
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de l'application dans l'image
+COPY . .
+
+# Installer Hex et Rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# Installer Node.js et npm (si nécessaire pour les assets)
-RUN apt-get update && apt-get install -y nodejs npm
-
-# Installer Make (facultatif)
-RUN apt-get install -y make
-
-# Installer inotify-tools pour le rechargement à chaud
-RUN apt-get install -y inotify-tools
-
-# Créer et définir le répertoire de travail
-WORKDIR /app
-
-# Copier les fichiers de dépendances
-COPY mix.exs mix.lock ./
-
-# Installer les dépendances
+# Installer les dépendances Phoenix
 RUN mix deps.get
 
+# Installer les dépendances Node.js et Webpack
+RUN cd assets && \
+    npm install && \
+    npm install -g webpack webpack-cli
 
-# Copier le reste des fichiers de l'application
-COPY . .
+# Copier le fichier .env dans le conteneur
+COPY .env .env
 
-# Compiler le projet
-RUN mix compile
-
-# Exposer le port 4000 pour l'API
+# Exposer le port pour Phoenix
 EXPOSE 4000
 
 
-# Commande pour démarrer le serveur Phoenix
-CMD ["mix", "phx.server"]
+# Copier le script wait-for-it.sh dans l'image
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+RUN chmod +x /usr/local/bin/wait-for-it.sh  # Rendre le script exécutable
+
+# Remplacer l'exécution par le script wait-for-it.sh
+CMD ["wait-for-it.sh", "db:5432", "--", "mix", "phx.server"]

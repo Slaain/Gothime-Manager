@@ -1,0 +1,66 @@
+services:
+  db: # Service pour la base de données PostgreSQL
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db  # Correspond à la base de données dans .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phoenix: # Service pour le backend
+    build:
+      context: ./time_manager_api
+      dockerfile: Dockerfile
+    container_name: phoenix
+    restart: always
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/time_manager_api/app
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_HOSTNAME: db
+      DB_NAME: time_manager_api_dev
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "mix ecto.create && mix ecto.migrate && mix phx.server"
+   
+  frontend:  # Service pour le frontend
+    build:
+      context: ./time_manager_frontend
+      dockerfile: Dockerfile  # Spécifie le Dockerfile à utiliser pour construire l'image frontend
+    container_name: vite_frontend
+    restart: always
+    ports:
+      - "5173:5173"  # Redirige le port Vite vers l'hôte
+    depends_on:
+     - phoenix  # Assure que le service backend "phoenix" soit démarré avant ce service
+    volumes:
+      - ./time_manager_frontend:/app  # Monte le répertoire local du frontend pour permettre
+      - /app/node_modules  # Exclut le répertoire node_modules pour éviter les conflits de dépendances
+ 
+  adminer:  # Service pour l'interface de gestion de base de données PgAdmin
+    image: adminer:latest
+    container_name: adminer
+    restart: always
+    ports:
+      - "8080:8080" # Expose l'interface web de PgAdmin
+    depends_on:
+      - db  # Assure que le service "db" soit démarré avant ce service
+
+volumes:
+  db_data:
