@@ -56,6 +56,8 @@ for _ <- 1..100 do
       total_time: NaiveDateTime.diff(end_time, start_time)
     }
 
+    print(workingtime)
+
     Repo.insert!(workingtime)
   end
 end
@@ -88,7 +90,6 @@ for user <- Repo.all(User) do
   group = Repo.one!(from g in Group, order_by: fragment("RANDOM()"), limit: 1)
   role = Repo.one!(from r in Role, order_by: fragment("RANDOM()"), limit: 1)
 
-  # Vérifiez si le user_role_org existe déjà
   existing_user_role = Repo.get_by(UserRoleOrganisation, user_id: user.id, role_id: role.id)
 
   if existing_user_role do
