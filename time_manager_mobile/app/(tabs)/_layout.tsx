@@ -45,6 +45,7 @@ export default function TabLayout() {
                     tabBarVisible: getTabBarVisibility(route),
                 })}
             />
+
         </Tabs>
     );
 }
