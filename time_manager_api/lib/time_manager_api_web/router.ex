@@ -78,13 +78,16 @@ defmodule TimeManagerApiWeb.Router do
   delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
 
   # routes pour les organisations
-  get "/organisations", OrganisationController, :index
-  post "/organisations", OrganisationController, :create
-  get "/organisations/:id", OrganisationController, :show
-  delete "/organisations/:id", OrganisationController, :delete
-  put "/organisations/:id", OrganisationController, :update
+  scope "/organisations" do
+    get "/", OrganisationController, :index
+    post "/", OrganisationController, :create
+    get "/:id/users", OrganisationController, :users
+    get "/:id", OrganisationController, :show
+    delete "/:id", OrganisationController, :delete
+    put "/:id", OrganisationController, :update
+    put "/:organisation_id/users/:user_id/:role_id", OrganisationController, :update_user_role
 
-
+  end
 
   #Routes pour l'authentification
   post "/register", AuthController, :register  # Route pour l'inscription

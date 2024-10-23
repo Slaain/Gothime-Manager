@@ -9,3 +9,4 @@ defmodule TimeManagerApi.Repo.Migrations.CreateOrganisationsTable do
 
   end
 end
+
