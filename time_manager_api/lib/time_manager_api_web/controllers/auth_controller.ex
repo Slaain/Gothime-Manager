@@ -8,6 +8,10 @@ defmodule TimeManagerApiWeb.AuthController do
 
   # Inscription d'un utilisateur
   def register(conn, %{"email" => email, "username" => username, "password" => password}) do
+    #print data
+    IO.inspect(email,label: "email")
+    IO.inspect(username,label: "username")
+    IO.inspect(password,label: "password")
     case UserService.create_user(%{"email" => email, "username" => username, "password" => password}) do
       {:ok, user} ->
         json(conn, %{message: "User created successfully", user: user})

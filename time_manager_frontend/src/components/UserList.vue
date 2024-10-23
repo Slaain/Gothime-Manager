@@ -9,6 +9,7 @@
     >
       <div class="w-1/2 px-8 py-4 bg-white">
         <p class="text-xl font-extrabold text-zinc-950">New User</p>
+        
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
           User's Name
           <p
@@ -19,7 +20,7 @@
         </label>
         <input
           v-model="newUser.username"
-          placeholder="Please enter your full name"
+          placeholder="Username"
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
         />
@@ -28,10 +29,29 @@
         >
         <input
           v-model="newUser.email"
-          placeholder="Please enter your email"
+          placeholder="Email"
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
         />
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
+          >User's Email</label
+        >
+        <input
+          v-model="newUser.password"
+          placeholder="Password"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
+          >Confirm Password</label
+        >
+        <input
+          v-model="newUser.confirmPassword"
+          placeholder="Password"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        
         <p class="h-6 text-red-600">{{ error }}</p>
         <button
           @click="createUser"
@@ -307,10 +327,12 @@ export default {
       limit: 5,
       totalPages: 10,
       totalUsers: null,
-      showCreateUserModal: false, // Ajout de la variable pour le formulaire
+      showCreateUserModal: false,
       newUser: {
         username: "",
         email: "",
+        password: "",
+        confirmPassword: "",
       },
       error: "",
       showCreateUserModal: false,
@@ -325,7 +347,7 @@ export default {
 
   // Handle the toggle switch when clock in/out is triggered
     handleClockToggle(employee) {
-        // On fait un POST vers /api/clocks/:user_id
+        
         this.toggleClock(employee.id);
       },
 
@@ -398,15 +420,19 @@ export default {
       this.toast.error(message);
     },
     createUser() {
+      if (this.newUser.password !== this.newUser.confirmPassword) {
+        this.error = "Passwords do not match";
+        console.log("Passwords do not match");
+        return;
+      }
       const userData = {
-        user: {
           username: this.newUser.username,
           email: this.newUser.email,
-        },
+          password: this.newUser.password,
       };
       console.log("this.$toast : ", this.$toast);
 
-      if (userData.user.username === "" || userData.user.email === "") {
+      if (userData.username === "" || userData.email === "" || userData.password === "") {
         this.error = "Please fill in all fields.";
         return;
       }
@@ -451,7 +477,7 @@ export default {
 
       console.log("DATATATATA : ", userData);
 
-      if (userData.user.username === "" || userData.user.email === "") {
+      if (userData.username === "" || userData.email === "" || userData.password === "") {
         this.error = "Please fill in all fields.";
         return;
       }
@@ -464,8 +490,8 @@ export default {
           const updatedUser = this.employees.find(
             (user) => user.id === this.selectedUserId
           );
-          updatedUser.username = userData.user.username;
-          updatedUser.email = userData.user.email;
+          updatedUser.username = userData.username;
+          updatedUser.email = userData.email;
           this.newUser.username = "";
           this.newUser.email = "";
           this.error = "";

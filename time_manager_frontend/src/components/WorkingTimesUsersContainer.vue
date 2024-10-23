@@ -183,8 +183,8 @@ export default {
       loading: true,
       showUpdateWorkingtimeModal: false,
       showDeleteWorkingtimeModal: false,
-      startTime: "", // Variable pour l'heure de début
-      endTime: "", // Variable pour l'heure de fin
+      startTime: "",
+      endTime: "",
       showCreateWorkingtimeModal: false,
       selectedWorkingTimeID: null,
     };
@@ -193,7 +193,7 @@ export default {
     userID(newUserID) {
       if (newUserID) {
         console.log("UserID a changé :", newUserID);
-        this.getWorkingTimes(); // Appel de la méthode pour mettre à jour les données
+        this.getWorkingTimes();
       }
     },
   },
@@ -235,8 +235,8 @@ export default {
         });
     },
     calculateDuration(totalTimeInMinutes) {
-      const totalTimeInHours = totalTimeInMinutes / 60; // Convertir les minutes en heures
-      return Math.ceil(totalTimeInHours); // Arrondir à la valeur entière supérieure
+      const totalTimeInHours = totalTimeInMinutes / 60;
+      return Math.ceil(totalTimeInHours);
     },
     createWorkingTime() {
       console.log("start time: ", this.startTime);
