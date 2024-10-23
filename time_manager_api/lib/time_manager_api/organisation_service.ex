@@ -1,5 +1,10 @@
 defmodule TimeManagerApi.OrganisationService do
-  alias TimeManagerApi.{Repo, Organisation}
+
+  import Ecto.Query, warn: false
+
+  alias TimeManagerApi.{Repo, Organisation, User, UserRoleOrganisation, Role}
+
+  # Les fonctions que tu avais déjà
 
   def list_organisations do
     Repo.all(Organisation)
@@ -26,4 +31,12 @@ defmodule TimeManagerApi.OrganisationService do
   def delete_organisation(organisation) do
     Repo.delete(organisation)
   end
+
+  # Fonction pour récupérer les utilisateurs d'une organisation avec leur clock
+  def get_users_by_organisation(organisation_id) do
+    Organisation
+    |> Repo.get(organisation_id)
+    |> Repo.preload(users: [:clock, :user_role_organisations])
+  end
+
 end

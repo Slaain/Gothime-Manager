@@ -1,7 +1,7 @@
 # priv/repo/seeds.exs
 
 alias TimeManagerApi.Repo
-alias TimeManagerApi.Accounts.User
+alias TimeManagerApi.User
 alias TimeManagerApi.Clock
 alias TimeManagerApi.WorkingTime
 alias TimeManagerApi.Task

@@ -4,7 +4,7 @@ defmodule TimeManagerApi.AccountsTest do
   alias TimeManagerApi.Accounts
 
   describe "users" do
-    alias TimeManagerApi.Accounts.User
+    alias TimeManagerApi.User
 
     import TimeManagerApi.AccountsFixtures
 

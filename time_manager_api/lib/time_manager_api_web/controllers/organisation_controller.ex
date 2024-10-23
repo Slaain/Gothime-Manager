@@ -1,7 +1,9 @@
 defmodule TimeManagerApiWeb.OrganisationController do
   use TimeManagerApiWeb, :controller
 
-  alias TimeManagerApi.{Repo, Organisation, Group, OrganisationGroup}
+  alias TimeManagerApi.User
+
+  alias TimeManagerApi.{Repo, Organisation, Group, OrganisationGroup, OrganisationService}
 
   # Liste des organisations
   def index(conn, _params) do
@@ -95,6 +97,42 @@ defmodule TimeManagerApiWeb.OrganisationController do
         |> json(%{errors: errors})
     end
   end
+
+  # Action pour récupérer les utilisateurs d'une organisation
+  def users(conn, %{"id" => organisation_id}) do
+    organisation = OrganisationService.get_users_by_organisation(organisation_id)
+
+    case organisation do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "Organisation not found"})
+
+      _organisation ->
+        # Préparer les données des utilisateurs avec leur statut de clock et leur role_id
+        users_with_clock_and_role = Enum.map(organisation.users, fn user ->
+          user_role_organisation = Enum.find(user.user_role_organisations, fn uro ->
+            uro.organisation_id == organisation_id
+          end)
+
+          %{
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            clock: %{
+              status: user.clock && user.clock.status || false
+            },
+            role_id: user_role_organisation && user_role_organisation.role_id
+          }
+        end)
+
+        conn
+        |> put_status(:ok)
+        |> json(%{organisation: organisation, users: users_with_clock_and_role})
+    end
+  end
+
+
 
   # Supprimer une organisation
   def delete(conn, %{"id" => id}) do

@@ -3,18 +3,17 @@ defmodule TimeManagerApi.UserRoleOrganisation do
   import Ecto.Changeset
 
   schema "user_role_organisation" do
-    field :organisation_ids, {:array, :integer}, default: []
+    belongs_to :user, TimeManagerApi.User
+    belongs_to :organisation, TimeManagerApi.Organisation
+    belongs_to :role, TimeManagerApi.Role
 
-    belongs_to :user, YourApp.User
-    belongs_to :role, YourApp.Role
-
+    # Autres champs si nécessaire
     timestamps()
   end
 
-  @doc false
   def changeset(user_role_organisation, attrs) do
     user_role_organisation
-    |> cast(attrs, [:user_id, :role_id, :organisation_ids])
-    |> validate_required([:user_id, :role_id])
+    |> cast(attrs, [:user_id, :organisation_id, :role_id])
+    |> validate_required([:user_id, :organisation_id, :role_id])
   end
 end
