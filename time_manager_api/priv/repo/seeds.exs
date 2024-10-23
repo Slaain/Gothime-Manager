@@ -22,10 +22,7 @@ for _ <- 1..10 do
   }
 
   changeset = User.changeset(%User{}, user_attrs)
-
-
   user = Repo.insert!(changeset)
-
 
   for _ <- 1..5 do
     clock = %Clock{
@@ -38,20 +35,27 @@ for _ <- 1..10 do
   end
 
   for _ <- 1..5 do
+    # Générer un start_time dans les 30 derniers jours
     start_time = Faker.DateTime.backward(30) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
-    end_time = Faker.DateTime.forward(1) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
+
+    # Générer une durée aléatoire entre 1 minute et 540 minutes (9 heures maximum)
+    duration_minutes = Enum.random(1..540)
+
+    # Calculer l'end_time en ajoutant la durée à start_time
+    end_time = NaiveDateTime.add(start_time, duration_minutes * 60)
 
     workingtime = %WorkingTime{
       start: start_time,
       end: end_time,
       user_id: user.id,
-      total_time: NaiveDateTime.diff(end_time, start_time)
+      total_time: duration_minutes
     }
-
 
     Repo.insert!(workingtime)
   end
 end
+
+
 
 
 

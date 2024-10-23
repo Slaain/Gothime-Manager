@@ -193,8 +193,6 @@ export default {
     userID(newUserID) {
       if (newUserID) {
         console.log("UserID a changé :", newUserID);
-        // console.log("this.userID : ", this.userID);
-
         this.getWorkingTimes(); // Appel de la méthode pour mettre à jour les données
       }
     },
@@ -237,11 +235,10 @@ export default {
         });
     },
     calculateDuration(totalTimeInMinutes) {
-      const totalTimeInHours = (totalTimeInMinutes / 60).toFixed(2); // Convertir les minutes en heures
-      return totalTimeInHours;
+      const totalTimeInHours = totalTimeInMinutes / 60; // Convertir les minutes en heures
+      return Math.ceil(totalTimeInHours); // Arrondir à la valeur entière supérieure
     },
     createWorkingTime() {
-      // Ajouter ici la logique pour ajouter un temps de travail
       console.log("start time: ", this.startTime);
       console.log("end time: ", this.endTime);
 
@@ -254,7 +251,7 @@ export default {
           },
           {
             headers: {
-              "Content-Type": "application/json", // Assurez-vous que c'est compatible avec ce que votre serveur attend
+              "Content-Type": "application/json",
             },
           }
         )
@@ -269,8 +266,6 @@ export default {
         });
     },
     updateWorkingTime() {
-      // Ajouter ici la logique pour modifier un temps de travail
-
       console.log("start time: ", this.startTime);
 
       axios
@@ -282,7 +277,7 @@ export default {
           },
           {
             headers: {
-              "Content-Type": "application/json", // Assurez-vous que c'est compatible avec ce que votre serveur attend
+              "Content-Type": "application/json",
             },
           }
         )
@@ -304,9 +299,7 @@ export default {
           `http://localhost:4000/api/workingtime/${this.userID}/${this.selectedWorkingTimeID}`
         )
         .then((response) => {
-          // Assigner les données reçues à startTime et endTime
           const workingTimeData = response.data;
-
           console.log("Données récupérées :", workingTimeData.data);
 
           this.startTime = workingTimeData.data.start;
@@ -350,6 +343,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 .glassmorphism-bg-white {
