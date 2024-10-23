@@ -169,6 +169,7 @@ export default {
         const response = await axios.get(
           "http://localhost:4000/api/clocks/countactive"
         );
+        
         this.currentUsers = response.data.count;
       } catch (error) {
         console.error(

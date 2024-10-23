@@ -15,17 +15,17 @@
             <th class="p-2">Status</th>
             <th class="p-2"></th>
             <th class="p-2"></th>
-
-
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id" class="border-b">
+          <tr v-for="user in sortedUsers" :key="user.id" class="border-b">
             <td class="p-2">{{ user.username }}</td>
             <td class="p-2">{{ user.email }}</td>
             <td class="p-4 border-b border-slate-200">
-              <select v-model="user.role_id" @change="updateUserRole(user)" class="w-[120px]">
-                <option value="1">Admin</option>
+              <!-- Afficher "Admin" en lecture seule si le rôle est Admin -->
+              <div v-if="user.role_id === 1">Admin</div>
+              <!-- Sinon, afficher le select pour Manager et Employee -->
+              <select v-else v-model="user.role_id" @change="updateUserRole(user)" class="w-[120px]">
                 <option value="2">Manager</option>
                 <option value="3">Employee</option>
               </select>
@@ -74,6 +74,12 @@ export default {
   mounted() {
     this.fetchUsers();
   },
+  computed: {
+    // Trier les utilisateurs : Admin (1), Manager (2), Employee (3)
+    sortedUsers() {
+      return this.users.slice().sort((a, b) => a.role_id - b.role_id);
+    },
+  },
   methods: {
     async fetchUsers() {
       try {
@@ -83,38 +89,48 @@ export default {
         console.error("Erreur lors de la récupération des utilisateurs:", error);
       }
     },
-    
 
-    // Méthode pour gérer le basculement de la clock
+    // Méthode pour gérer le changement de rôle
+    async updateUserRole(user) {
+      if (user.role_id === 1) {
+        this.showErrorToast("Le rôle d'un administrateur ne peut pas être modifié.");
+        return;
+      }
+
+      try {
+        await axios.put(`http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}`, {
+          role_id: user.role_id,
+        });
+        this.showSuccessToast("Role mis à jour avec succès !");
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du rôle:", error);
+        this.showErrorToast("Échec de la mise à jour du rôle.");
+      }
+    },
+
     async handleClockToggle(user) {
       try {
-        // Envoie une requête POST pour effectuer un clock in ou clock out selon le statut actuel
         await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
-          status: user.clock.status ? 'clock_in' : 'clock_out'
+          status: user.clock.status ? "clock_in" : "clock_out",
         });
-        await this.fetchUsers();
+        this.fetchUsers();
         this.showSuccessToast("Clock action successful!");
-        console.log(`Le statut de la clock pour l'utilisateur ${user.username} a été mis à jour.`);
       } catch (error) {
         console.error("Erreur lors de la mise à jour du statut de la clock:", error);
         this.showErrorToast("Failed to toggle clock.");
-
       }
     },
 
     showSuccessToast(message = "Successful operation") {
       this.toast.success(message);
-      console.log("this.toast : ", this.toast);
     },
 
-    // params in english
     showErrorToast(message = "An error occurred") {
       this.toast.error(message);
     },
   },
 };
 </script>
-
 
 <style scoped>
 .modal {
@@ -188,5 +204,4 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(14px);
 }
-
 </style>

@@ -334,6 +334,7 @@ export default {
       userService
         .toggleClock(userID)
         .then((response) => {
+          this.getCurrentUsers();
           this.showSuccessToast("Clock action successful!");
           this.fetchEmployees(); // Rafraîchir la liste si nécessaire
         })
