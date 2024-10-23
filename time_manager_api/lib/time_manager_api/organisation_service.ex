@@ -36,7 +36,7 @@ defmodule TimeManagerApi.OrganisationService do
   def get_users_by_organisation(organisation_id) do
     Organisation
     |> Repo.get(organisation_id)
-    |> Repo.preload(users: [:clock, :user_role_organisations])
+    |> Repo.preload(users: [:clock, :user_role_organisation])
   end
 
 end

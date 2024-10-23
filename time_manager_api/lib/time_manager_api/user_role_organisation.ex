@@ -13,7 +13,9 @@ defmodule TimeManagerApi.UserRoleOrganisation do
 
   def changeset(user_role_organisation, attrs) do
     user_role_organisation
-    |> cast(attrs, [:user_id, :organisation_id, :role_id])
-    |> validate_required([:user_id, :organisation_id, :role_id])
+    |> cast(attrs, [:role_id])
+    |> validate_required([:role_id])
+    |> validate_number(:role_id, greater_than: 0, message: "Le role_id doit être un entier positif.")
   end
+
 end

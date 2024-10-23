@@ -3,7 +3,7 @@ defmodule TimeManagerApiWeb.OrganisationController do
 
   alias TimeManagerApi.User
 
-  alias TimeManagerApi.{Repo, Organisation, Group, OrganisationGroup, OrganisationService}
+  alias TimeManagerApi.{Repo, Organisation, Group, OrganisationGroup, OrganisationService, UserRoleOrganisation}
 
   # Liste des organisations
   def index(conn, _params) do
@@ -111,8 +111,9 @@ defmodule TimeManagerApiWeb.OrganisationController do
       _organisation ->
         # Préparer les données des utilisateurs avec leur statut de clock et leur role_id
         users_with_clock_and_role = Enum.map(organisation.users, fn user ->
-          user_role_organisation = Enum.find(user.user_role_organisations, fn uro ->
-            uro.organisation_id == organisation_id
+
+          user_role_organisation = Enum.find(user.user_role_organisation, fn uro ->
+            uro.organisation_id == String.to_integer(organisation_id)
           end)
 
           %{
@@ -148,6 +149,44 @@ defmodule TimeManagerApiWeb.OrganisationController do
         conn
         |> put_status(:unprocessable_entity)
         |> json(%{message: "Error deleting organisation"})
+    end
+  end
+
+  # Action pour mettre à jour le rôle d'un utilisateur
+  def update_user_role(conn, %{"user_id" => user_id, "organisation_id" => organisation_id, "role_id" => role_id}) do
+    # Rechercher l'entrée correspondante dans user_role_organisation
+    case Repo.get_by(UserRoleOrganisation, user_id: user_id, organisation_id: organisation_id) do
+      nil ->
+        # Si aucune entrée n'est trouvée, retourner une erreur
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User role in organisation not found"})
+
+      user_role_organisation ->
+        # Si trouvé, mettre à jour le role_id
+        role_id = case Integer.parse(String.trim(role_id)) do
+          {id, _} -> id
+          :error ->
+            conn
+            |> put_status(:bad_request)
+            |> json(%{error: "Le role_id doit être un entier valide."})
+            |> halt()
+        end
+
+
+        changeset = Ecto.Changeset.change(user_role_organisation, role_id: role_id)
+
+        case Repo.update(changeset) do
+          {:ok, _updated_user_role} ->
+            conn
+            |> put_status(:ok)
+            |> json(%{message: "User role updated successfully"})
+
+          {:error, changeset} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> json(%{errors: changeset})
+        end
     end
   end
 end

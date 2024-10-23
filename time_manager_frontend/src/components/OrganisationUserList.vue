@@ -1,6 +1,6 @@
 <template>
   <div class="modal fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg p-6 w-1/2">
+    <div class="bg-white rounded-lg p-6 w-2/3">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Organisation's Users</h2>
         <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
@@ -13,15 +13,24 @@
             <th class="p-2">Email</th>
             <th class="p-2">Role</th>
             <th class="p-2">Status</th>
-            <th class="p-2">Edit</th>
-            <th class="p-2">Delete</th>
+            <th class="p-2"></th>
+            <th class="p-2"></th>
+
+
           </tr>
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.id" class="border-b">
             <td class="p-2">{{ user.username }}</td>
             <td class="p-2">{{ user.email }}</td>
-            <td class="p-2">User</td>
+            <td class="p-4 border-b border-slate-200">
+              <select v-model="user.role_id" @change="updateUserRole(user)" class="w-[120px]">
+                <option value="1">Admin</option>
+                <option value="2">Manager</option>
+                <option value="3">Employee</option>
+              </select>
+            </td>
+
             <!-- Toggle button for Clock In/Out -->
             <td class="p-2">
               <label class="switch">
@@ -74,6 +83,7 @@ export default {
         console.error("Erreur lors de la récupération des utilisateurs:", error);
       }
     },
+    
 
     // Méthode pour gérer le basculement de la clock
     async handleClockToggle(user) {
