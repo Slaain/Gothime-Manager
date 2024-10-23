@@ -88,10 +88,16 @@ export default function GothamNeedsYouScreen() {
             style={styles.backgroundImage}
             resizeMode="cover"
         >
-            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-                <LinearGradient
-                    colors={['#00000080', '#00000080', '#3e3e3e']}
-                    style={styles.overlay}
+            {/* LinearGradient couvrant toute la zone défilante */}
+            <LinearGradient
+                colors={['#00000080', '#00000080', '#3e3e3e']}
+                style={styles.overlay}
+            >
+                <ScrollView
+                    contentContainerStyle={styles.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                    horizontal={false}  // Assurer que le ScrollView global soit seulement en vertical
+                    nestedScrollEnabled={true}  // Permet aux sous-ScrollView de fonctionner correctement
                 >
                     {/* Icon de profil en haut à droite */}
                     <View style={styles.iconContainer} pointerEvents="box-none">
@@ -114,14 +120,18 @@ export default function GothamNeedsYouScreen() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Scrollable Bar Chart */}
-                        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+                        {/* Scrollable Bar Chart uniquement en horizontal */}
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={true}
+                            style={styles.chartContainer}
+                        >
                             <BarChart
                                 data={{
-                                    labels: chartData.labels && chartData.labels.length > 0 ? chartData.labels : [], // Vérifie que labels existe et contient des données
+                                    labels: chartData.labels && chartData.labels.length > 0 ? chartData.labels : [],
                                     datasets: [
                                         {
-                                            data: chartData.durations && chartData.durations.length > 0 ? chartData.durations : [], // Vérifie que durations existe et contient des données
+                                            data: chartData.durations && chartData.durations.length > 0 ? chartData.durations : [],
                                         },
                                     ],
                                 }}
@@ -147,7 +157,6 @@ export default function GothamNeedsYouScreen() {
                             />
                         </ScrollView>
 
-
                         <TextOrbitronBold style={styles.userNameText}>
                             Your history, <TextOrbitronBold style={styles.highlight}>{userName}</TextOrbitronBold>
                         </TextOrbitronBold>
@@ -171,8 +180,8 @@ export default function GothamNeedsYouScreen() {
                             ))
                         )}
                     </View>
-                </LinearGradient>
-            </ScrollView>
+                </ScrollView>
+            </LinearGradient>
         </ImageBackground>
     );
 }
@@ -191,6 +200,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 20,
+        width: '100%',
     },
     contentContainer: {
         paddingTop: 80,
@@ -223,8 +233,13 @@ const styles = StyleSheet.create({
         color: '#FDCB12',
         fontSize: 16,
     },
-    chart: {
+    chartContainer: {
+        backgroundColor: '#00000080',
+        padding: 10,
+        borderRadius: 16,
         marginVertical: 10,
+    },
+    chart: {
         borderRadius: 16,
     },
     workingTimeItem: {
@@ -234,7 +249,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 1)',
-        width: Dimensions.get('window').width * 0.9,
+        width: '100%',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -260,7 +275,7 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         position: 'absolute',
-        top: 50,
+        top: 30,
         right: 20,
         zIndex: 10,
     },
