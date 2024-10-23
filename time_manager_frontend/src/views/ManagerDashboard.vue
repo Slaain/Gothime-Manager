@@ -1,5 +1,5 @@
 <template>
-  <div class="managerDashboard flex min-h-screen bg-custom-background">
+  <div class="organisation-page flex min-h-screen bg-custom-background">
     <Sidebar />
     <div class="content flex-1 p-6">
       <h1 class="text-3xl font-bold mb-6 text-yellow-400">Organisation: {{ organisation?.name }}</h1>
@@ -9,12 +9,7 @@
         <div class="organisation-card">
           <h2>{{ organisation.name }}</h2>
           <p>{{ organisation.description }}</p>
-
-          <UserModal
-            v-if="showUserModal"
-            :organisation-id="selectedOrganisationId"
-            @close-modal="handleCloseUserModal"
-          />
+          
           <!-- Afficher des informations supplémentaires comme les groupes ou les utilisateurs -->
           <div class="groups-container overflow-y-auto mb-4">
             <h3 class="font-medium text-white">List Groups:</h3>
@@ -25,11 +20,9 @@
               </li>
             </ul>
           </div>
-          <button @click="viewUsers" class="btn btn-secondary mt-2">Voir Users</button>
-
-
+          <button @click="viewUsers" class="btn btn-secondary mt-2">Voir Les employés</button>
           <!-- Ajouter des boutons pour afficher/modifier l'organisation -->
-          <button @click="handleModifyOrganisation(organisation.id)" class="btn">Modifier</button>
+    <button @click="handleModifyOrganisation(organisation.id)" class="btn">Modifier</button>
         </div>
       </div>
 
@@ -38,16 +31,27 @@
         <p>Aucune organisation trouvée.</p>
       </div>
     </div>
+    
+    <UserModal
+      v-if="showUserModal"
+      :organisation-id="selectedOrganisationId"
+      @close-modal="handleCloseUserModal"
+    />
+   
   </div>
 </template>
 
 <script>
 import Sidebar from '../components/Sidebar.vue';
+import UserModal from '../components/OrganisationUserList.vue'; // Import de la modale UserModal
+import OrganisationList from '../components/OrganisationList.vue';
 import axios from 'axios';
 
 export default {
   components: {
     Sidebar,
+    OrganisationList,
+    UserModal,
   },
   props: {
     organisationId: {
@@ -58,6 +62,7 @@ export default {
   data() {
     return {
       organisation: null,
+      showUserModal: false,
       groups: [],
     };
   },
@@ -73,18 +78,44 @@ export default {
         console.error("Erreur lors de la récupération de l'organisation:", error);
       }
     },
+    async fetchUsers(organisationId) {
+      try {
+        const response = await axios.get(`http://localhost:4000/api/organisations/${organisationId}/users`);
+        // Traiter les données des utilisateurs ici, par exemple, en les stockant dans une propriété de données
+      } catch (error) {
+        console.error("Erreur lors de la récupération des utilisateurs :", error);
+      }
+    },
+    
+    handleModifyOrganisation(organisationId) {
+      console.log("Modifier l'organisation :", organisationId);
+      // Ajoutez votre logique de modification ici
+    },
+     // Gestion de l'affichage d'un groupe
+     handleViewGroup(groupId) {
+      console.log("Afficher le groupe :", groupId);
+    },
+     // Gestion de l'affichage des utilisateurs d'une organisation
+     handleViewUsers(organisationId) {
+      console.log("Voir les utilisateurs de l'organisatioooon :", organisationId);
+      this.selectedOrganisationId = organisationId;
+      this.showUserModal = true; // Affiche la modale pour afficher les utilisateurs
+    },
+     // Fermeture de la modale des utilisateurs
+     handleCloseUserModal() {
+      this.showUserModal = false;
+    },
     viewGroup(group) {
       this.$emit("view-group", group.id);
     },
     viewUsers() {
       console.log("Voir Users pour l'organisation :", this.organisation.id);
-      this.$emit("view-users", this.organisation.id); // Émettre l'événement pour ouvrir la modale
+      this.handleViewUsers(this.organisation.id); // Émettre l'événement pour ouvrir la modale
     },
-    handleModifyOrganisation(organisationId) {
-      console.log("Modifier l'organisation :", organisationId);
-      // Ajoutez votre logique de modification ici
-    },
+
   },
+  
+
   mounted() {
     this.fetchOrganisation(); // Récupérer l'organisation au montage du composant
   }
@@ -93,7 +124,7 @@ export default {
 
 <style scoped>
 /* Style du fond similaire à ton tableau de bord */
-.managerDashboard {
+.organisation-page {
   display: flex;
   min-height: 100vh;
   background: #333333;
@@ -103,7 +134,7 @@ export default {
   background-position: 0 0;
 }
 
-.managerDashboard::after {
+.organisation-page::after {
   content: "";
   position: fixed;
   top: 0;
@@ -120,8 +151,10 @@ export default {
 .content {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  padding: 20px;
+  padding: 40px;
   background: rgba(0, 0, 0, 0.8);
   z-index: 2;
 }
@@ -138,6 +171,7 @@ h1 {
 }
 
 .organisation-card {
+
   position: relative;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -149,7 +183,7 @@ h1 {
   overflow: hidden;
   transition: transform 0.3s ease-in-out;
   z-index: 2;
-  width: 300px;  /* Largeur fixe */
+  width: 450px;  /* Largeur fixe */
   height: 400px; /* Hauteur fixe */
   display: flex;
   flex-direction: column;
