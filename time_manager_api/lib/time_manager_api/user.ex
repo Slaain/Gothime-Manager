@@ -1,7 +1,10 @@
-defmodule TimeManagerApi.Accounts.User do
+defmodule TimeManagerApi.User do
   use Ecto.Schema
   import Ecto.Changeset
   alias Bcrypt
+
+  alias TimeManagerApi.{Repo, User, UserRoleOrganisation, Role, Organisation}
+
 
   @derive {Jason.Encoder, only: [:id, :username, :email, :inserted_at, :updated_at]}
   schema "users" do
@@ -11,6 +14,9 @@ defmodule TimeManagerApi.Accounts.User do
     field :password_hash, :string
 
     has_one :clock, TimeManagerApi.Clock
+    has_many :user_role_organisations, TimeManagerApi.UserRoleOrganisation, on_delete: :delete_all
+    has_many :organisations, through: [:user_role_organisations, :organisation]
+
 
     timestamps(type: :utc_datetime)
   end
