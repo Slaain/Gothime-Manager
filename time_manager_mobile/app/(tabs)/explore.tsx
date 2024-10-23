@@ -1,12 +1,28 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform, Text } from 'react-native';
+import { StyleSheet, Image, Platform, Text, View } from 'react-native';
 import Home from '@/components/Home';
 import Test from '@/components/Test';
 
 export default function TabTwoScreen() {
   return (
 
-    <Home />
+    <View>
+      <Text style={{ color: "white" }}>
+        YO
+      </Text><Text style={{ color: "white" }}>
+        YO
+      </Text><Text style={{ color: "white" }}>
+        YO
+      </Text><Text style={{ color: "white" }}>
+        YO
+      </Text><Text style={{ color: "white" }}>
+        YO
+      </Text><Text style={{ color: "white" }}>
+        YO
+      </Text><Text style={{ color: "white" }}>
+        YO
+      </Text>
+    </View>
   );
 }
 
