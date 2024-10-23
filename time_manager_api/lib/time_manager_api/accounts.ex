@@ -5,7 +5,7 @@ defmodule TimeManagerApi.Accounts do
 
   import Ecto.Query, warn: false
   alias TimeManagerApi.Repo
-  alias TimeManagerApi.Accounts.User
+  alias TimeManagerApi.User
 
   @doc """
   Returns the list of users.

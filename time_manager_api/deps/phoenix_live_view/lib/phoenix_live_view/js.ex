@@ -151,7 +151,10 @@ defmodule Phoenix.LiveView.JS do
 
     * `:target` - A selector or component ID to push to. This value will
       overwrite any `phx-target` attribute present on the element.
-    * `:loading` - A selector to apply the phx loading classes to.
+    * `:loading` - A selector to apply the phx loading classes to,
+      such as `phx-click-loading` in case the event was triggered by
+      `phx-click`. The element will be locked from server updates
+      until the push is acknowledged by the server.
     * `:page_loading` - Boolean to trigger the phx:page-loading-start and
       phx:page-loading-stop events for this push. Defaults to `false`.
     * `:value` - A map of values to send to the server. These values will be
@@ -593,6 +596,10 @@ defmodule Phoenix.LiveView.JS do
 
       <div id="item">My Item</div>
       <button phx-click={JS.transition("shake", to: "#item")}>Shake!</button>
+
+      <div phx-mounted={JS.transition({"ease-out duration-300", "opacity-0", "opacity-100"}, time: 300)}>
+         duration-300 milliseconds matches time: 300 milliseconds
+      <div>
   """
   def transition(transition) when is_binary(transition) or is_tuple(transition) do
     transition(%JS{}, transition, [])
@@ -904,6 +911,11 @@ defmodule Phoenix.LiveView.JS do
     put_op(js, "exec", attr: attr, to: opts[:to])
   end
 
+  @doc """
+  Combines two JS commands, appending the second to the first.
+  """
+  def concat(%JS{ops: first}, %JS{ops: second}), do: %JS{ops: first ++ second}
+
   defp put_op(%JS{ops: ops} = js, kind, args) do
     args = drop_nil_values(args)
     struct!(js, ops: ops ++ [[kind, args]])
@@ -931,16 +943,32 @@ defmodule Phoenix.LiveView.JS do
   end
 
   defp validate_keys(opts, kind, allowed_keys) do
-    for key <- Keyword.keys(opts) do
-      if key not in allowed_keys do
+    Enum.map(opts, fn
+      {:to, {scope, _selector}} when scope not in [:closest, :inner, :document] ->
         raise ArgumentError, """
-        invalid option for #{kind}
-        Expected keys to be one of #{inspect(allowed_keys)}, got: #{inspect(key)}
+        invalid scope for :to option in #{kind}.
+        Valid scopes are :closest, :inner, :document. Got: #{inspect(scope)}
         """
-      end
-    end
 
-    opts
+      {:to, {:document, selector}} ->
+        {:to, selector}
+
+      {:to, {scope, selector}} ->
+        {:to, %{scope => selector}}
+
+      {:to, selector} when is_binary(selector) ->
+        {:to, selector}
+
+      {key, val} ->
+        if key not in allowed_keys do
+          raise ArgumentError, """
+          invalid option for #{kind}
+          Expected keys to be one of #{inspect(allowed_keys)}, got: #{inspect(key)}
+          """
+        end
+
+        {key, val}
+    end)
   end
 
   defp put_value(opts) do

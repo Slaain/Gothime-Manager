@@ -14,6 +14,10 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    Montserrat: require('../assets/fonts/Montserrat-Regular.ttf'),
+    MontserratBold: require('../assets/fonts/Montserrat-Bold.ttf'),
+    Orbitron: require('../assets/fonts/Orbitron-Regular.ttf'),
+    OrbitronBold: require('../assets/fonts/Orbitron-Bold.ttf'),
   });
 
   useEffect(() => {
@@ -31,6 +35,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        <Stack.Screen name='organization/index' options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
