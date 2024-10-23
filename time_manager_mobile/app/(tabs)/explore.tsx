@@ -15,7 +15,7 @@ export default function GothamNeedsYouScreen() {
     const { userId, userName } = useLocalSearchParams();
     const [workingTimes, setWorkingTimes] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [chartData, setChartData] = useState([]);
+    const [chartData, setChartData] = useState({ labels: [], durations: [] });
     const [viewMode, setViewMode] = useState('day');
     const router = useRouter(); // Utilisation de router pour redirection
 
@@ -76,10 +76,9 @@ export default function GothamNeedsYouScreen() {
 
     // Redirection vers la page profil
     const goToProfile = () => {
-        console.log("Icon Pressed");  // Si ça n'apparaît pas, le problème est ailleurs
         router.push({
             pathname: '../PageProfil',
-            params: { userId,userName},
+            params: { userId, userName },
         });
     };
 
@@ -115,36 +114,39 @@ export default function GothamNeedsYouScreen() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Bar Chart */}
-                        <BarChart
-                            data={{
-                                labels: chartData.labels || [],
-                                datasets: [
-                                    {
-                                        data: chartData.durations || [],
+                        {/* Scrollable Bar Chart */}
+                        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+                            <BarChart
+                                data={{
+                                    labels: chartData.labels && chartData.labels.length > 0 ? chartData.labels : [], // Vérifie que labels existe et contient des données
+                                    datasets: [
+                                        {
+                                            data: chartData.durations && chartData.durations.length > 0 ? chartData.durations : [], // Vérifie que durations existe et contient des données
+                                        },
+                                    ],
+                                }}
+                                width={Math.max((chartData.labels && chartData.labels.length > 0 ? chartData.labels.length : 1) * 60, Dimensions.get('window').width * 0.9)}
+                                height={220}
+                                chartConfig={{
+                                    backgroundColor: '#000',
+                                    backgroundGradientFrom: '#000',
+                                    backgroundGradientTo: '#3e3e3e',
+                                    decimalPlaces: 0,
+                                    color: (opacity = 1) => `rgba(253, 203, 18, ${opacity})`,
+                                    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                    style: {
+                                        borderRadius: 16,
                                     },
-                                ],
-                            }}
-                            width={Dimensions.get('window').width * 0.9} // from react-native
-                            height={220}
-                            chartConfig={{
-                                backgroundColor: '#000',
-                                backgroundGradientFrom: '#000',
-                                backgroundGradientTo: '#3e3e3e',
-                                decimalPlaces: 0,
-                                color: (opacity = 1) => `rgba(253, 203, 18, ${opacity})`,
-                                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                                style: {
-                                    borderRadius: 16,
-                                },
-                                propsForDots: {
-                                    r: '6',
-                                    strokeWidth: '2',
-                                    stroke: '#FDCB12',
-                                },
-                            }}
-                            style={styles.chart}
-                        />
+                                    propsForDots: {
+                                        r: '6',
+                                        strokeWidth: '2',
+                                        stroke: '#FDCB12',
+                                    },
+                                }}
+                                style={styles.chart}
+                            />
+                        </ScrollView>
+
 
                         <TextOrbitronBold style={styles.userNameText}>
                             Your history, <TextOrbitronBold style={styles.highlight}>{userName}</TextOrbitronBold>
@@ -260,6 +262,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 50,
         right: 20,
-        zIndex: 10,  // Augmenter le z-index pour s'assurer que l'icône est au-dessus des autres éléments
+        zIndex: 10,
     },
 });
