@@ -1,4 +1,5 @@
-import { ImageBackground, Image, StyleSheet, Text as DefaultText, View, Dimensions, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ImageBackground, Pressable, Image, StyleSheet, Text as DefaultText, View, Dimensions, ScrollView } from 'react-native';
 
 export default function HelloWave() {
   const { width: screenWidth, height: windowHeight } = Dimensions.get('window');
@@ -11,7 +12,7 @@ export default function HelloWave() {
   const TextBold = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'MontserratBold' }]} />;
   const TextOrbitron = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Orbitron' }]} />;
   const TextOrbitronBold = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'OrbitronBold' }]} />;
-
+  const router = useRouter();
   return (
     <ImageBackground source={require('../assets/images/batground.png')} style={style.container}>
       <ScrollView
@@ -27,12 +28,14 @@ export default function HelloWave() {
           Gotham needs you, <TextOrbitronBold style={{ color: colors.primary }}>Paul</TextOrbitronBold>
         </TextOrbitronBold>
 
-        <View style={[style.glassmorphism, { width: "100%", padding: 15, height: 150 }]}>
+        <Pressable
+          onPress={() => router.push('/organization')}
+          style={[style.glassmorphism, { width: "100%", padding: 15, height: 150, overflow: 'hidden' }]}>
           <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>Groupe A</TextOrbitronBold>
           <Text style={{ marginBottom: 10 }}>Paul Durive - Pierre Deloup - Idris Ali - Ali Idris - Sam Sam</Text>
           <Text>08:00 - 12:00</Text>
           <Image source={require('../assets/images/bat2.png')} style={style.batImage} />
-        </View>
+        </Pressable>
 
         <TextOrbitronBold style={{ color: 'white', fontSize: 20, marginBottom: 20 }}>
           Next working days
