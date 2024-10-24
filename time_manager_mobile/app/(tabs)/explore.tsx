@@ -224,8 +224,8 @@ export default function GothamNeedsYouScreen() {
                             </View>
                         </>
                     }
+                </ScrollView>
             </LinearGradient>
-        </ScrollView>
         </ImageBackground >
     );
 }
