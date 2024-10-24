@@ -31,7 +31,7 @@ COPY .env ./
 # Copier le reste des fichiers de l'application
 COPY . .
 
-RUN ls
+RUN mix deps.get
 
 # Exposer le port 4000 pour l'API
 EXPOSE 4000
