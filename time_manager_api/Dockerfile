@@ -25,7 +25,7 @@ COPY .env ./
 
 
 # Installer les dépendances
-#RUN mix deps.get
+RUN mix deps.get
 
 
 # Copier le reste des fichiers de l'application
