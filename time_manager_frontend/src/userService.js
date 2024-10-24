@@ -1,12 +1,14 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:4000/api/users';
-const CLOCK_API_URL = 'http://localhost:4000/api/clocks'; // Assuming clocks are managed separately
+const CLOCK_API_URL = 'http://localhost:4000/api/clocks';
+const REGISTER_API_URL =  'http://localhost:4000/api/register';
+const ORGANISATION_API_URL = 'http://localhost:4000/api/organisations';
 
 export default {
-  // Existing user methods
   createUser(user) {
-    return axios.post(API_URL, user)
+    console.log('Création de l\'utilisateur:', user);
+    return axios.post(REGISTER_API_URL, user)
       .then(response => response.data);
   },
 
@@ -56,5 +58,14 @@ export default {
         throw error;
       });
   },
+
+  getOrganisations() {
+    return axios.get(ORGANISATION_API_URL)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Erreur lors de la récupération des organisations:', error);
+        throw error;
+      });
+  }
   
 };

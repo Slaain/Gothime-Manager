@@ -7,10 +7,61 @@ defmodule TimeManagerApiWeb.AuthController do
   alias TimeManagerApi.UserService
 
   # Inscription d'un utilisateur
-  def register(conn, %{"email" => email, "username" => username, "password" => password}) do
+  def register(conn, %{"email" => email, "username" => username, "password" => password, "organisation_id" => organisation_id, "role_id" => role_id}) do
+    # Print data for debugging
+    IO.inspect(email, label: "email")
+    IO.inspect(username, label: "username")
+    IO.inspect(password, label: "password")
+    IO.inspect(organisation_id, label: "organisation_id")
+    IO.inspect(role_id, label: "role_id")
+
+    # Assurez-vous que organisation_id est un entier
+    organisation_id =
+      case Integer.parse(to_string(organisation_id)) do
+        {int_value, ""} -> int_value
+        _ ->
+          conn
+          |> put_status(:bad_request)
+          |> json(%{error: "organisation_id must be a valid integer"})
+          |> halt()
+      end
+
+    # Assurez-vous que role_id est également un entier
+    role_id =
+      case Integer.parse(to_string(role_id)) do
+        {int_value, ""} -> int_value
+        _ ->
+          conn
+          |> put_status(:bad_request)
+          |> json(%{error: "role_id must be a valid integer"})
+          |> halt()
+      end
+
+    # Continuez avec la création de l'utilisateur
     case UserService.create_user(%{"email" => email, "username" => username, "password" => password}) do
       {:ok, user} ->
-        json(conn, %{message: "User created successfully", user: user})
+        # Associate user with organisation and role
+        changeset = %TimeManagerApi.UserRoleOrganisation{}
+                    |> TimeManagerApi.UserRoleOrganisation.changeset(%{
+                        user_id: user.id,
+                        organisation_ids: [organisation_id],  # Assurez-vous que c'est un tableau
+                        role_id: role_id
+                      })
+
+        case Repo.insert(changeset) do
+          {:ok, _user_role_organisation} ->
+            json(conn, %{message: "User created successfully", user: user})
+
+          {:error, changeset} ->
+            Repo.delete(user)
+
+            # Log or inspect the changeset errors for debugging
+            IO.inspect(changeset.errors, label: "Changeset errors")
+
+            conn
+            |> put_status(:bad_request)
+            |> json(%{error: "Failed to associate user with organisation and role", reasons: changeset.errors})
+        end
 
       {:error, changeset} ->
         errors = changeset.errors
@@ -21,6 +72,8 @@ defmodule TimeManagerApiWeb.AuthController do
         |> json(%{error: "User creation failed", reasons: errors})
     end
   end
+
+
 
 
 
