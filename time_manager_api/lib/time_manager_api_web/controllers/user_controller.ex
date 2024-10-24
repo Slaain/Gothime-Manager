@@ -34,7 +34,7 @@ defmodule TimeManagerApiWeb.UserController do
   def create(conn, %{"user" => user_params}) do
 
     # Vérifier si les paramètres requis sont présents et ne sont pas vide
-    required_params = ["email", "username", "password", "role_id", "organisation_id"],
+    required_params = ["email", "username", "password", "role_id", "organisation_id"]
     Enum.each(required_params, fn param ->
       if Map.get(user_params, param) == nil do
         conn
@@ -43,6 +43,7 @@ defmodule TimeManagerApiWeb.UserController do
         |> halt() # Arrêter le traitement
       end
     end)
+
 
     # Verifier si le nom d'utilisateur a entre 2 et 30 caractères
     if String.length(user_params["username"]) < 2 or String.length(user_params["username"]) > 30 do
