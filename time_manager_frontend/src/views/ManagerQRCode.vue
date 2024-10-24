@@ -29,16 +29,16 @@ import axios from "axios";
 export default {
   name: "QRCodePage",
   data() {
-    organizationId: 1;
+    organizationId: 3;
     return {
-      url: "http://localhost:4000/api/clocks/1/2", // Organization ID/Employee ID
+      url: "http://localhost:4000/api/clocks/3/1", // Organization ID/Employee ID
     };
   },
   methods: {
     generateQRCode() {
       axios
         .post(
-          `http://localhost:4000/api/qrcode/generate/1`,
+          `http://localhost:4000/api/qrcode/generate/3`,
           {},
           {
             headers: {
@@ -49,7 +49,7 @@ export default {
         .then((response) => {
           console.log(response.data);
 
-          this.url = `http://localhost:4000/api/clocks/1/2?token=${response.data.qr_code}`; // Organization ID/Employee ID
+          this.url = `http://localhost:4000/api/clocks/3/1?token=${response.data.qr_code}`; // Organization ID/Employee ID
           if (response.data.qr_code) {
             const canvas = this.$refs.qrcodeCanvas;
             QRCode.toCanvas(

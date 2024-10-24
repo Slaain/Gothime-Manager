@@ -5,6 +5,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import { useSession } from './ctx';
 import { jwtDecode } from 'jwt-decode';
+import { router } from 'expo-router';
 
 export default function Camera() {
   const [facing, setFacing] = useState<CameraType>('back');
@@ -70,6 +71,7 @@ export default function Camera() {
         // Affiche l'alerte en fonction de la présence de data.time
         if (data.time) {
           alert(`${data.message}\nTime: ${data.time}`);
+          router.push(`/?refreshQrCode=${new Date().getTime()}`); // Rafraîchir la page
         } else {
           alert(`${data.message}`);
         }

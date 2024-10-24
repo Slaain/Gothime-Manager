@@ -6,6 +6,7 @@ defmodule TimeManagerApiWeb.QRCodeController do
   alias TimeManagerApi.JWTService
   alias TimeManagerApi.RoleService
   alias TimeManagerApi.QRCode  # Ensure the alias is here
+  alias TimeManagerApi.Repo
 
 
   def beep(conn, %{"organization_id" => org_id, "token" => token, "user_id" => user_id}) do
@@ -70,7 +71,8 @@ defmodule TimeManagerApiWeb.QRCodeController do
 
 
 
-      if Enum.member?(true_organization_ids, organization_id) do
+      if true_organization_ids == organization_id do
+
         # Check if a QR code already exists for this organization
         case QRCodeService.get_qrcode_by_organization(organization_id) do
           nil ->
@@ -116,7 +118,10 @@ defmodule TimeManagerApiWeb.QRCodeController do
       # Vérifier si l'utilisateur fait partie de l'organisation
       true_organization_ids = RoleService.get_user_organisation_id(user_id)
 
-      if Enum.member?(true_organization_ids, organization_id) do
+      IO.inspect(organization_id, label: "orga")
+      IO.inspect(true_organization_ids, label: "true org")
+      IO.inspect(true_organization_ids ==organization_id )
+      if true_organization_ids == organization_id do
         # Récupérer le token de l'organisation
         case QRCodeService.get_qrcode_by_organization(organization_id) do
           %QRCode{token: token} ->

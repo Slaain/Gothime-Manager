@@ -5,15 +5,19 @@ import { useEffect, useState } from 'react';
 import { jwtDecode } from "jwt-decode";
 import { useSession } from './ctx';
 import useUserStatsStore from '@/stores/useUserStatsStore';
+import { useLocalSearchParams } from 'expo-router'; // Hook fourni par expo-router
 
 export default function HelloWave() {
   const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
   const { session } = useSession();
+  const { refreshQrCode } = useLocalSearchParams(); // Récupérer le paramètre "refresh" à partir de l'URL
+
 
   const userId = jwtDecode(session).sub;
   const [userInfo, setUserInfo] = useState(null);
   const [groups, setGroups] = useState(null);
   const [loading, setLoaging] = useState(true);
+  const [dayWorkingTime, setDayWorkingTime] = useState(null);
   const { username } = useUserStatsStore();
 
   console.log("username : ", username);
@@ -67,16 +71,33 @@ export default function HelloWave() {
     }
   }
 
+  const getDayWorkingTime = async () => {
+    const response = await axios.get(`http://10.79.216.9:4000/api/workingtime/today/${userId}`)
+
+    console.log("response day working time: ", response.data);
+
+    setDayWorkingTime(response.data)
+  }
+
   const getAllData = async () => {
     await fetchGetUserData()
     await fetchUserOfOrganization()
     await fetchGetUserGroup()
+    await getDayWorkingTime()
     setLoaging(false)
   }
+
+
 
   useEffect(() => {
     getAllData()
   }, [])
+
+  useEffect(() => {
+    if (refreshQrCode) {
+      getDayWorkingTime()
+    }
+  }, [refreshQrCode])
 
   const mapFirst4Users = () => {
 
@@ -94,6 +115,35 @@ export default function HelloWave() {
 
     return allUsers.join(' - ')
   }
+
+  const mapDayWorkingTime = dayWorkingTime && dayWorkingTime.map((time, index) => {
+
+    const startDate = new Date(time.start);
+    const startHoursAndMinutes = startDate.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false // Pour éviter le format AM/PM
+    });
+
+    const formattedDate = startDate.toLocaleDateString('fr-FR');
+
+
+    const endDate = new Date(time.end);
+    const endHoursAndMinutes = endDate.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false // Pour éviter le format AM/PM
+    });
+
+
+    return (
+      <View key={index} style={[style.glassmorphism, { paddingVertical: 10, paddingHorizontal: 20 }]}>
+        <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>{formattedDate}</TextOrbitronBold>
+        <Text style={{ fontSize: 16, color: "white" }}>Arrived at <Text style={{ color: colors.primary }}>{startHoursAndMinutes}</Text></Text>
+        {time.end && <Text style={{ fontSize: 16, color: "white" }}>Left at <Text style={{ color: colors.primary }}>{endHoursAndMinutes}</Text></Text>}
+      </View>
+    )
+  })
 
 
 
@@ -135,56 +185,11 @@ export default function HelloWave() {
             </Pressable>
 
             <TextOrbitronBold style={{ color: 'white', fontSize: 20, marginBottom: 20 }}>
-              Next working days
+              Signing of the day
             </TextOrbitronBold>
 
-            <View style={[style.glassmorphism, { width: "100%", padding: 15, height: 150, overflow: 'hidden' }]}>
-              <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>12/10/2024</TextOrbitronBold>
-              <Text style={{ marginBottom: 10 }}>{organization && organization.name}}</Text>
-              <Text style={{}}>08:00 - 16:00</Text>
+            {mapDayWorkingTime}
 
-              <Image source={require('../assets/images/bat2.png')} style={{ width: 90, height: 90, position: 'absolute', right: -28, bottom: -28, opacity: 0.7, transform: [{ rotate: '-45deg' }] }} />
-            </View>
-
-            <View style={[style.glassmorphism, { width: "100%", padding: 15, height: 150, overflow: 'hidden' }]}>
-              <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>12/10/2024</TextOrbitronBold>
-              <Text style={{ marginBottom: 10 }}>Groupe A</Text>
-              <Text style={{}}>08:00 - 16:00</Text>
-
-              <Image source={require('../assets/images/bat2.png')} style={{ width: 90, height: 90, position: 'absolute', right: -28, bottom: -28, opacity: 0.7, transform: [{ rotate: '-45deg' }] }} />
-            </View>
-
-            <View style={[style.glassmorphism, { width: "100%", padding: 15, height: 150, overflow: 'hidden' }]}>
-              <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>12/10/2024</TextOrbitronBold>
-              <Text style={{ marginBottom: 10 }}>Groupe A</Text>
-              <Text style={{}}>08:00 - 16:00</Text>
-
-              <Image source={require('../assets/images/bat2.png')} style={{ width: 90, height: 90, position: 'absolute', right: -28, bottom: -28, opacity: 0.7, transform: [{ rotate: '-45deg' }] }} />
-            </View>
-
-            <View style={[style.glassmorphism, { width: "100%", padding: 15, height: 150, overflow: 'hidden' }]}>
-              <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>12/10/2024</TextOrbitronBold>
-              <Text style={{ marginBottom: 10 }}>Groupe A</Text>
-              <Text style={{}}>08:00 - 16:00</Text>
-
-              <Image source={require('../assets/images/bat2.png')} style={{ width: 90, height: 90, position: 'absolute', right: -28, bottom: -28, opacity: 0.7, transform: [{ rotate: '-45deg' }] }} />
-            </View>
-
-            <View style={[style.glassmorphism, { width: "100%", padding: 15, height: 150, overflow: 'hidden' }]}>
-              <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>12/10/2024</TextOrbitronBold>
-              <Text style={{ marginBottom: 10 }}>Groupe A</Text>
-              <Text style={{}}>08:00 - 16:00</Text>
-
-              <Image source={require('../assets/images/bat2.png')} style={{ width: 90, height: 90, position: 'absolute', right: -28, bottom: -28, opacity: 0.7, transform: [{ rotate: '-45deg' }] }} />
-            </View>
-
-            <View style={[style.glassmorphism, { width: "100%", padding: 15, height: 150, overflow: 'hidden' }]}>
-              <TextOrbitronBold style={{ color: colors.primary, fontSize: 18, marginBottom: 30 }}>12/10/2024</TextOrbitronBold>
-              <Text style={{ marginBottom: 10 }}>Groupe A</Text>
-              <Text style={{}}>08:00 - 16:00</Text>
-
-              <Image source={require('../assets/images/bat2.png')} style={{ width: 90, height: 90, position: 'absolute', right: -28, bottom: -28, opacity: 0.7, transform: [{ rotate: '-45deg' }] }} />
-            </View>
           </>
         }
 

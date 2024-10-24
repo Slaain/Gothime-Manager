@@ -18,17 +18,50 @@ export default function GothamNeedsYouScreen() {
     const [workingTimes, setWorkingTimes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [chartData, setChartData] = useState([]);
-    const [viewMode, setViewMode] = useState('day');
+    const [viewMode, setViewMode] = useState('daily'); // Default to 'daily'
     const router = useRouter(); // Utilisation de router pour redirection
     const { session } = useSession();
     const userId = jwtDecode(session).sub;
+    const [loadingChart, setLoadingChart] = useState(true);
 
+    const colors = {
+        primary: "#FDCB12"
+    }
 
+    const fetchDataForViewMode = async (mode) => {
+        let url = '';
 
+        switch (mode) {
+            case 'daily':
+                url = `http://10.79.216.9:4000/api/workingtimes/daily/${userId}`;
+                break;
+            case 'weekly':
+                url = `http://10.79.216.9:4000/api/workingtimes/weekly/${userId}`;
+                break;
+            case 'monthly':
+                url = `http://10.79.216.9:4000/api/workingtimes/monthly/${userId}`;
+                break;
+            default:
+                return;
+        }
 
+        try {
+            setLoadingChart(true);
+            setLoading(true);
+            const response = await axios.get(url);
 
+            console.log("response.data.data : ", response.data);
 
-    console.log("session : ", session);
+            setWorkingTimes(response.data);
+            setLoadingChart(false);
+            setLoading(false);
+            processChartData(response.data, mode);
+        } catch (error) {
+            console.error(`Error fetching ${mode} working times:`, error.response?.data || error.message);
+            setLoadingChart(false);
+            setLoading(false);
+        }
+    };
 
     // Fetch working times
     const getWorkingTimes = async () => {
@@ -49,8 +82,8 @@ export default function GothamNeedsYouScreen() {
     };
 
     useEffect(() => {
-        getWorkingTimes();
-    }, []);
+        fetchDataForViewMode(viewMode);
+    }, [viewMode]);
 
     // Process chart data depending on view mode (day, week, month)
     const processChartData = (data, mode) => {
@@ -118,18 +151,17 @@ export default function GothamNeedsYouScreen() {
                             <View style={styles.contentContainer}>
                                 {/* Buttons for Day/Week/Month */}
                                 <View style={styles.buttonContainer}>
-                                    <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'day')}>
-                                        <TextOrbitron style={styles.buttonText}>Day</TextOrbitron>
+                                    <TouchableOpacity style={[viewMode === 'daily' ? { backgroundColor: colors.primary } : { backgroundColor: '#3e3e3e' }, styles.button]} onPress={() => setViewMode('daily')}>
+                                        <TextOrbitron style={[viewMode === 'daily' ? { color: "white" } : { color: colors.primary }, styles.buttonText]}>Day</TextOrbitron>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'week')}>
-                                        <TextOrbitron style={styles.buttonText}>Week</TextOrbitron>
+                                    <TouchableOpacity style={[viewMode === 'weekly' ? { backgroundColor: colors.primary } : { backgroundColor: '#3e3e3e' }, styles.button]} onPress={() => setViewMode('weekly')}>
+                                        <TextOrbitron style={[viewMode === 'weekly' ? { color: "white" } : { color: colors.primary }, styles.buttonText]}>Week</TextOrbitron>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'month')}>
-                                        <TextOrbitron style={styles.buttonText}>Month</TextOrbitron>
+                                    <TouchableOpacity style={[viewMode === 'monthly' ? { backgroundColor: colors.primary } : { backgroundColor: '#3e3e3e' }, styles.button]} onPress={() => setViewMode('monthly')}>
+                                        <TextOrbitron style={[viewMode === 'monthly' ? { color: "white" } : { color: colors.primary }, styles.buttonText]}>Month</TextOrbitron>
                                     </TouchableOpacity>
                                 </View>
 
-                                {/* Bar Chart */}
                                 <BarChart
                                     data={{
                                         labels: chartData.labels || [],
@@ -167,27 +199,29 @@ export default function GothamNeedsYouScreen() {
                                 {loading ? (
                                     <ActivityIndicator size="large" color="#E3B75B" />
                                 ) : (
-                                    workingTimes.map((item) => (
-                                        <View key={item.id} style={styles.workingTimeItem}>
-                                            <TextOrbitronBold style={styles.workingTimeDateText}>
-                                                {formatDateTime(item.start)}
-                                            </TextOrbitronBold>
-                                            <TextOrbitron style={styles.workingTimeGroupText}>Groupe A</TextOrbitron>
-                                            <TextOrbitron style={styles.workingTimeHourText}>
-                                                {formatTime(item.start)} - {formatTime(item.end)}
-                                            </TextOrbitron>
-                                            <TextOrbitron style={styles.workingTimeHourText}>
-                                                {item.total_time ? `${(item.total_time / 60).toFixed(2)} heures` : 'Non disponible'}
-                                            </TextOrbitron>
-                                        </View>
-                                    ))
+                                    workingTimes
+                                        .sort((a, b) => new Date(a.start) - new Date(b.start))
+                                        .map((item) => (
+                                            <View key={item.id} style={styles.workingTimeItem}>
+                                                <TextOrbitronBold style={styles.workingTimeDateText}>
+                                                    {formatDateTime(item.start)}
+                                                </TextOrbitronBold>
+                                                <TextOrbitron style={styles.workingTimeGroupText}>Groupe A</TextOrbitron>
+                                                <TextOrbitron style={styles.workingTimeHourText}>
+                                                    {formatTime(item.start)} - {formatTime(item.end)}
+                                                </TextOrbitron>
+                                                <TextOrbitron style={styles.workingTimeHourText}>
+                                                    {item.total_time ? `${(item.total_time / 60).toFixed(2)} heures` : 'Non disponible'}
+                                                </TextOrbitron>
+                                            </View>
+                                        ))
                                 )}
                             </View>
                         </>
                     }
                 </LinearGradient>
             </ScrollView>
-        </ImageBackground>
+        </ImageBackground >
     );
 }
 
@@ -228,14 +262,14 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     button: {
-        backgroundColor: '#3e3e3e',
+        // backgroundColor: '#3e3e3e',
         padding: 10,
         borderRadius: 10,
         borderWidth: 1,
         borderColor: '#FDCB12',
     },
     buttonText: {
-        color: '#FDCB12',
+        // color: '#FDCB12',
         fontSize: 16,
     },
     chart: {
