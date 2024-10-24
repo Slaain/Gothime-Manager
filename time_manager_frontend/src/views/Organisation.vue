@@ -2,10 +2,19 @@
   <div class="organisation-page flex min-h-screen bg-custom-background">
     <Sidebar />
     <div class="content flex-1 p-6">
-      <h1 class="text-3xl font-bold mb-6 text-yellow-400">Organisations</h1>
+      <div class="header mb-6">
+        <h1 class="text-3xl font-bold text-yellow-400">Organisations</h1>
+      </div>
+
+      <!-- Bouton pour créer une nouvelle organisation, maintenant en dessous du titre -->
+      <div class="create-button-container mb-6">
+        <button @click="showCreateModal = true" class="btn btn-create-organisation">
+          Create Organisation
+        </button>
+      </div>
       <OrganisationList
         :organisations="organisations"
-        @modify-organisation="handleModifyOrganisation"
+        @organisation-updated="fetchOrganisations"
         @view-group="handleViewGroup"
         @view-users="handleViewUsers"
       />
@@ -17,6 +26,14 @@
       :organisation-id="selectedOrganisationId"
       @close-modal="handleCloseUserModal"
     />
+
+      <!-- Modale pour créer une nouvelle organisation -->
+      <CreateOrganisationModal
+        v-if="showCreateModal"
+        @close-modal="handleCloseCreateModal"
+        @organisation-created="fetchOrganisations"
+      />  
+
   </div>
 </template>
 
@@ -24,6 +41,8 @@
 import Sidebar from '../components/Sidebar.vue';
 import OrganisationList from '../components/OrganisationList.vue';
 import UserModal from '../components/OrganisationUserList.vue'; // Import de la modale UserModal
+import CreateOrganisationModal from '../components/CreateOrganisationModal.vue'; // Import de la modale
+
 import axios from 'axios';
 
 export default {
@@ -31,13 +50,16 @@ export default {
     Sidebar,
     OrganisationList,
     UserModal,
+    CreateOrganisationModal
   },
   data() {
     return {
       organisations: [],
       showUserModal: false, // Variable pour contrôler l'affichage de la modale des utilisateurs
       selectedOrganisationId: null, // ID de l'organisation sélectionnée pour voir les utilisateurs
-    };
+      showCreateModal: false, // Variable pour contrôler l'affichage de la modale de création d'organisation
+
+    }
   },
   methods: {
     // Récupération des organisations
@@ -48,11 +70,6 @@ export default {
       } catch (error) {
         console.error("Erreur lors de la récupération des organisations:", error);
       }
-    },
-
-    // Gestion des événements pour la modification d'une organisation
-    handleModifyOrganisation(organisationId) {
-      console.log("Modifier l'organisation :", organisationId);
     },
 
     // Gestion de l'affichage d'un groupe
@@ -67,8 +84,13 @@ export default {
       this.showUserModal = true; // Affiche la modale pour afficher les utilisateurs
     },
 
+    handleCloseCreateModal() {
+      this.showCreateModal = false;
+    },
+
     // Fermeture de la modale des utilisateurs
     handleCloseUserModal() {
+      console.log('ferme la creation');
       this.showUserModal = false;
     },
   },
@@ -80,6 +102,24 @@ export default {
 </script>
 
 <style scoped>
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-create-organisation {
+  background-color: #fdcb12;
+  color: black;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn-create-organisation:hover {
+  background-color: #f5b900;
+}
 /* Style du fond similaire à ton tableau de bord */
 .organisation-page {
   display: flex;

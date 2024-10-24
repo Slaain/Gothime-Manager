@@ -7,6 +7,7 @@
         :organisation="organisation"
         @modify-organisation="modifyOrganisation"
         @modify-users="modifyUsers"
+        @organisation-updated="handleOrganisationUpdated"
         @view-users="$emit('view-users', organisation.id)" 
 
       />
@@ -30,6 +31,12 @@
       modifyOrganisation(organisationId) {
         this.$emit('modify-organisation', organisationId);
       },
+
+      handleOrganisationUpdated() {
+      // Émettre un événement pour que le composant parent (Organisation.vue) puisse réagir
+      this.$emit('organisation-updated');
+    },
+    
       viewGroup(groupId) {
         this.$emit('view-group', groupId);
       },

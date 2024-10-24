@@ -1,8 +1,25 @@
 <template>
-  <div class="organisation-card glassmorphism-bg-white p-6 shadow-md rounded-xl">
-    <div class="header flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold text-white">{{ organisation.name }}</h2>
-      <button @click="modifyOrganisation" class="btn btn-primary">Modifier</button>
+  <div class="organisation-card glassmorphism-bg-white p-6 shadow-md rounded-xl" @click="cancelEdit">
+    <div class="header flex justify-between items-center mb-4" @click.stop>
+      <!-- Affichage du nom de l'organisation ou champ d'édition -->
+      <h2 v-if="!isEditing" class="text-xl font-semibold text-white">{{ organisation.name }}</h2>
+      <div v-if="isEditing" class="flex items-center">
+        <input
+          v-model="organisationName"
+          @keyup.enter="saveOrganisationName"
+          @blur="toggleEdit"
+          class="input-field text-xl font-semibold"
+          type="text"
+        />
+        <!-- Bouton de coche pour sauvegarder -->
+        <button @click="saveOrganisationName" class="btn-save ml-2">
+          <i class="fas fa-check"></i>
+        </button>
+      </div>
+      <!-- Bouton avec icône de stylo pour l'édition -->
+      <button @click="toggleEdit" class="btn-edit" v-if="!isEditing">
+        <i class="fas fa-pencil-alt"></i> <!-- Icône de stylo -->
+      </button>
     </div>
 
     <div class="groups-container overflow-y-auto mb-4">
@@ -21,6 +38,7 @@
 
 <script>
 import axios from "axios";
+import { useToast } from "vue-toastification";
 
 export default {
   props: {
@@ -29,18 +47,21 @@ export default {
       required: true,
     },
   },
+  setup() {
+    const toast = useToast(); // Utiliser le toast via setup
+    return { toast };
+  },
   data() {
     return {
       groups: [],
+      isEditing: false, // Gérer l'état d'édition du nom
+      organisationName: this.organisation.name, // Initialise avec le nom actuel de l'organisation
     };
   },
   mounted() {
     this.fetchGroups();
   },
   methods: {
-    modifyOrganisation() {
-      this.$emit("modify-organisation", this.organisation.id);
-    },
     async fetchGroups() {
       try {
         const response = await axios.get(
@@ -55,27 +76,51 @@ export default {
       this.$emit("view-group", group.id);
     },
     viewUsers() {
-      console.log("Voir Users pour l'organisation :", this.organisation.id);
-      this.$emit("view-users", this.organisation.id); // Émettre l'événement pour ouvrir la modale
-    }
+      this.$emit("view-users", this.organisation.id);
+    },
+    toggleEdit() {
+      if (!this.isEditing) {
+        this.isEditing = true; // Activer le mode édition
+      }
+    },
+    cancelEdit() {
+      if (this.isEditing) {
+        this.isEditing = false; // Désactiver le mode édition
+        this.organisationName = this.organisation.name; // Réinitialiser le nom si non sauvegardé
+      }
+    },
+    async saveOrganisationName() {
+      try {
+        await axios.put(`http://localhost:4000/api/organisations/${this.organisation.id}`, {
+          organisation: { name: this.organisationName },
+        });
 
+        // Affiche un toast de succès après la mise à jour
+        this.toast.success("Organisation's name updated successfully!");
+
+        this.$emit('organisation-updated');
+
+        this.isEditing = false; // Revenir à l'affichage normal après la sauvegarde
+      } catch (error) {
+        // Affiche un toast d'erreur en cas de problème
+        this.toast.error("Error updating the organisation's name.");
+        console.error("Erreur lors de la mise à jour du nom de l'organisation:", error);
+      }
+    }
   },
 };
 </script>
 
-
-
 <style scoped>
 /* Taille fixe de la carte */
 .organisation-card {
-  width: 300px;  /* Largeur fixe */
-  height: 400px; /* Hauteur fixe */
+  width: 320px; /* Agrandir un peu la carte */
+  height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* Glassmorphism pour correspondre au design global */
 .glassmorphism-bg-white {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -87,33 +132,50 @@ export default {
   color: white;
 }
 
-.glassmorphism-bg-white::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  padding: 2px;
-  border-radius: 10px;
-  background: linear-gradient(
-    to bottom right,
-    #ffffff,
-    rgba(255, 255, 255, 0.2),
-    #fdcb12
-  );
-  opacity: 0.3;
-  pointer-events: none;
-}
-
 .header h2 {
   color: #fdcb12;
+}
+
+/* Bouton d'édition avec icône */
+.btn-edit {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fdcb12;
+  margin-left: 10px; /* Espace entre le nom et l'icône */
+}
+
+.btn-edit:hover {
+  color: #f5b900;
+}
+
+/* Bouton de coche pour sauvegarder */
+.btn-save {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #00ff00;
+}
+
+.btn-save:hover {
+  color: #00cc00;
+}
+
+/* Champ d'édition plus petit et adapté à la carte */
+.input-field {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #fdcb12;
+  color: #fdcb12;
+  padding: 0.2em;
+  border-radius: 4px;
+  outline: none;
+  width: 180px; /* Agrandir légèrement */
 }
 
 /* Liste des groupes avec une scrollbar stylisée */
 .groups-container {
   overflow-y: auto;
-  max-height: 175px; /* Hauteur maximale de la liste des groupes */
+  max-height: 175px;
   flex-grow: 1;
   margin-bottom: 10px;
 }
@@ -123,15 +185,14 @@ export default {
 }
 
 .groups-container::-webkit-scrollbar-thumb {
-  background-color: #000; /* Couleur noire pour la scrollbar */
-  border-radius: 10px; /* Bordure arrondie pour la scrollbar */
+  background-color: #000;
+  border-radius: 10px;
 }
 
 .groups-container::-webkit-scrollbar-track {
-  background: transparent; /* Couleur transparente pour l'arrière-plan de la scrollbar */
+  background: transparent;
 }
 
-/* Styles des boutons */
 .btn {
   padding: 0.5em 1em;
   border-radius: 5px;
