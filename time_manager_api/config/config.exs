@@ -66,6 +66,16 @@ config :time_manager_api, TimeManagerApi.Guardian,
   issuer: "time_manager_api",
   secret_key: "JEi6Qjnn+edMIQ6DUL1oIbAwXF+9f2tbSWmDda8uyPD1q3XpkdqN+NP5pbnwkP8W"
 
+# config :time_manager_api, TimeManagerApi.Mailer,
+#   adapter: Bamboo.SMTPAdapter,
+#   server: "smtp.gmail.com",
+#   port: 587,
+#   username: "gothimemanager@gmail.com",
+#   password: "gothimemanager123",
+#   tls: :if_available,
+#   ssl: false,
+#   retries: 1
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
