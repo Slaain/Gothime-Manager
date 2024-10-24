@@ -831,12 +831,6 @@ import { Clock, CalendarDays, Bell } from "lucide-vue-next";
           >
             Ready to get started? Sign up today and take control of your work
           </h1>
-          <router-link
-            class="flex-shrink-0 px-8 py-2 mt-10 text-lg text-white border-0 rounded bg-primaryYellow focus:outline-none hover:bg-primaryYellow400 sm:mt-0"
-            to="/signup"
-          >
-            Sign Up
-          </router-link>
         </div>
       </div>
     </div>
