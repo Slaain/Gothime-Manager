@@ -12,6 +12,7 @@ export async function isUserAdmin(token) {
 
     console.log("id : ", decoded.sub);
     
+    if(!token) return false;
     const response = await axios.get("http://localhost:4000/api/roles", {
       headers: {
       Authorization: `Bearer ${token}`
