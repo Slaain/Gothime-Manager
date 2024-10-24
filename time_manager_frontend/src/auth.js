@@ -12,7 +12,7 @@ export function isUserAdmin(token) {
     console.log(decoded.sub);
     
     // Supposons que l'info "role" est dans le token et que "admin" est le rôle attendu
-    if(decoded.sub == 2){
+    if(decoded.sub == 11){
       console.log("admin");
       
       return true;
