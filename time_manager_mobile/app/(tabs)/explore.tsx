@@ -120,7 +120,6 @@ export default function GothamNeedsYouScreen() {
 
     // Redirection vers la page profil
     const goToProfile = () => {
-        console.log("Icon Pressed");  // Si ça n'apparaît pas, le problème est ailleurs
         router.push({
             pathname: '/profil',
             params: { userId, userName },
@@ -133,10 +132,16 @@ export default function GothamNeedsYouScreen() {
             style={styles.backgroundImage}
             resizeMode="cover"
         >
-            <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-                <LinearGradient
-                    colors={['#00000080', '#00000080', '#3e3e3e']}
-                    style={styles.overlay}
+            {/* LinearGradient couvrant toute la zone défilante */}
+            <LinearGradient
+                colors={['#00000080', '#00000080', '#3e3e3e']}
+                style={styles.overlay}
+            >
+                <ScrollView
+                    contentContainerStyle={styles.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                    horizontal={false}  // Assurer que le ScrollView global soit seulement en vertical
+                    nestedScrollEnabled={true}  // Permet aux sous-ScrollView de fonctionner correctement
                 >
                     {loading && <ActivityIndicator size="large" color="#FDCB12" />}
                     {!loading &&
@@ -219,8 +224,8 @@ export default function GothamNeedsYouScreen() {
                             </View>
                         </>
                     }
-                </LinearGradient>
-            </ScrollView>
+            </LinearGradient>
+        </ScrollView>
         </ImageBackground >
     );
 }
@@ -240,6 +245,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 20,
+        width: '100%',
     },
     contentContainer: {
         paddingTop: 80,
@@ -272,8 +278,13 @@ const styles = StyleSheet.create({
         // color: '#FDCB12',
         fontSize: 16,
     },
-    chart: {
+    chartContainer: {
+        backgroundColor: '#00000080',
+        padding: 10,
+        borderRadius: 16,
         marginVertical: 10,
+    },
+    chart: {
         borderRadius: 16,
     },
     workingTimeItem: {
@@ -283,7 +294,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 1)',
-        width: Dimensions.get('window').width * 0.9,
+        width: '100%',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -309,8 +320,8 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         position: 'absolute',
-        top: 50,
+        top: 30,
         right: 20,
-        zIndex: 10,  // Augmenter le z-index pour s'assurer que l'icône est au-dessus des autres éléments
+        zIndex: 10,
     },
 });

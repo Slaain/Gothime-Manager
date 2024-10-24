@@ -28,11 +28,7 @@ export async function isUserAdmin(token) {
           console.log("not admin");
           return false;
         }
-    
-    
-
-    // Supposons que l'info "role" est dans le token et que "admin" est le rôle attendu
-    
+  
     // return decoded.role && decoded.role === 'admin';
   } catch (error) {
     return false;

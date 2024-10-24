@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text as DefaultText, View, TouchableOpacity, Image, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import {
+    StyleSheet,
+    Text as DefaultText,
+    View,
+    TouchableOpacity,
+    Image,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    TouchableWithoutFeedback,
+    Keyboard,
+    Alert,
+    ImageBackground,
+    Dimensions
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { storeToken } from '../components/asyncStorage'; // Chemin relatif vers asyncStorage.tsx
@@ -68,6 +82,11 @@ export default function HomeScreen() {
     };
 
     return (
+        <ImageBackground
+            source={require('../assets/images/bg-jn.png')}
+            style={styles.backgroundImage}
+            resizeMode="cover"
+        >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <LinearGradient
                 colors={['#000000', '#1c1c1c', '#3e3e3e']}
@@ -118,10 +137,16 @@ export default function HomeScreen() {
                 </KeyboardAvoidingView>
             </LinearGradient>
         </TouchableWithoutFeedback>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
+    backgroundImage: {
+        flex: 1,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height, // Assure-toi que la hauteur couvre tout l'écran
+    },
     backgroundContainer: {
         flex: 1,
         justifyContent: 'center',

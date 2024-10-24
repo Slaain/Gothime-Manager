@@ -96,7 +96,7 @@ import { Clock, CalendarDays, Bell } from "lucide-vue-next";
       <div class="flex flex-col w-full gap-8 mt-6">
         <div class="flex flex-row items-center justify-center w-full gap-x-36">
           <div
-            class="relative w-1/3 px-6 py-5 overflow-hidden border border-white rounded-md max-w-80 glassmorphism bg-primaryYellow400/70"
+            class="relative w-1/3 px-6 py-5 overflow-hidden border border-white rounded-md max-w-80 glassmorphism bg-primaryYellow400/70 hover-3d"
           >
             <div class="mt-5">
               <p class="mb-2 text-lg font-bold">
@@ -129,7 +129,7 @@ import { Clock, CalendarDays, Bell } from "lucide-vue-next";
                 counted. No more remote sign-ins or inaccurate records.
               </p>
               <img
-                class="absolute bottom-0 right-0 translate-y-[32%] translate-x-[32%] -rotate-45 size-24 opacity-40"
+                class="absolute bottom-0 right-0 translate-y-[32%] translate-x-[32%] -rotate-45 size-24 opacity-40 hover-3d"
                 src="../assets/images/bat1.png"
               />
             </div>
@@ -138,7 +138,7 @@ import { Clock, CalendarDays, Bell } from "lucide-vue-next";
 
         <div class="flex flex-row items-center justify-center w-full gap-x-36">
           <div
-            class="absolute w-1/3 px-6 py-5 border border-white rounded-md max-w-80 glassmorphism bg-primaryYellow400/70"
+            class="absolute w-1/3 px-6 py-5 border border-white rounded-md max-w-80 glassmorphism bg-primaryYellow400/70 hover-3d"
           >
             <div class="mt-5">
               <p class="mb-2 text-lg font-bold">Automatic Shift Reminders</p>
@@ -156,7 +156,7 @@ import { Clock, CalendarDays, Bell } from "lucide-vue-next";
           </div>
 
           <div
-            class="absolute w-1/3 px-6 py-5 border border-white rounded-md max-w-80 glassmorphism bg-primaryYellow400/70"
+            class="absolute w-1/3 px-6 py-5 border border-white rounded-md max-w-80 glassmorphism bg-primaryYellow400/70 hover-3d"
           >
             <div class="mt-5">
               <p class="mb-2 text-lg font-bold">
@@ -831,12 +831,6 @@ import { Clock, CalendarDays, Bell } from "lucide-vue-next";
           >
             Ready to get started? Sign up today and take control of your work
           </h1>
-          <router-link
-            class="flex-shrink-0 px-8 py-2 mt-10 text-lg text-white border-0 rounded bg-primaryYellow focus:outline-none hover:bg-primaryYellow400 sm:mt-0"
-            to="/signup"
-          >
-            Sign Up
-          </router-link>
         </div>
       </div>
     </div>
