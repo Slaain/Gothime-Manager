@@ -3,6 +3,7 @@ import axios from 'axios';
 const API_URL = 'http://localhost:4000/api/users';
 const CLOCK_API_URL = 'http://localhost:4000/api/clocks';
 const REGISTER_API_URL =  'http://localhost:4000/api/register';
+const ORGANISATION_API_URL = 'http://localhost:4000/api/organisations';
 
 export default {
   createUser(user) {
@@ -57,5 +58,14 @@ export default {
         throw error;
       });
   },
+
+  getOrganisations() {
+    return axios.get(ORGANISATION_API_URL)
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Erreur lors de la récupération des organisations:', error);
+        throw error;
+      });
+  }
   
 };

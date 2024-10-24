@@ -34,7 +34,7 @@
           type="text"
         />
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-          >User's Email</label
+          >Enter Password </label
         >
         <input
           v-model="newUser.password"
@@ -51,6 +51,32 @@
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
         />
+        
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          Select Organisation
+        </label>
+        <select
+          v-model="newUser.selectedOrganisation"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="" disabled>Select an organisation</option>
+          <option v-for="organisation in organisations_list" :key="organisation.id" :value="organisation.id">
+            {{ organisation.name }}
+          </option>
+        </select>
+
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+        Select Role
+        </label>
+        <select
+          v-model="newUser.selectedRole"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="" disabled>Select a role</option>
+          <option v-for="role in roles" :key="role" :value="role">
+            {{ role }}
+          </option>
+        </select>
         
         <p class="h-6 text-red-600">{{ error }}</p>
         <button
@@ -322,6 +348,7 @@ export default {
   name: "EmployeeList",
   data() {
     return {
+      organisations_list: [],
       employees: [],
       currentPage: 1,
       limit: 5,
@@ -333,7 +360,10 @@ export default {
         email: "",
         password: "",
         confirmPassword: "",
+        selectedOrganisation: null,
+        selectedRole: null,
       },
+      roles: ["Admin", "Manager", "Employee"],
       error: "",
       showCreateUserModal: false,
       showDeleteUserModal: false,
@@ -346,8 +376,8 @@ export default {
   methods: {
 
   // Handle the toggle switch when clock in/out is triggered
-    handleClockToggle(employee) {
-        
+  handleClockToggle(employee) {
+        // On fait un POST vers /api/clocks/:user_id
         this.toggleClock(employee.id);
       },
 
@@ -544,6 +574,20 @@ export default {
         });
     },
 
+
+    fetchOrganisations() {
+      console.log("Fetching organisations");
+      userService
+        .getOrganisations()
+        .then((data) => {
+          this.organisations_list = data.data;
+          console.log(data)
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération des organisations:", error);
+        });
+    },
+
     nextPage() {
       console.log("Next page");
       if (this.currentPage < this.totalPages) {
@@ -580,6 +624,8 @@ export default {
   },
   mounted() {
     this.fetchEmployees();
+    this.fetchOrganisations();
+    console.log("this.organisations_list : ", this.organisations_list);
   },
 };
 </script>
