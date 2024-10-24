@@ -1,14 +1,27 @@
-import { Tabs, usePathname } from 'expo-router';
+import { Redirect, Tabs, usePathname } from 'expo-router';
 import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AntDesign, Entypo, Ionicons } from '@expo/vector-icons';
 import MyTabBar from '@/components/MyTabBar';
+import { Text } from 'react-native';
+import { useSession } from '@/components/ctx';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const pathname = usePathname();
   const colors = { primary: "#FDCB12" };
+
+  const { session, isLoading } = useSession();
+
+
+  if (isLoading) return <Text>Loading...</Text>;
+
+  if (!session) {
+    // On web, static rendering will stop here as the user is not authenticated
+    // in the headless Node process that the pages are rendered in.
+    return <Redirect href="/sign-in" />;
+  }
 
   console.log("pathname : ", pathname);
 

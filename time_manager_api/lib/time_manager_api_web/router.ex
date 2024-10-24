@@ -71,6 +71,8 @@ defmodule TimeManagerApiWeb.Router do
   get "/groups/:id", GroupController, :show   # Afficher un groupe spécifique
   delete "/groups/:id", GroupController, :delete
   put "/groups/:id", GroupController, :update
+  get "/groups/user/:user_id", GroupController, :get_group_by_user
+
 
 
     # Routes pour gérer les utilisateurs dans les groupes
@@ -87,6 +89,10 @@ defmodule TimeManagerApiWeb.Router do
     put "/:id", OrganisationController, :update
     put "/:organisation_id/users/:user_id/:role_id", OrganisationController, :update_user_role
 
+  end
+
+  scope "/roles" do
+    get "/", RoleController, :show
   end
 
   #Routes pour l'authentification

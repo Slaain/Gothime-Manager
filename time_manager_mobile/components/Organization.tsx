@@ -24,6 +24,8 @@ export default function HelloWave() {
   };
 
   const fetchGetUsersInGroup = async () => {
+
+    if (!groups) return;
     const groupId = groups[0].id;
 
     const response = await axios.get(`http://10.79.216.9:4000/api/groups/${groupId}`);

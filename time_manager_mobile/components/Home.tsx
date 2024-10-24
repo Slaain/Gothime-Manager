@@ -2,12 +2,23 @@ import { useRouter } from 'expo-router';
 import { ImageBackground, ActivityIndicator, Pressable, Image, StyleSheet, Text as DefaultText, View, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios'
 import { useEffect, useState } from 'react';
+import { jwtDecode } from "jwt-decode";
+import { useSession } from './ctx';
+import useUserStatsStore from '@/stores/useUserStatsStore';
+
 export default function HelloWave() {
   const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
-  const userId = 1;
+  const { session } = useSession();
+
+  const userId = jwtDecode(session).sub;
   const [userInfo, setUserInfo] = useState(null);
   const [groups, setGroups] = useState(null);
   const [loading, setLoaging] = useState(true);
+  const { username } = useUserStatsStore();
+
+  console.log("username : ", username);
+
+
 
   const [organization, setOrganization] = useState(null);
   const colors = {
@@ -25,22 +36,34 @@ export default function HelloWave() {
   const fetchGetUserData = async () => {
     const response = await axios.get(`http://10.79.216.9:4000/api/users/${userId}`)
 
-    console.log("response : ", response.data.user)
+    console.log("UUU : ", response.data.user)
     setUserInfo(response.data.user)
+
+
 
   }
 
   const fetchUserOfOrganization = async () => {
     const response = await axios.get(`http://10.79.216.9:4000/api/organisations/${userId}/users`)
+
+    console.log("response org: ", response.data);
+
     setOrganization(response.data)
   }
 
   const fetchGetUserGroup = async () => {
 
-    const response = await axios.get(`http://10.79.216.9:4000/api/groups/user/${userId}`)
+    try {
 
-    if (response.data.groups) {
-      setGroups(response.data.groups)
+
+      const response = await axios.get(`http://10.79.216.9:4000/api/groups/user/${userId}`)
+
+      console.log("response group: ", response.data.groups);
+      if (response.data.groups) {
+        setGroups(response.data.groups)
+      }
+    } catch (error) {
+      console.log("error : ", error);
     }
   }
 
@@ -89,7 +112,7 @@ export default function HelloWave() {
         {loading && <ActivityIndicator size="large" color="#FDCB12" />}
         {loading === false &&
           <><TextOrbitronBold style={{ color: 'white', fontSize: 25, marginBottom: 60 }}>
-            Gotham needs you, <TextOrbitronBold style={{ color: colors.primary }}>{userInfo && userInfo.username}</TextOrbitronBold>
+            Gotham needs you, <TextOrbitronBold style={{ color: colors.primary }}>{username}</TextOrbitronBold>
           </TextOrbitronBold>
 
             <Pressable

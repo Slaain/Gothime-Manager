@@ -1,43 +1,39 @@
 alias TimeManagerApi.Repo
 alias TimeManagerApi.{User, Clock, WorkingTime, Group, Role, Organisation, UserRoleOrganisation}
 import Ecto.Query
+import Bcrypt
 
 Faker.start()
 
-# Créer des organisations
+# Create organisations
 for org_name <- ["Organisation A", "Organisation B", "Organisation C"] do
-  organisation = %Organisation{
-    name: org_name
-  }
-
+  organisation = %Organisation{name: org_name}
   Repo.insert!(organisation)
 end
 
-# Créer des utilisateurs, des clocks, et des working times
+# Create users, clocks, and working times with encrypted passwords
 for _ <- 1..10 do
-  password = Faker.String.base64()
-
+  IO.inspect(Bcrypt.hash_pwd_salt("test"))
   user_attrs = %{
     username: Faker.Internet.user_name(),
     email: Faker.Internet.email(),
-    password: password
+    password: Bcrypt.hash_pwd_salt("test")  # Set the password as "test" and hash it
   }
 
   changeset = User.changeset(%User{}, user_attrs)
   user = Repo.insert!(changeset)
 
-  # Créer des clocks pour chaque utilisateur
+  # Create clocks for each user
   for _ <- 1..5 do
     clock = %Clock{
       time: Faker.DateTime.backward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second),
       status: Enum.random([true, false]),
       user_id: user.id
     }
-
     Repo.insert!(clock)
   end
 
-  # Créer des working times pour chaque utilisateur
+  # Create working times for each user
   for _ <- 1..5 do
     start_time = Faker.DateTime.backward(30) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
     end_time = Faker.DateTime.forward(1) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
@@ -48,32 +44,27 @@ for _ <- 1..10 do
       user_id: user.id,
       total_time: NaiveDateTime.diff(end_time, start_time)
     }
-
     Repo.insert!(working_time)
   end
 end
 
-# Créer des groupes
+# Create groups
 for _ <- 1..5 do
   group = %Group{
     name: Faker.Team.name(),
     start_date: Faker.DateTime.backward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second),
     end_date: Faker.DateTime.forward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
   }
-
   Repo.insert!(group)
 end
 
-# Créer des rôles
+# Create roles
 for role_name <- ["admin", "manager", "employee"] do
-  role = %Role{
-    name: role_name
-  }
-
+  role = %Role{name: role_name}
   Repo.insert!(role)
 end
 
-# Assigner des utilisateurs à des organisations et des rôles
+# Assign users to organisations and roles
 for user <- Repo.all(User) do
   organisation = Repo.one!(from o in Organisation, order_by: fragment("RANDOM()"), limit: 1)
   role = Repo.one!(from r in Role, order_by: fragment("RANDOM()"), limit: 1)
@@ -88,7 +79,6 @@ for user <- Repo.all(User) do
       role_id: role.id,
       organisation_id: organisation.id
     }
-
     Repo.insert!(user_role_org)
   end
 end

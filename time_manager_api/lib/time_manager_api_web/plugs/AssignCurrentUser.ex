@@ -11,6 +11,9 @@ defmodule TimeManagerApiWeb.Plugs.AssignCurrentUser do
         _ -> nil
       end
 
+      # io inspect with label
+      IO.inspect(token, label: "TOKEN")
+
     case token && Guardian.decode_and_verify(token) do
       {:ok, claims} ->
         assign(conn, :current_user, claims["sub"])

@@ -2,6 +2,11 @@ import React from 'react';
 import { StyleSheet, Text as DefaultText, View, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router'; // Utilisation de la route
+import { useSession } from "@/components/ctx";
+import { jwtDecode } from "jwt-decode";
+import useUserStatsStore from '@/stores/useUserStatsStore';
+
+
 
 // Custom Text component with Orbitron font
 const TextOrbitron = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Orbitron' }]} />;
@@ -9,17 +14,25 @@ const TextOrbitronBold = (props) => <DefaultText {...props} style={[props.style,
 
 export default function ProfileScreen() {
     const router = useRouter();
-    const { userName } = useLocalSearchParams(); // On récupère l'ID de l'utilisateur depuis les paramètres
-    if (!userName) {
-        console.error("userName is undefined"); // Ajoutez un log d'erreur
-    }
+    const { signOut, session } = useSession();
+    const { username, resetStats } = useUserStatsStore();
+
+
+    const userId = jwtDecode(session).sub;
+
+
+
     const handleLogout = () => {
         Alert.alert('Logout', 'Are you sure you want to log out?', [
             { text: 'Cancel', style: 'cancel' },
             {
                 text: 'Yes',
                 onPress: () => {
-                    router.push('/'); // Rediriger vers la page d'accueil après la déconnexion
+
+                    router.push('/sign-in'); // Rediriger vers la page d'accueil après la déconnexion
+                    signOut()
+                    resetStats()
+
                 },
             },
         ]);
@@ -31,7 +44,7 @@ export default function ProfileScreen() {
             style={styles.backgroundContainer}
         >
             <View style={styles.contentContainer}>
-                <TextOrbitronBold style={styles.welcomeText}>Bonjour, {userName}</TextOrbitronBold>
+                <TextOrbitronBold style={styles.welcomeText}>Bonjour, {username}</TextOrbitronBold>
 
                 {/* Espace pour d'autres informations du profil si nécessaire */}
 

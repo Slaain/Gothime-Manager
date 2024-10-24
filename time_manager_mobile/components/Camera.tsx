@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Button, StyleSheet, Image, TextInput, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
+import { useSession } from './ctx';
+import { jwtDecode } from 'jwt-decode';
 
 export default function Camera() {
   const [facing, setFacing] = useState<CameraType>('back');
@@ -12,6 +14,9 @@ export default function Camera() {
   const [expiredUrls, setExpiredUrls] = useState([]); // Stocker les URLs expirées
   const [code, setCode] = useState('');
   const [permission, requestPermission] = useCameraPermissions();
+  const { session } = useSession();
+
+  const userId = jwtDecode(session).sub;
 
   if (!permission) {
     return <View />;

@@ -6,18 +6,29 @@ import { BarChart } from 'react-native-chart-kit';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons'; // Import Icon
-
+import { useSession } from "@/components/ctx";
+import { jwtDecode } from 'jwt-decode';
 // Custom Text component with Orbitron font
 const TextOrbitron = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Orbitron' }]} />;
 const TextOrbitronBold = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'OrbitronBold' }]} />;
 
 export default function GothamNeedsYouScreen() {
-    const { userId, userName } = useLocalSearchParams();
+
+    const { userName } = useLocalSearchParams();
     const [workingTimes, setWorkingTimes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [chartData, setChartData] = useState([]);
     const [viewMode, setViewMode] = useState('day');
     const router = useRouter(); // Utilisation de router pour redirection
+    const { session } = useSession();
+    const userId = jwtDecode(session).sub;
+
+
+
+
+
+
+    console.log("session : ", session);
 
     // Fetch working times
     const getWorkingTimes = async () => {
@@ -27,7 +38,7 @@ export default function GothamNeedsYouScreen() {
                 setLoading(false);
                 return;
             }
-            const response = await axios.get(`http://10.79.216.151:4000/api/workingtimes/${userId}`);
+            const response = await axios.get(`http://10.79.216.9:4000/api/workingtimes/${userId}`);
             setWorkingTimes(response.data.data);
             setLoading(false);
             processChartData(response.data.data, 'day'); // Process initial data
@@ -78,8 +89,8 @@ export default function GothamNeedsYouScreen() {
     const goToProfile = () => {
         console.log("Icon Pressed");  // Si ça n'apparaît pas, le problème est ailleurs
         router.push({
-            pathname: '../PageProfil',
-            params: { userId,userName},
+            pathname: '/profil',
+            params: { userId, userName },
         });
     };
 
@@ -94,81 +105,86 @@ export default function GothamNeedsYouScreen() {
                     colors={['#00000080', '#00000080', '#3e3e3e']}
                     style={styles.overlay}
                 >
-                    {/* Icon de profil en haut à droite */}
-                    <View style={styles.iconContainer} pointerEvents="box-none">
-                        <Pressable onPress={goToProfile}>
-                            <Icon name="person-circle-outline" size={40} color="#FDCB12" />
-                        </Pressable>
-                    </View>
+                    {loading && <ActivityIndicator size="large" color="#FDCB12" />}
+                    {!loading &&
+                        <>
 
-                    <View style={styles.contentContainer}>
-                        {/* Buttons for Day/Week/Month */}
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'day')}>
-                                <TextOrbitron style={styles.buttonText}>Day</TextOrbitron>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'week')}>
-                                <TextOrbitron style={styles.buttonText}>Week</TextOrbitron>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'month')}>
-                                <TextOrbitron style={styles.buttonText}>Month</TextOrbitron>
-                            </TouchableOpacity>
-                        </View>
+                            <View style={styles.iconContainer} pointerEvents="box-none">
+                                <Pressable onPress={goToProfile}>
+                                    <Icon name="person-circle-outline" size={40} color="#FDCB12" />
+                                </Pressable>
+                            </View>
 
-                        {/* Bar Chart */}
-                        <BarChart
-                            data={{
-                                labels: chartData.labels || [],
-                                datasets: [
-                                    {
-                                        data: chartData.durations || [],
-                                    },
-                                ],
-                            }}
-                            width={Dimensions.get('window').width * 0.9} // from react-native
-                            height={220}
-                            chartConfig={{
-                                backgroundColor: '#000',
-                                backgroundGradientFrom: '#000',
-                                backgroundGradientTo: '#3e3e3e',
-                                decimalPlaces: 0,
-                                color: (opacity = 1) => `rgba(253, 203, 18, ${opacity})`,
-                                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                                style: {
-                                    borderRadius: 16,
-                                },
-                                propsForDots: {
-                                    r: '6',
-                                    strokeWidth: '2',
-                                    stroke: '#FDCB12',
-                                },
-                            }}
-                            style={styles.chart}
-                        />
-
-                        <TextOrbitronBold style={styles.userNameText}>
-                            Your history, <TextOrbitronBold style={styles.highlight}>{userName}</TextOrbitronBold>
-                        </TextOrbitronBold>
-
-                        {loading ? (
-                            <ActivityIndicator size="large" color="#E3B75B" />
-                        ) : (
-                            workingTimes.map((item) => (
-                                <View key={item.id} style={styles.workingTimeItem}>
-                                    <TextOrbitronBold style={styles.workingTimeDateText}>
-                                        {formatDateTime(item.start)}
-                                    </TextOrbitronBold>
-                                    <TextOrbitron style={styles.workingTimeGroupText}>Groupe A</TextOrbitron>
-                                    <TextOrbitron style={styles.workingTimeHourText}>
-                                        {formatTime(item.start)} - {formatTime(item.end)}
-                                    </TextOrbitron>
-                                    <TextOrbitron style={styles.workingTimeHourText}>
-                                        {item.total_time ? `${(item.total_time / 60).toFixed(2)} heures` : 'Non disponible'}
-                                    </TextOrbitron>
+                            <View style={styles.contentContainer}>
+                                {/* Buttons for Day/Week/Month */}
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'day')}>
+                                        <TextOrbitron style={styles.buttonText}>Day</TextOrbitron>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'week')}>
+                                        <TextOrbitron style={styles.buttonText}>Week</TextOrbitron>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.button} onPress={() => processChartData(workingTimes, 'month')}>
+                                        <TextOrbitron style={styles.buttonText}>Month</TextOrbitron>
+                                    </TouchableOpacity>
                                 </View>
-                            ))
-                        )}
-                    </View>
+
+                                {/* Bar Chart */}
+                                <BarChart
+                                    data={{
+                                        labels: chartData.labels || [],
+                                        datasets: [
+                                            {
+                                                data: chartData.durations || [],
+                                            },
+                                        ],
+                                    }}
+                                    width={Dimensions.get('window').width * 0.9} // from react-native
+                                    height={220}
+                                    chartConfig={{
+                                        backgroundColor: '#000',
+                                        backgroundGradientFrom: '#000',
+                                        backgroundGradientTo: '#3e3e3e',
+                                        decimalPlaces: 0,
+                                        color: (opacity = 1) => `rgba(253, 203, 18, ${opacity})`,
+                                        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                        style: {
+                                            borderRadius: 16,
+                                        },
+                                        propsForDots: {
+                                            r: '6',
+                                            strokeWidth: '2',
+                                            stroke: '#FDCB12',
+                                        },
+                                    }}
+                                    style={styles.chart}
+                                />
+
+                                <TextOrbitronBold style={styles.userNameText}>
+                                    Your history, <TextOrbitronBold style={styles.highlight}>{userName}</TextOrbitronBold>
+                                </TextOrbitronBold>
+
+                                {loading ? (
+                                    <ActivityIndicator size="large" color="#E3B75B" />
+                                ) : (
+                                    workingTimes.map((item) => (
+                                        <View key={item.id} style={styles.workingTimeItem}>
+                                            <TextOrbitronBold style={styles.workingTimeDateText}>
+                                                {formatDateTime(item.start)}
+                                            </TextOrbitronBold>
+                                            <TextOrbitron style={styles.workingTimeGroupText}>Groupe A</TextOrbitron>
+                                            <TextOrbitron style={styles.workingTimeHourText}>
+                                                {formatTime(item.start)} - {formatTime(item.end)}
+                                            </TextOrbitron>
+                                            <TextOrbitron style={styles.workingTimeHourText}>
+                                                {item.total_time ? `${(item.total_time / 60).toFixed(2)} heures` : 'Non disponible'}
+                                            </TextOrbitron>
+                                        </View>
+                                    ))
+                                )}
+                            </View>
+                        </>
+                    }
                 </LinearGradient>
             </ScrollView>
         </ImageBackground>
@@ -183,6 +199,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         paddingBottom: 100,
+        minHeight: Dimensions.get('window').height,
     },
     overlay: {
         flex: 1,
