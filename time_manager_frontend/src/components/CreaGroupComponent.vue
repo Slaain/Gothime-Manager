@@ -21,10 +21,21 @@
       <div v-if="showGroupModal" class="mt-4">
         <label class="block text-sm font-bold mt-2">Group Name</label>
         <input v-model="newGroup.name" type="text" class="w-full p-2 border border-gray-300 rounded bg-gray-600 text-white" />
+
         <label class="block text-sm font-bold mt-2">Start Date and Time</label>
         <input v-model="newGroup.start_date" type="datetime-local" class="w-full p-2 border border-gray-300 rounded bg-gray-600 text-white" />
+
         <label class="block text-sm font-bold mt-2">End Date and Time</label>
         <input v-model="newGroup.end_date" type="datetime-local" class="w-full p-2 border border-gray-300 rounded bg-gray-600 text-white" />
+
+        <!-- Sélection d'une organisation -->
+        <label class="block text-sm font-bold mt-2">Select Organisation</label>
+        <select v-model="selectedOrganisationId" class="w-full p-2 border border-gray-300 rounded bg-gray-600 text-white">
+          <option v-for="organisation in organisations" :key="organisation.id" :value="organisation.id">
+            {{ organisation.name }}
+          </option>
+        </select>
+
         <div class="flex justify-end gap-4 mt-4">
           <button @click="createGroup" class="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500">Create</button>
           <button @click="closeGroupModal" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Cancel</button>
@@ -35,6 +46,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -44,7 +57,12 @@ export default {
         start_date: "",
         end_date: "",
       },
+      organisations: [], // Liste des organisations
+      selectedOrganisationId: null, // ID de l'organisation sélectionnée
     };
+  },
+  mounted() {
+    this.fetchOrganisations(); // Charger les organisations au montage
   },
   methods: {
     openGroupModal() {
@@ -53,9 +71,32 @@ export default {
     closeGroupModal() {
       this.showGroupModal = false;
     },
-    createGroup() {
-      // Logique de création de groupe (à implémenter)
-      this.closeGroupModal();
+    // Récupérer les organisations depuis l'API
+    async fetchOrganisations() {
+      try {
+        const response = await axios.get("http://localhost:4000/api/organisations");
+        this.organisations = response.data.data;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des organisations", error);
+      }
+    },
+    // Créer le groupe avec une organisation
+    async createGroup() {
+      try {
+        const response = await axios.post("http://localhost:4000/api/groups", {
+          group: {
+            name: this.newGroup.name,
+            start_date: this.newGroup.start_date,
+            end_date: this.newGroup.end_date
+          },
+          organisation_id: this.selectedOrganisationId, // Lien avec l'organisation
+        });
+
+        console.log("Groupe créé avec succès", response.data);
+        this.closeGroupModal();
+      } catch (error) {
+        console.error("Erreur lors de la création du groupe", error);
+      }
     },
   },
 };
