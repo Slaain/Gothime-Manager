@@ -189,4 +189,28 @@ defmodule TimeManagerApiWeb.OrganisationController do
         end
     end
   end
+
+  def remove_user(conn, %{"organisation_id" => organisation_id, "user_id" => user_id}) do
+    case Repo.get_by(UserRoleOrganisation, user_id: user_id, organisation_id: organisation_id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User not found in this organisation"})
+
+      user_role_organisation ->
+        case Repo.delete(user_role_organisation) do
+          {:ok, _} ->
+            conn
+            |> put_status(:ok)
+            |> json(%{message: "User successfully removed from organisation"})
+
+          {:error, changeset} ->
+            errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, _opts} -> msg end)
+
+            conn
+            |> put_status(:unprocessable_entity)
+            |> json(%{error: "Failed to remove user from organisation", reasons: errors})
+        end
+    end
+  end
 end

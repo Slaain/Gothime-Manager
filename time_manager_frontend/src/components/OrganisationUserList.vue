@@ -3,10 +3,31 @@
     <div class="bg-white rounded-lg p-6 w-2/3">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Organisation's Users</h2>
-        <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
+        
+        <!-- Bouton + et fermeture -->
+        <div class="flex items-center space-x-2">
+          <!-- Bouton + qui se transforme en Add -->
+          <button @click="toggleAddUser" class="relative flex items-center space-x-1 p-2 transition-all duration-300 ease-in-out">
+            <span v-if="!showEmailInput">+</span>
+          </button>
+
+          <!-- Bouton de fermeture -->
+          <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
+        </div>      
+      </div>  
+
+      <!-- Barre de recherche qui apparaît avec animation -->
+      <div class="relative flex items-center overflow-hidden transition-all duration-500 ease-in-out" :style="showEmailInput ? 'max-width: 300px;' : 'max-width: 0px;'">
+        <input
+          v-show="showEmailInput"
+          v-model="searchEmail"
+          placeholder="Enter email to add user"
+          class="border rounded-lg p-2 w-[250px] transition-all duration-500 ease-in-out"
+        />
+        <button v-if="showEmailInput" @click="addUser" class="ml-2 bg-blue-500 text-white p-2 rounded-lg">Add</button>
       </div>
 
-      <table class="w-full table-auto">
+      <table class="w-full table-auto mt-4">
         <thead>
           <tr class="bg-gray-200">
             <th class="p-2">Member Name</th>
@@ -42,7 +63,7 @@
               <button class="text-blue-600 hover:underline">Edit</button>
             </td>
             <td class="p-2">
-              <button class="text-red-600 hover:underline">Delete</button>
+              <button @click="deleteUser(user.id)" class="text-red-600 hover:underline">Delete</button>
             </td>
           </tr>
         </tbody>
@@ -69,6 +90,8 @@ export default {
   data() {
     return {
       users: [],
+      showEmailInput: false, // Contrôle la visibilité du champ d'email
+      searchEmail: "", // Stocke l'email à rechercher
     };
   },
   mounted() {
@@ -81,6 +104,16 @@ export default {
     },
   },
   methods: {
+    async addUser(){
+      try{
+        const response = await axios.post(`http://localhost:4000/api/organisations/${this.organisationId}/users`);
+      } catch (error){
+        console.error("Error on add an user to this organisation", error);
+      }
+    },
+    toggleAddUser() {
+      this.showEmailInput = !this.showEmailInput;
+    },
     async fetchUsers() {
       try {
         const response = await axios.get(`http://localhost:4000/api/organisations/${this.organisationId}/users`);
@@ -98,9 +131,7 @@ export default {
       }
 
       try {
-        await axios.put(`http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}`, {
-          role_id: user.role_id,
-        });
+        await axios.put(`http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`);
         this.showSuccessToast("Role mis à jour avec succès !");
       } catch (error) {
         console.error("Erreur lors de la mise à jour du rôle:", error);
@@ -128,6 +159,18 @@ export default {
     showErrorToast(message = "An error occurred") {
       this.toast.error(message);
     },
+
+
+    async deleteUser(userId) {
+      try {
+        await axios.delete(`http://localhost:4000/api/organisations/${this.organisationId}/users/${userId}`);
+        this.showSuccessToast("Utilisateur supprimé avec succès !");
+        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
+      } catch (error) {
+        console.error("Erreur lors de la suppression de l'utilisateur:", error);
+        this.showErrorToast("Échec de la suppression de l'utilisateur.");
+      }
+    },
   },
 };
 </script>
@@ -135,11 +178,6 @@ export default {
 <style scoped>
 .modal {
   z-index: 9999;
-}
-
-.table-auto {
-  width: 100%;
-  border-collapse: collapse;
 }
 
 table {

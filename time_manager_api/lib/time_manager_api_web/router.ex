@@ -97,6 +97,9 @@ defmodule TimeManagerApiWeb.Router do
     delete "/:id", OrganisationController, :delete
     put "/:id", OrganisationController, :update
     put "/:organisation_id/users/:user_id/:role_id", OrganisationController, :update_user_role
+    delete "/:organisation_id/users/:user_id", OrganisationController, :remove_user
+
+
 
   end
 
@@ -108,6 +111,7 @@ defmodule TimeManagerApiWeb.Router do
   post "/register", AuthController, :register  # Route pour l'inscription
   post "/login", AuthController, :login        # Route pour la connexion
   post "/decrypt_token", AuthController, :decrypt_token  # Route pour décrypter le token
+
 
 
 end

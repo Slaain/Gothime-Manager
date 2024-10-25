@@ -12,4 +12,7 @@ export default {
   getGroupsByOrganisation(organisationId) {
     return axios.get(`http://localhost:4000/api/organisations/${organisationId}`);
   },
+  deleteUser(organisationId, userId) {
+    return axios.delete(`${API_URL}/organisations/${organisationId}/users/${userId}`);
+  },
 };
