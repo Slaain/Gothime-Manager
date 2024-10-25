@@ -44,7 +44,7 @@ defmodule TimeManagerApiWeb.AuthController do
         changeset = %TimeManagerApi.UserRoleOrganisation{}
                     |> TimeManagerApi.UserRoleOrganisation.changeset(%{
                         user_id: user.id,
-                        organisation_ids: [organisation_id],  # Assurez-vous que c'est un tableau
+                        organisation_id: organisation_id,
                         role_id: role_id
                       })
 

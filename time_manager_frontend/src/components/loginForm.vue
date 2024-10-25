@@ -85,10 +85,19 @@ export default {
           password: form.value.password,
         });
 
-        const response = await axios.post("http://localhost:4000/api/login", {
-          email: form.value.email,
-          password: form.value.password,
-        });
+        const response = await axios.post(
+          "http://localhost:4000/api/login",
+          {
+            email: form.value.email,
+            password: form.value.password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
 
         console.log("response : ", response.data.token);
 

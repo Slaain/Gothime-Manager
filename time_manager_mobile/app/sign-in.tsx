@@ -87,56 +87,56 @@ export default function HomeScreen() {
             style={styles.backgroundImage}
             resizeMode="cover"
         >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <LinearGradient
-                colors={['#000000', '#1c1c1c', '#3e3e3e']}
-                style={styles.backgroundContainer}
-            >
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <LinearGradient
+                    colors={['#000000', '#1c1c1c', '#3e3e3e']}
                     style={styles.backgroundContainer}
                 >
-                    <View style={styles.titleContainer}>
-                        <TextOrbitronBold style={styles.titleText}>Gotham Needs You</TextOrbitronBold>
-                        <TextOrbitron style={styles.subtitleText}>
-                            Join Gotham's pulse. Log in to track your hours and schedule, and be a key part of the city's heartbeat.
-                        </TextOrbitron>
-                    </View>
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={styles.backgroundContainer}
+                    >
+                        <View style={styles.titleContainer}>
+                            <TextOrbitronBold style={styles.titleText}>Gotham Needs You</TextOrbitronBold>
+                            <TextOrbitron style={styles.subtitleText}>
+                                Join Gotham's pulse. Log in to track your hours and schedule, and be a key part of the city's heartbeat.
+                            </TextOrbitron>
+                        </View>
 
-                    <Image
-                        source={require('../assets/images/logo.png')}
-                        style={styles.logo}
-                        resizeMode="contain"
-                    />
+                        <Image
+                            source={require('../assets/images/logo.png')}
+                            style={styles.logo}
+                            resizeMode="contain"
+                        />
 
-                    <View style={styles.formContainer}>
-                        <TextInput
-                            placeholder="Email"
-                            value={emailInput}
-                            onChangeText={setEmailInput}
-                            style={styles.input}
-                            placeholderTextColor="#F3F3F3"
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                        <TextInput
-                            placeholder="Password"
-                            value={password}
-                            onChangeText={setPassword}
-                            style={styles.input}
-                            placeholderTextColor="#F3F3F3"
-                            secureTextEntry
-                        />
-                        <TouchableOpacity style={styles.signInButton} onPress={handleLogin}>
-                            <TextOrbitron style={styles.buttonText}>Sign In</TextOrbitron>
-                        </TouchableOpacity>
-                        <TextOrbitron style={styles.forgetPasswordText}>
-                            Forget Password?
-                        </TextOrbitron>
-                    </View>
-                </KeyboardAvoidingView>
-            </LinearGradient>
-        </TouchableWithoutFeedback>
+                        <View style={styles.formContainer}>
+                            <TextInput
+                                placeholder="Email"
+                                value={emailInput}
+                                onChangeText={setEmailInput}
+                                style={styles.input}
+                                placeholderTextColor="#F3F3F3"
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                            />
+                            <TextInput
+                                placeholder="Password"
+                                value={password}
+                                onChangeText={setPassword}
+                                style={styles.input}
+                                placeholderTextColor="#F3F3F3"
+                                secureTextEntry
+                            />
+                            <TouchableOpacity style={styles.signInButton} onPress={handleLogin}>
+                                <TextOrbitron style={styles.buttonText}>Sign In</TextOrbitron>
+                            </TouchableOpacity>
+                            <TextOrbitron style={styles.forgetPasswordText}>
+                                Forget Password?
+                            </TextOrbitron>
+                        </View>
+                    </KeyboardAvoidingView>
+                </LinearGradient>
+            </TouchableWithoutFeedback>
         </ImageBackground>
     );
 }

@@ -1,21 +1,33 @@
 <template>
-  <div class="organisation-card glassmorphism-bg-white p-6 shadow-md rounded-xl">
-    <div class="header flex justify-between items-center mb-4">
+  <div
+    class="p-6 shadow-md organisation-card glassmorphism-bg-white rounded-xl"
+  >
+    <div class="flex items-center justify-between mb-4 header">
       <h2 class="text-xl font-semibold text-white">{{ organisation.name }}</h2>
-      <button @click="modifyOrganisation" class="btn btn-primary">Modifier</button>
+      <button @click="modifyOrganisation" class="btn btn-primary">
+        Modifier
+      </button>
     </div>
 
-    <div class="groups-container overflow-y-auto mb-4">
+    <div class="mb-4 overflow-y-auto groups-container">
       <h3 class="font-medium text-white">List Groups:</h3>
       <ul>
-        <li v-for="group in groups" :key="group.id" class="flex justify-between items-center mb-2 text-white">
+        <li
+          v-for="group in groups"
+          :key="group.id"
+          class="flex items-center justify-between mb-2 text-white"
+        >
           {{ group.groupname }}
-          <button @click="viewGroup(group)" class="btn btn-secondary ml-4">Voir</button>
+          <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
+            Voir
+          </button>
         </li>
       </ul>
     </div>
 
-    <button @click="viewUsers" class="btn btn-secondary mt-2">Voir Users</button>
+    <button @click="viewUsers" class="mt-2 btn btn-secondary">
+      Voir Users
+    </button>
   </div>
 </template>
 
@@ -44,7 +56,13 @@ export default {
     async fetchGroups() {
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/organisations/${this.organisation.id}`
+          `http://localhost:4000/api/organisations/${this.organisation.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.groups = response.data.data.groups;
       } catch (error) {
@@ -57,8 +75,7 @@ export default {
     viewUsers() {
       console.log("Voir Users pour l'organisation :", this.organisation.id);
       this.$emit("view-users", this.organisation.id); // Émettre l'événement pour ouvrir la modale
-    }
-
+    },
   },
 };
 </script>
@@ -68,7 +85,7 @@ export default {
 <style scoped>
 /* Taille fixe de la carte */
 .organisation-card {
-  width: 300px;  /* Largeur fixe */
+  width: 300px; /* Largeur fixe */
   height: 400px; /* Hauteur fixe */
   display: flex;
   flex-direction: column;

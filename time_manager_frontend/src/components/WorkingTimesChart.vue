@@ -126,7 +126,13 @@ export default {
       try {
         const userID = 1;
         const response = await axios.get(
-          `http://localhost:4000/api/workingtimes/${userID}`
+          `http://localhost:4000/api/workingtimes/${userID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.workingTimes = response.data.data;
         this.loading = false;

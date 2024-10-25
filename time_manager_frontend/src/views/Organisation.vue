@@ -1,8 +1,8 @@
 <template>
-  <div class="organisation-page flex min-h-screen bg-custom-background">
+  <div class="flex min-h-screen organisation-page bg-custom-background">
     <Sidebar />
-    <div class="content flex-1 p-6">
-      <h1 class="text-3xl font-bold mb-6 text-yellow-400">Organisations</h1>
+    <div class="flex-1 p-6 content">
+      <h1 class="mb-6 text-3xl font-bold text-yellow-400">Organisations</h1>
       <OrganisationList
         :organisations="organisations"
         @modify-organisation="handleModifyOrganisation"
@@ -21,10 +21,10 @@
 </template>
 
 <script>
-import Sidebar from '../components/Sidebar.vue';
-import OrganisationList from '../components/OrganisationList.vue';
-import UserModal from '../components/OrganisationUserList.vue'; // Import de la modale UserModal
-import axios from 'axios';
+import Sidebar from "../components/Sidebar.vue";
+import OrganisationList from "../components/OrganisationList.vue";
+import UserModal from "../components/OrganisationUserList.vue"; // Import de la modale UserModal
+import axios from "axios";
 
 export default {
   components: {
@@ -43,10 +43,21 @@ export default {
     // Récupération des organisations
     async fetchOrganisations() {
       try {
-        const response = await axios.get('http://localhost:4000/api/organisations');
+        const response = await axios.get(
+          "http://localhost:4000/api/organisations",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
         this.organisations = response.data.data; // Récupère les données des organisations
       } catch (error) {
-        console.error("Erreur lors de la récupération des organisations:", error);
+        console.error(
+          "Erreur lors de la récupération des organisations:",
+          error
+        );
       }
     },
 
@@ -62,7 +73,10 @@ export default {
 
     // Gestion de l'affichage des utilisateurs d'une organisation
     handleViewUsers(organisationId) {
-      console.log("Voir les utilisateurs de l'organisatioooon :", organisationId);
+      console.log(
+        "Voir les utilisateurs de l'organisatioooon :",
+        organisationId
+      );
       this.selectedOrganisationId = organisationId;
       this.showUserModal = true; // Affiche la modale pour afficher les utilisateurs
     },
@@ -75,7 +89,7 @@ export default {
 
   mounted() {
     this.fetchOrganisations(); // Charger les organisations au montage du composant
-  }
+  },
 };
 </script>
 

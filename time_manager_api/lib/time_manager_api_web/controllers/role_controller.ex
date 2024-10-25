@@ -7,7 +7,6 @@ defmodule TimeManagerApiWeb.RoleController do
   alias TimeManagerApi.Clock
   alias TimeManagerApi.WorkingTime
   alias TimeManagerApi.ClockService
-  alias TimeManagerApi.WorkingTimeService
   alias TimeManagerApi.RoleService
 
 

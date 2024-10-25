@@ -1,9 +1,16 @@
 <template>
-  <div class="modal fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg p-6 w-2/3">
-      <div class="flex justify-between items-center mb-4">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 modal"
+  >
+    <div class="w-2/3 p-6 bg-white rounded-lg">
+      <div class="flex items-center justify-between mb-4">
         <h2 class="text-2xl font-bold">Organisation's Users</h2>
-        <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
+        <button
+          @click="$emit('close-modal')"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          X
+        </button>
       </div>
 
       <table class="w-full table-auto">
@@ -25,7 +32,12 @@
               <!-- Afficher "Admin" en lecture seule si le rôle est Admin -->
               <div v-if="user.role_id === 1">Admin</div>
               <!-- Sinon, afficher le select pour Manager et Employee -->
-              <select v-else v-model="user.role_id" @change="updateUserRole(user)" class="w-[120px]">
+              <select
+                v-else
+                v-model="user.role_id"
+                @change="updateUserRole(user)"
+                class="w-[120px]"
+              >
                 <option value="2">Manager</option>
                 <option value="3">Employee</option>
               </select>
@@ -34,7 +46,11 @@
             <!-- Toggle button for Clock In/Out -->
             <td class="p-2">
               <label class="switch">
-                <input type="checkbox" v-model="user.clock.status" @change="handleClockToggle(user)">
+                <input
+                  type="checkbox"
+                  v-model="user.clock.status"
+                  @change="handleClockToggle(user)"
+                />
                 <span class="slider round"></span>
               </label>
             </td>
@@ -83,24 +99,46 @@ export default {
   methods: {
     async fetchUsers() {
       try {
-        const response = await axios.get(`http://localhost:4000/api/organisations/${this.organisationId}/users`);
+        const response = await axios.get(
+          `http://localhost:4000/api/organisations/${this.organisationId}/users`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
         this.users = response.data.users; // Assign the fetched users to the component data
       } catch (error) {
-        console.error("Erreur lors de la récupération des utilisateurs:", error);
+        console.error(
+          "Erreur lors de la récupération des utilisateurs:",
+          error
+        );
       }
     },
 
     // Méthode pour gérer le changement de rôle
     async updateUserRole(user) {
       if (user.role_id === 1) {
-        this.showErrorToast("Le rôle d'un administrateur ne peut pas être modifié.");
+        this.showErrorToast(
+          "Le rôle d'un administrateur ne peut pas être modifié."
+        );
         return;
       }
 
       try {
-        await axios.put(`http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}`, {
-          role_id: user.role_id,
-        });
+        await axios.put(
+          `http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}`,
+          {
+            role_id: user.role_id,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
         this.showSuccessToast("Role mis à jour avec succès !");
       } catch (error) {
         console.error("Erreur lors de la mise à jour du rôle:", error);
@@ -110,13 +148,25 @@ export default {
 
     async handleClockToggle(user) {
       try {
-        await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
-          status: user.clock.status ? "clock_in" : "clock_out",
-        });
+        await axios.post(
+          `http://localhost:4000/api/clocks/${user.id}`,
+          {
+            status: user.clock.status ? "clock_in" : "clock_out",
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
         this.fetchUsers();
         this.showSuccessToast("Clock action successful!");
       } catch (error) {
-        console.error("Erreur lors de la mise à jour du statut de la clock:", error);
+        console.error(
+          "Erreur lors de la mise à jour du statut de la clock:",
+          error
+        );
         this.showErrorToast("Failed to toggle clock.");
       }
     },
