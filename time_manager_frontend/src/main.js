@@ -10,5 +10,3 @@ createApp(App)
   .use(router) // Utilisation du routeur dans l'application Vue
   .use(Toast)
   .mount('#app');
-
-
