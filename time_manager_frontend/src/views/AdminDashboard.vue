@@ -118,6 +118,8 @@ export default {
     };
   },
   mounted() {
+    console.log("Dashboard mounted : ", localStorage.getItem("authToken"));
+
     this.getCurrentUsers();
     this.getWorkingTimesThisMonth(); // Appel de la méthode pour récupérer le count lors du montage du composant
     document.addEventListener("click", this.handleClickOutside);
@@ -153,7 +155,13 @@ export default {
     async getWorkingTimesThisMonth() {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/workingtimes/count"
+          "http://localhost:4000/api/workingtimes/count",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.monthlyUsers = response.data.users_count; // Assigner le nombre retourné par l'API
         this.workingTimesThisMonth = response.data.working_times_count;
@@ -167,9 +175,15 @@ export default {
     async getCurrentUsers() {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/clocks/countactive"
+          "http://localhost:4000/api/clocks/countactive",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
-        
+
         this.currentUsers = response.data.count;
       } catch (error) {
         console.error(

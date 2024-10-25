@@ -85,13 +85,13 @@
       </div>
       <button
         @click="updateWorkingTime"
-        class="w-full px-4 py-2 mt-4 text-black bg-primaryYellow rounded-md hover:bg-primaryYellow400"
+        class="w-full px-4 py-2 mt-4 text-black rounded-md bg-primaryYellow hover:bg-primaryYellow400"
       >
         Update
       </button>
       <button
         @click="closeUpdateWorkingtimeModal"
-        class="w-full px-4 py-2 mt-2 text-black border border-primaryYellow rounded-md hover:bg-neutral-100"
+        class="w-full px-4 py-2 mt-2 text-black border rounded-md border-primaryYellow hover:bg-neutral-100"
       >
         Cancel
       </button>
@@ -108,13 +108,13 @@
       <p>Are you sure you want to delete this working time?</p>
       <button
         @click="deleteWorkingTime"
-        class="w-full py-2 mt-4 text-black transition-all bg-primaryYellow rounded-lg hover:bg-primaryYellow400"
+        class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
       >
         Delete
       </button>
       <button
         @click="closeDeleteWorkingtimeModal"
-        class="w-full py-2 mt-2 text-black transition-all border border-primaryYellow rounded-lg hover:bg-neutral-100"
+        class="w-full py-2 mt-2 text-black transition-all border rounded-lg border-primaryYellow hover:bg-neutral-100"
       >
         Cancel
       </button>
@@ -202,7 +202,13 @@ export default {
       console.log("allo : ", this.userID);
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/workingtimes/${this.userID}`
+          `http://localhost:4000/api/workingtimes/${this.userID}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.workingTimes = response.data.data;
         console.log("aled : ", this.workingTimes);
