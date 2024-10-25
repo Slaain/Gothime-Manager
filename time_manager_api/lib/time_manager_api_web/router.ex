@@ -105,6 +105,7 @@ defmodule TimeManagerApiWeb.Router do
     delete "/:id", GroupController, :delete
     put "/:id", GroupController, :update
     post "/", GroupController, :create    # Créer un groupe
+
       # Routes pour gérer les utilisateurs dans les groupes
   post "/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
   delete "/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
@@ -113,10 +114,6 @@ defmodule TimeManagerApiWeb.Router do
 
 
 
-
-      # Routes pour gérer les utilisateurs dans les groupes
-    post "/groups/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
-    delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
 
   # routes pour les organisations
   scope "/organisations" do
@@ -132,6 +129,7 @@ defmodule TimeManagerApiWeb.Router do
     put "/:id", OrganisationController, :update
     put "/:organisation_id/users/:user_id/:role_id", OrganisationController, :update_user_role
     delete "/:organisation_id/users/:user_id", OrganisationController, :remove_user
+    post "/:organisation_id/users", RoleController, :add_user_to_organisation
   end
 
   scope "/roles" do

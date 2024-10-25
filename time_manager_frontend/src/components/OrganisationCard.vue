@@ -4,16 +4,41 @@
     <div
       class="p-6 shadow-md organisation-card glassmorphism-bg-white rounded-xl"
     >
-      <div class="flex items-center justify-between mb-4 header">
-        <h2 class="text-xl font-semibold text-white">
+      <div class="flex items-center justify-between mb-4 header" @click.stop>
+        <!-- Affichage du nom de l'organisation ou champ d'édition -->
+        <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
           {{ organisation.name }}
         </h2>
-        <button @click="modifyOrganisation" class="btn btn-primary">
-          Modifier
-        </button>
+        <div v-if="isEditing" class="flex items-center">
+          <input
+            v-model="organisationName"
+            @keyup.enter="saveOrganisationName"
+            @blur="toggleEdit"
+            class="text-xl font-semibold input-field"
+            type="text"
+          />
+          <!-- Bouton de coche pour sauvegarder -->
+          <button @click="saveOrganisationName" class="ml-2 btn-save">
+            <i class="fas fa-check"></i>
+          </button>
+        </div>
+        <!-- Regrouper les boutons d'édition et de suppression ensemble à droite -->
+        <div class="flex action-buttons">
+          <button @click="toggleEdit" class="btn-edit" v-if="!isEditing">
+            <i class="fas fa-pencil-alt"></i>
+            <!-- Icône de stylo -->
+          </button>
+          <button
+            @click="deleteOrganisation"
+            class="btn-delete"
+            v-if="!isEditing"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
       </div>
 
-      <!-- Ajout du bouton "Add Group" au milieu de la carte -->
+      <!-- Bouton "Add Group" au centre -->
       <div class="flex justify-center mb-4">
         <button @click="openCreateGroupModal" class="btn btn-primary">
           Add Group
@@ -42,7 +67,7 @@
       </button>
     </div>
 
-    <!-- Détails du groupe sélectionné et gestion des utilisateurs -->
+    <!-- Modale pour détails du groupe et gestion des utilisateurs -->
     <div
       v-if="showGroupModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
@@ -118,7 +143,7 @@
       </div>
     </div>
 
-    <!-- Modale pour créer un groupe avec le composant CreaGroupComponent en dehors de la carte -->
+    <!-- Modale pour créer un groupe avec CreaGroupComponent -->
     <div
       v-if="showCreateGroupModal"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
@@ -132,7 +157,6 @@
         >
           X
         </button>
-        <!-- Appel du composant CreaGroupComponent -->
         <CreaGroupComponent
           @group-created="handleGroupCreated"
           @close="closeCreateGroupModal"
@@ -151,8 +175,6 @@
         <h3 class="mb-4 text-lg font-semibold text-yellow-400">
           Add User to Group
         </h3>
-
-        <!-- Select pour afficher tous les utilisateurs disponibles -->
         <select
           v-model="selectedUser"
           class="w-full p-2 mb-4 text-black border rounded"
@@ -161,7 +183,6 @@
             {{ user.username }} ({{ user.email }})
           </option>
         </select>
-
         <div class="flex justify-end gap-4 mt-4">
           <button
             @click="addUserToGroup"
@@ -184,6 +205,7 @@
 <script>
 import axios from "axios";
 import CreaGroupComponent from "../components/CreaGroupComponent.vue";
+import { useToast } from "vue-toastification";
 
 export default {
   props: {
@@ -191,6 +213,10 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  setup() {
+    const toast = useToast(); // Utiliser le toast via setup
+    return { toast };
   },
   components: {
     CreaGroupComponent,
@@ -206,6 +232,8 @@ export default {
       showGroupModal: false,
       showUserModal: false,
       selectedUser: null,
+      isEditing: false,
+      organisationName: this.organisation.name, // Initialise avec le nom actuel de l'organisation
     };
   },
   mounted() {
@@ -216,17 +244,53 @@ export default {
     modifyOrganisation() {
       this.$emit("modify-organisation", this.organisation.id);
     },
-    async fetchGroups() {
+    async saveOrganisationName() {
       try {
-        const response = await axios.get(
-          `http://localhost:4000/api/organisations/${this.organisation.id}`
+        await axios.put(
+          `http://localhost:4000/api/organisations/${this.organisation.id}`,
+          {
+            organisation: { name: this.organisationName },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
-        console.log("Groups:", response.data.data.groups);
 
-        this.groups = response.data.data.groups;
+        // Affiche un toast de succès après la mise à jour
+        this.toast.success("Organisation's name updated successfully!");
+
+        this.$emit("organisation-updated");
+
+        this.isEditing = false; // Revenir à l'affichage normal après la sauvegarde
       } catch (error) {
-        console.error("Erreur lors de la récupération des groupes:", error);
+        // Affiche un toast d'erreur en cas de problème
+        this.toast.error("Error updating the organisation's name.");
+        console.error(
+          "Erreur lors de la mise à jour du nom de l'organisation:",
+          error
+        );
       }
+    },
+    toggleEdit() {
+      if (!this.isEditing) {
+        this.isEditing = true; // Activer le mode édition
+      }
+    },
+    cancelEdit() {
+      if (this.isEditing) {
+        this.isEditing = false; // Désactiver le mode édition
+        this.organisationName = this.organisation.name; // Réinitialiser le nom si non sauvegardé
+      }
+    },
+    deleteOrganisation() {
+      if (confirm("Are you sure you want to delete this organisation?")) {
+        this.$emit("delete-organisation", this.organisation.id);
+      }
+    },
+    viewUsers() {
+      this.$emit("view-users", this.organisation.id);
     },
     formatDate(date) {
       const options = {
@@ -239,6 +303,16 @@ export default {
       return new Date(date)
         .toLocaleDateString("fr-FR", options)
         .replace(",", "");
+    },
+    async fetchGroups() {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/organisations/${this.organisation.id}`
+        );
+        this.groups = response.data.data.groups;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des groupes:", error);
+      }
     },
     async fetchAllUsers() {
       try {
@@ -258,15 +332,7 @@ export default {
         const response = await axios.get(
           `http://localhost:4000/api/groups/${group.id}`
         );
-
-        // Mettre à jour selectedGroup avec les données de l'API
-        this.selectedGroup = {
-          ...group,
-          groupname: response.data.data.name,
-          start_date: response.data.data.start_date,
-          end_date: response.data.data.end_date,
-        };
-
+        this.selectedGroup = { ...group, ...response.data.data };
         this.selectedGroupUsers = response.data.data.users || [];
         this.selectedGroupWorkingTimes = response.data.data.workingtimes || [];
         this.showGroupModal = true;
@@ -290,7 +356,6 @@ export default {
       this.showCreateGroupModal = false;
     },
     handleGroupCreated() {
-      // Relancer la requête pour obtenir la liste mise à jour des groupes après ajout
       this.fetchGroups();
       this.closeCreateGroupModal();
     },
@@ -312,7 +377,6 @@ export default {
           {},
           {
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
           }
@@ -329,7 +393,6 @@ export default {
           `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${userId}`,
           {
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
           }
@@ -345,22 +408,18 @@ export default {
       }
     },
     async deleteGroup() {
-      if (!this.selectedGroup) {
-        console.error("Aucun groupe sélectionné");
-        return;
-      }
+      if (!this.selectedGroup) return;
       try {
         await axios.delete(
           `http://localhost:4000/api/groups/${this.selectedGroup.id}`,
           {
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
           }
         );
         this.closeGroupModal();
-        this.fetchGroups(); // Mettre à jour la liste des groupes après suppression
+        this.fetchGroups();
       } catch (error) {
         console.error("Erreur lors de la suppression du groupe :", error);
       }
@@ -369,18 +428,45 @@ export default {
 };
 </script>
 
-
 <style scoped>
-/* Taille fixe de la carte */
 .organisation-card {
-  width: 300px; /* Largeur fixe */
-  height: 400px; /* Hauteur fixe */
+  width: 300px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.glassmorphism-bg-white {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+.groups-container {
+  overflow-y: auto;
+  max-height: 175px;
+}
+.btn {
+  padding: 0.5em 1em;
+  border-radius: 5px;
+}
+.btn-primary {
+  background-color: #fdcb12;
+  color: black;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+.organisation-card {
+  width: 320px; /* Agrandir un peu la carte */
+  height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* Glassmorphism pour correspondre au design global */
 .glassmorphism-bg-white {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
@@ -392,33 +478,58 @@ export default {
   color: white;
 }
 
-.glassmorphism-bg-white::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  padding: 2px;
-  border-radius: 10px;
-  background: linear-gradient(
-    to bottom right,
-    #ffffff,
-    rgba(255, 255, 255, 0.2),
-    #fdcb12
-  );
-  opacity: 0.3;
-  pointer-events: none;
-}
-
 .header h2 {
   color: #fdcb12;
+}
+
+/* Bouton d'édition avec icône */
+.btn-edit {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fdcb12;
+  margin-left: 10px; /* Espace entre le nom et l'icône */
+}
+
+.btn-edit:hover {
+  color: #f5b900;
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fd2d12;
+  margin-left: 10px;
+}
+
+/* Bouton de coche pour sauvegarder */
+.btn-save {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #00ff00;
+}
+
+.btn-save:hover {
+  color: #00cc00;
+}
+
+/* Champ d'édition plus petit et adapté à la carte */
+.input-field {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #fdcb12;
+  color: #fdcb12;
+  padding: 0.2em;
+  border-radius: 4px;
+  outline: none;
+  width: 180px; /* Agrandir légèrement */
 }
 
 /* Liste des groupes avec une scrollbar stylisée */
 .groups-container {
   overflow-y: auto;
-  max-height: 175px; /* Hauteur maximale de la liste des groupes */
+  max-height: 175px;
   flex-grow: 1;
   margin-bottom: 10px;
 }
@@ -428,15 +539,14 @@ export default {
 }
 
 .groups-container::-webkit-scrollbar-thumb {
-  background-color: #000; /* Couleur noire pour la scrollbar */
-  border-radius: 10px; /* Bordure arrondie pour la scrollbar */
+  background-color: #000;
+  border-radius: 10px;
 }
 
 .groups-container::-webkit-scrollbar-track {
-  background: transparent; /* Couleur transparente pour l'arrière-plan de la scrollbar */
+  background: transparent;
 }
 
-/* Styles des boutons */
 .btn {
   padding: 0.5em 1em;
   border-radius: 5px;
@@ -459,27 +569,5 @@ export default {
 
 .btn-secondary:hover {
   background-color: #5a6268;
-}
-
-/* Styles pour la modale */
-.modal-content {
-  background-color: #282828; /* Fond plus clair pour plus de contraste */
-  padding: 30px; /* Plus de padding pour un espace plus aéré */
-  border-radius: 15px; /* Bordure plus arrondie */
-  width: 100%; /* Taille large */
-  max-width: 768px; /* Limite maximale de largeur */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Renforcer l'ombre */
-  position: relative;
-}
-
-.close-button {
-  background-color: #fbbf24; /* Couleur jaune */
-  color: black;
-  padding: 5px 15px;
-  border-radius: 5px;
-  font-weight: bold;
-}
-m .close-button:hover {
-  background-color: #f59e0b; /* Couleur jaune plus foncée */
 }
 </style>

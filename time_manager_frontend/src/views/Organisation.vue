@@ -2,12 +2,25 @@
   <div class="flex min-h-screen organisation-page bg-custom-background">
     <Sidebar />
     <div class="flex-1 p-6 content">
-      <h1 class="mb-6 text-3xl font-bold text-yellow-400">Organisations</h1>
+      <div class="mb-6 header">
+        <h1 class="text-3xl font-bold text-yellow-400">Organisations</h1>
+      </div>
+
+      <!-- Bouton pour créer une nouvelle organisation, maintenant en dessous du titre -->
+      <div class="mb-6 create-button-container">
+        <button
+          @click="showCreateModal = true"
+          class="btn btn-create-organisation"
+        >
+          Create Organisation
+        </button>
+      </div>
       <OrganisationList
         :organisations="organisations"
-        @modify-organisation="handleModifyOrganisation"
+        @organisation-updated="fetchOrganisations"
         @view-group="handleViewGroup"
         @view-users="handleViewUsers"
+        @delete-organisation="handleDeleteOrganisation"
       />
 
       <!-- Détails du groupe sélectionné -->
@@ -52,6 +65,19 @@
         @close-modal="handleCloseUserModal"
       />
     </div>
+    <!-- Modale pour afficher les utilisateurs -->
+    <UserModal
+      v-if="showUserModal"
+      :organisation-id="selectedOrganisationId"
+      @close-modal="handleCloseUserModal"
+    />
+
+    <!-- Modale pour créer une nouvelle organisation -->
+    <CreateOrganisationModal
+      v-if="showCreateModal"
+      @close-modal="handleCloseCreateModal"
+      @organisation-created="fetchOrganisations"
+    />
   </div>
 </template>
 
@@ -60,23 +86,45 @@ import Sidebar from "../components/Sidebar.vue";
 import OrganisationList from "../components/OrganisationList.vue";
 import UserModal from "../components/OrganisationUserList.vue"; // Import de la modale UserModal
 import axios from "axios";
+import CreateOrganisationModal from "../components/CreateOrganisationModal.vue"; // Import de la modale
 
 export default {
   components: {
     Sidebar,
     OrganisationList,
     UserModal,
+    CreateOrganisationModal,
   },
   data() {
     return {
       organisations: [],
-      selectedOrganisationId: null,
       selectedGroup: null, // Stocker le groupe sélectionné
       selectedGroupUsers: [], // Stocker les utilisateurs du groupe sélectionné
       showUserModal: false, // Variable pour contrôler l'affichage de la modale des utilisateurs
+      selectedOrganisationId: null, // ID de l'organisation sélectionnée pour voir les utilisateurs
+      showCreateModal: false, // Variable pour contrôler l'affichage de la modale de création d'organisation
     };
   },
   methods: {
+    async handleDeleteOrganisation(organisationId) {
+      try {
+        await axios.delete(
+          `http://localhost:4000/api/organisations/${organisationId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        this.fetchOrganisations(); // Recharge la liste après la suppression
+      } catch (error) {
+        console.error(
+          "Erreur lors de la suppression de l'organisation:",
+          error
+        );
+      }
+    },
     // Récupération des organisations
     async fetchOrganisations() {
       try {
@@ -98,6 +146,9 @@ export default {
       }
     },
 
+    handleCloseCreateModal() {
+      this.showCreateModal = false;
+    },
     // Gestion de l'affichage d'un groupe
     async handleViewGroup(groupId) {
       try {
@@ -173,6 +224,23 @@ export default {
 </script>
 
 <style scoped>
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-create-organisation {
+  background-color: #fdcb12;
+  color: black;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn-create-organisation:hover {
+  background-color: #f5b900;
+}
 /* Style du fond similaire à ton tableau de bord */
 .organisation-page {
   display: flex;

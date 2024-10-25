@@ -26,4 +26,21 @@ defmodule TimeManagerApi.RoleService do
     # Exécuter la requête et récupérer le nom du rôle
     Repo.one(user_role_query)
   end
+
+
+  # Vérifier si l'utilisateur est déjà dans l'organisation
+  def user_in_organisation?(user_id, organisation_id) do
+    query = from(our in UserRoleOrganisation,
+      where: our.user_id == ^user_id and our.organisation_id == ^organisation_id
+    )
+
+    Repo.exists?(query)
+  end
+
+  # Ajouter un utilisateur à une organisation
+  def add_user_to_organisation(user_id, organisation_id, role_id) do
+    %UserRoleOrganisation{}
+    |> UserRoleOrganisation.changeset(%{user_id: user_id, organisation_id: organisation_id, role_id: role_id})
+    |> Repo.insert()
+  end
 end

@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <!-- Barre de recherche qui apparaît avec animation -->
+      <!-- Barre de recherche pour ajouter un utilisateur avec l'email -->
       <div
         class="relative flex items-center overflow-hidden transition-all duration-500 ease-in-out"
         :style="showEmailInput ? 'max-width: 300px;' : 'max-width: 0px;'"
@@ -39,7 +39,7 @@
         />
         <button
           v-if="showEmailInput"
-          @click="addUser"
+          @click="addUserToOrganisation"
           class="p-2 ml-2 text-white bg-blue-500 rounded-lg"
         >
           Add
@@ -124,7 +124,7 @@ export default {
     return {
       users: [],
       showEmailInput: false, // Contrôle la visibilité du champ d'email
-      searchEmail: "", // Stocke l'email à rechercher
+      searchEmail: "", // Stocke l'email saisi
     };
   },
   mounted() {
@@ -137,15 +137,34 @@ export default {
     },
   },
   methods: {
-    async addUser() {
+    // Ajouter un utilisateur sélectionné à l'organisation
+    async addUserToOrganisation() {
       try {
+        // Requête pour ajouter un utilisateur via son email
         const response = await axios.post(
-          `http://localhost:4000/api/organisations/${this.organisationId}/users`
+          `http://localhost:4000/api/organisations/${this.organisationId}/users`,
+          {
+            email: this.searchEmail,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json", // Assure que le contenu est envoyé comme JSON
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Assure que l'utilisateur est authentifié
+            },
+          }
         );
+
+        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
+        this.showSuccessToast("Utilisateur ajouté avec succès !");
       } catch (error) {
-        console.error("Error on add an user to this organisation", error);
+        console.error(
+          "Erreur lors de l'ajout de l'utilisateur à l'organisation:",
+          error
+        );
+        this.showErrorToast(error.response.data.error);
       }
     },
+
     toggleAddUser() {
       this.showEmailInput = !this.showEmailInput;
     },
@@ -180,13 +199,7 @@ export default {
 
       try {
         await axios.put(
-          `http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
+          `http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`
         );
         this.showSuccessToast("Role mis à jour avec succès !");
       } catch (error) {
