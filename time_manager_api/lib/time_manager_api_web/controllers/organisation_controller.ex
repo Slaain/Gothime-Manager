@@ -35,10 +35,20 @@ defmodule TimeManagerApiWeb.OrganisationController do
     end
   end
 
+  #récupérer les détails d'une organisation, y compris les groupes et les utilisateurs qui ont travaillé dans chaque groupe
+  def show_with_users(conn, %{"id" => organisation_id}) do
+    organisation = Repo.get!(Organisation, organisation_id)|> Repo.preload(groups: :users)
+    # Précharger les groupes et leurs utilisateurs
+    render(conn, "show_with_users.json", organisation: organisation)
+  end
+
+
   # Ajouter un groupe dans une organisation
   def add_group(conn, %{"organisation_id" => organisation_id, "group_id" => group_id}) do
-    group = Repo.get!(Group, group_id)
-    organisation = Repo.get!(Organisation, organisation_id)
+
+  # Rechercher le groupe et l'organisation
+  group = Repo.get!(Group, group_id)
+  organisation = Repo.get!(Organisation, organisation_id)
 
     now = NaiveDateTime.utc_now()
 

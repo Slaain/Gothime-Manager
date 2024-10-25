@@ -171,4 +171,12 @@ defmodule TimeManagerApiWeb.ClockController do
     json(conn, %{count: active_users_count})
   end
 
+  def countactive_by_organisation(conn, %{"organisation_id" => organisation_id}) do
+    user_ids = ClockService.get_user_ids_by_organisation(organisation_id)
+    active_users_count = ClockService.count_active_clocks_for_users(user_ids)
+    json(conn, %{count: active_users_count})
+  end
+
+
+
 end

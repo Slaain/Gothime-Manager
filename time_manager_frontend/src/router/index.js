@@ -10,9 +10,16 @@ const routes = [
 
   },
   {
-    path: '/manager',
+    path: '/manager/:organisationId',
     name: 'ManagerDashboard',
-    component: () => import("@/views/ManagerDashboard.vue")
+    component: () => import("@/views/ManagerDashboard.vue"),
+    props: true,
+  },
+  {
+    path: '/manager/:organisationId/groups',
+    name: 'GroupsPage',
+    component: () => import("http://localhost:4000/api/organisations/1e"),
+    props: true,
   },
   {
     path: '/manager/qrcode',

@@ -36,6 +36,9 @@ defmodule TimeManagerApiWeb.Router do
       get "/monthly/:userID", WorkingTimeController, :get_workingtimes_monthly
       get "/count", WorkingTimeController, :count
       get "/", WorkingTimeController, :index
+      get "/by_organisation/:organisation_id", WorkingTimeController, :by_organisation
+      get "/count_by_organisation/:organisation_id", WorkingTimeController, :count_by_organisation
+
       get "/:userID", WorkingTimeController, :indexA
       get "/:userID/:id", WorkingTimeController, :show
 
@@ -54,6 +57,7 @@ defmodule TimeManagerApiWeb.Router do
       post "/:userID", WorkingTimeController, :create
       put "/:id", WorkingTimeController, :update
       delete "/:id", WorkingTimeController, :delete
+
     end
 
     # Scope pour les tests
@@ -83,6 +87,8 @@ defmodule TimeManagerApiWeb.Router do
     scope "/clocks" do
       post "/:organization_id/:user_id", ClockController, :beep
       get "/countactive", ClockController, :countactive
+      get "/countactive_by_organisation/:organisation_id", ClockController, :countactive_by_organisation
+
     end
 
 
@@ -108,6 +114,9 @@ defmodule TimeManagerApiWeb.Router do
 
 
 
+      # Routes pour gérer les utilisateurs dans les groupes
+    post "/groups/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
+    delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
 
   # routes pour les organisations
   scope "/organisations" do
@@ -136,5 +145,8 @@ defmodule TimeManagerApiWeb.Router do
   end
   post "/login", AuthController, :login        # Route pour la connexion
   post "/decrypt_token", AuthController, :decrypt_token  # Route pour décrypter le token
-end
+
+
+
+  end
 end

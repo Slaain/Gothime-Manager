@@ -17,6 +17,7 @@ const tailwindConfig = {
   variants: {
     extend: {},
   },
+  darkMode: 'media',
   plugins: [],
 };
 

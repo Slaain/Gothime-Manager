@@ -134,4 +134,7 @@ defmodule TimeManagerApi.WorkingTimeService do
       |> Repo.aggregate(:count, :user_id)
     end
 
+
+
+
 end

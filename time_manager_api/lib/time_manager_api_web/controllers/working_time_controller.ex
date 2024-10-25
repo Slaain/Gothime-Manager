@@ -278,4 +278,39 @@ end
   end
 
 
+  # GET : /api/workingtimes/by_organisation/:organisation_id
+  def by_organisation(conn, %{"organisation_id" => organisation_id}) do
+    import Ecto.Query
+    working_times =
+      from(wt in TimeManagerApi.WorkingTime,
+        join: u in TimeManagerApi.User, on: wt.user_id == u.id,
+        join: uro in TimeManagerApi.UserRoleOrganisation, on: u.id == uro.user_id,
+        where: uro.organisation_id == ^organisation_id,
+        select: %{working_time: wt, user_name: u.username, user_email: u.email}
+      )
+      |> TimeManagerApi.Repo.all()
+
+    json(conn, working_times)
+  end
+
+  # GET : /api/workingtimes/count_by_organisation/:organisation_id
+def count_by_organisation(conn, %{"organisation_id" => organisation_id}) do
+  import Ecto.Query
+
+  # Compter le nombre total de working_times pour l'organisation spécifiée
+  working_times_count =
+    from(wt in TimeManagerApi.WorkingTime,
+      join: u in TimeManagerApi.User, on: wt.user_id == u.id,
+      join: uro in TimeManagerApi.UserRoleOrganisation, on: u.id == uro.user_id,
+      where: uro.organisation_id == ^organisation_id,
+      select: count(wt.id)
+    )
+    |> TimeManagerApi.Repo.one() || 0  # Récupère le total ou 0 si aucun résultat
+
+  conn
+  |> put_status(:ok)
+  |> json(%{working_times_count: working_times_count})
+end
+
+
 end

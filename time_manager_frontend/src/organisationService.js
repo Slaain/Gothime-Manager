@@ -33,6 +33,12 @@ export default {
     );
   },
   deleteUser(organisationId, userId) {
-    return axios.delete(`${API_URL}/organisations/${organisationId}/users/${userId}`);
+    return axios.delete(`${API_URL}/organisations/${organisationId}/users/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    );
   },
 };

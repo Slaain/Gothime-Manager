@@ -160,5 +160,21 @@ defmodule TimeManagerApi.ClockService do
     |> Repo.one()
   end
 
+  def get_user_ids_by_organisation(organisation_id) do
+    from(u in TimeManagerApi.User,
+      join: uro in TimeManagerApi.UserRoleOrganisation,
+      where: uro.organisation_id == ^organisation_id,
+      select: u.id
+    )
+    |> Repo.all()
+  end
+
+  # Compter les clocks actives pour les utilisateurs donnés
+  def count_active_clocks_for_users(user_ids) do
+    from(c in Clock,
+      where: c.user_id in ^user_ids and c.status == true  # Vérifiez si la clock est active
+    )
+    |> Repo.aggregate(:count, :id)
+  end
 
 end
