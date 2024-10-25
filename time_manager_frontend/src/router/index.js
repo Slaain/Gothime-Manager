@@ -6,7 +6,7 @@ const routes = [
     path: '/admin',
     name: 'AdminDashboard',
     component: () => import("@/views/AdminDashboard.vue"),
-    // meta: { requiresAdmin: true }, // Ajout d'une meta donnée pour vérifier le rôle admin
+    meta: { requiresAdmin: true }, // Ajout d'une meta donnée pour vérifier le rôle admin
 
   },
   {
