@@ -3,7 +3,7 @@ defmodule TimeManagerApiWeb.GroupController do
   import Ecto.Query  # Importer Ecto.Query pour utiliser `from/2`
 
 
-  alias TimeManagerApi.{Repo, Group, User, GroupUser}
+  alias TimeManagerApi.{Repo, Group, User, GroupUser, Organisation,}
 
 
   # Liste des groupes
@@ -11,7 +11,7 @@ defmodule TimeManagerApiWeb.GroupController do
     groups = Repo.all(Group) |> Repo.preload(:users) # charge les utilisateurs associés
     render(conn, "index.json", groups: groups)
   end
-  # Créer un groupe
+   # créer un groupe et l'afficher
   def create(conn, %{"group" => group_params, "organisation_id" => organisation_id}) do
     changeset = Group.changeset(%Group{}, group_params)
 
@@ -21,11 +21,11 @@ defmodule TimeManagerApiWeb.GroupController do
         now = NaiveDateTime.utc_now()
 
         case Repo.insert_all("organisation_groups", [%{organisation_id: organisation_id, group_id: group.id, inserted_at: now, updated_at: now}]) do
-          {1, } ->
+          {1, _} ->
             conn
             |> put_status(:created)
             |> json(%{group: %{id: group.id, name: group.name, start_date: group.start_date, end_date: group.end_date}})
-           _->
+          _ ->
             conn
             |> put_status(:unprocessable_entity)
             |> json(%{message: "Error associating group with organisation"})
@@ -37,6 +37,8 @@ defmodule TimeManagerApiWeb.GroupController do
         |> json(%{errors: Ecto.Changeset.traverse_errors(changeset, &(&1))})
     end
   end
+
+
 
   # Afficher un groupe spécifique
   def show(conn, %{"id" => id}) do

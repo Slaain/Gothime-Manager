@@ -8,6 +8,9 @@ defmodule TimeManagerApi.Group do
     field :start_date, :naive_datetime
     field :end_date, :naive_datetime
 
+    # Relation many-to-many avec les organisations via organisation_groups
+    many_to_many :organisations, TimeManagerApi.Organisation, join_through: "organisation_groups"
+
     many_to_many :users, TimeManagerApi.User, join_through: "groups_users", on_replace: :delete # Ajout de l'option on_replace ici
     timestamps(type: :utc_datetime)
   end
