@@ -177,9 +177,14 @@
         </h3>
         <select
           v-model="selectedUser"
-          class="w-full p-2 mb-4 text-black border rounded"
+          class="w-full p-2 mb-4 text-white border rounded"
         >
-          <option v-for="user in allUsers" :key="user.id" :value="user.id">
+          <option
+            class="text-black"
+            v-for="user in allUsers"
+            :key="user.id"
+            :value="user.id"
+          >
             {{ user.username }} ({{ user.email }})
           </option>
         </select>

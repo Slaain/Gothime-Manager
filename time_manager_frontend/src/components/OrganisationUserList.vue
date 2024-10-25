@@ -199,7 +199,14 @@ export default {
 
       try {
         await axios.put(
-          `http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`
+          `http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.showSuccessToast("Role mis à jour avec succès !");
       } catch (error) {
