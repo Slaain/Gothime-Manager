@@ -26,16 +26,15 @@
                 <button @click="viewGroup(group)" class="btn btn-secondary ml-4">Voir</button>
               </li>
             </ul>
-          </div> <!--div groups-container-->
+          </div>
 
           <button @click="viewUsers" class="btn btn-secondary mt-2">Voir Les employés</button>
           <button @click="handleModifyOrganisation(organisation.id)" class="btn">Modifier</button>
-        </div><!--div oraganisation-card-->
-        <!-- Main Content -->
-    
+        </div>
+
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
-          <LineChart />
+          <LineChartManager :organizationId="'1'"/>
         </section>
 
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
@@ -47,35 +46,48 @@
           </div>
         </section>
       </main>
-    </div><!--div dashboard-->
-    
+    </div>
+
     <UserModal
       v-if="showUserModal"
       :organisation-id="selectedOrganisationId"
       @close-modal="handleCloseUserModal"
     />
-  </div><!--div bat-container-->
+  </div>
 </template>
 
 <script>
 import axios from 'axios';
+import LineChartManager from '../components/LineChartManager.vue';
+import UserModal from '../components/OrganisationUserList.vue'; 
+import BarChart from "@/components/WorkingTimesChart.vue";
+import UserList from '../components/UserList.vue';
 import LineChart from '../components/LineChart.vue';
-import UserModal from '../components/OrganisationUserList.vue'; // Import de la modale UserModal
+import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
+import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 
 export default {
   components: {
     LineChart,
+    BarChart,
     UserModal,
+    UserList,
+    WorkingTimeUserContainer,
+    CreaGroupComponent,
   },
   props: {
     organisationId: {
       type: String,
       required: true,
-    }
+    },
   },
   data() {
     return {
       organisation: null,
+      currentUsers: 0,
+
+      showUserModal: false,
+      workingTimes: [],
       showUserModal: false,
       groups: [],
       chartsData: [
@@ -96,20 +108,47 @@ export default {
         console.error("Erreur lors de la récupération de l'organisation:", error);
       }
     },
+    
     async fetchChartData() {
-      try {
-        const [usersResponse, timesResponse] = await Promise.all([
-          axios.get('http://localhost:4000/api/clocks/countactive'),
-           axios.get('http://localhost:4000/api/workingtimes/count'),
-        ]);
-  
-        this.chartsData[0].value = timesResponse.data.users_count;
-        this.chartsData[1].value = usersResponse.data.count;
-        this.chartsData[2].value = timesResponse.data.working_times_count;
-      } catch (error) {
-        console.error("Erreur lors de la récupération des données", error);
-      }
+  try {
+    const [usersResponse, timesResponse] = await Promise.all([
+      axios.get(`http://localhost:4000/api/clocks/countactive_by_organisation/${this.organisationId}`),
+      axios.get(`http://localhost:4000/api/workingtimes/count_by_organisation/${this.organisationId}`)
+    ]);
+
+    console.log("Users Response:", usersResponse.data);
+    console.log("Times Response:", timesResponse.data);
+
+    this.chartsData[0].value = timesResponse.data.users_count || 0;
+    this.chartsData[1].value = usersResponse.data.count || 0;
+    this.chartsData[2].value = timesResponse.data.working_times_count || 0;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données", error);
+  }
+},
+
+ // Récupérer et filtrer les working times en fonction de l'organisation
+ async fetchWorkingTimesByOrganisation() {
+  try {
+    const response = await axios.get(`http://localhost:4000/api/workingtimes/by_organisation/${this.organisationId}`);
+    this.workingTimes = response.data;
+    this.updateCharts(); // Ajouter cette ligne
+  } catch (error) {
+    console.error("Erreur lors de la récupération des working times:", error);
+  }
+} ,
+    updateCharts() {
+      const usersWorkedThisMonth = this.workingTimes.length;
+      const usersCurrentlyWorking = this.workingTimes.filter(time => !time.end).length;
+      const workingTimesThisMonth = this.workingTimes.length;
+
+      this.chartsData = [
+        { id: 1, title: 'Users Worked This Month', value: usersWorkedThisMonth },
+        { id: 2, title: 'Users Currently Working', value: usersCurrentlyWorking },
+        { id: 3, title: 'Working Times This Month', value: workingTimesThisMonth },
+      ];
     },
+
     viewGroup(group) {
       this.$emit("view-group", group.id);
     },
@@ -127,9 +166,11 @@ export default {
   mounted() {
     this.fetchOrganisation();
     this.fetchChartData();
+    this.fetchWorkingTimesByOrganisation();
   },
 };
 </script>
+
 
 <style scoped>
   .bat-container {
@@ -376,4 +417,3 @@ export default {
     transition: all 0.3s ease;
   }
 </style>
-

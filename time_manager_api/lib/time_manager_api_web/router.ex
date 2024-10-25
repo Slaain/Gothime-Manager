@@ -14,17 +14,22 @@ defmodule TimeManagerApiWeb.Router do
     scope "/workingtimes" do
       get "/count", WorkingTimeController, :count
       get "/", WorkingTimeController, :index
+      get "/by_organisation/:organisation_id", WorkingTimeController, :by_organisation
+      get "/count_by_organisation/:organisation_id", WorkingTimeController, :count_by_organisation
+
       get "/:userID", WorkingTimeController, :indexA
       get "/:userID/:id", WorkingTimeController, :show
+
     end
 
     # Scope pour les workingtimes avec des routes personnalisées pour les utilisateurs
     scope "/workingtime" do
-      get "/:userID", WorkingTimeController, :index
-      get "/:userID/:id", WorkingTimeController, :show
+     # get "/:userID", WorkingTimeController, :index
+      #get "/:userID/:id", WorkingTimeController, :show
       post "/:userID", WorkingTimeController, :create
       put "/:id", WorkingTimeController, :update
       delete "/:id", WorkingTimeController, :delete
+
     end
 
     # Scope pour les tests
@@ -43,6 +48,8 @@ defmodule TimeManagerApiWeb.Router do
     scope "/clocks" do
       post "/:user_id", ClockController, :beep
       get "/countactive", ClockController, :countactive
+      get "/countactive_by_organisation/:organisation_id", ClockController, :countactive_by_organisation
+
     end
 
     # Route pour les requêtes OPTIONS (utilisées pour le CORS)
