@@ -1,7 +1,10 @@
 defmodule TimeManagerApiWeb.GroupController do
   use TimeManagerApiWeb, :controller
+  import Ecto.Query  # Importer Ecto.Query pour utiliser `from/2`
+
 
   alias TimeManagerApi.{Repo, Group, User, GroupUser}
+
 
   # Liste des groupes
   def index(conn, _params) do
@@ -31,6 +34,28 @@ defmodule TimeManagerApiWeb.GroupController do
   def show(conn, %{"id" => id}) do
     group = Repo.get!(Group, id) |> Repo.preload(:users)
     render(conn, "show.json", group: group)
+  end
+
+  def get_group_by_user(conn, %{"user_id" => user_id}) do
+    query =
+      from gu in TimeManagerApi.GroupUser,
+        join: g in TimeManagerApi.Group,
+        on: gu.group_id == g.id,
+        where: gu.user_id == ^user_id,
+        select: g
+
+    groups = Repo.all(query)
+
+    case groups do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{message: "No groups found for this user"})
+      groups ->
+        conn
+        |> put_status(:ok)
+        |> json(%{groups: groups})
+    end
   end
 
   # Ajouter un utilisateur à un groupe

@@ -1,52 +1,50 @@
-# priv/repo/seeds.exs
-
 alias TimeManagerApi.Repo
-alias TimeManagerApi.User
-alias TimeManagerApi.Clock
-alias TimeManagerApi.WorkingTime
-alias TimeManagerApi.Task
-alias TimeManagerApi.Group
-alias TimeManagerApi.Role
-alias TimeManagerApi.UserRoleOrganisation
+alias TimeManagerApi.{User, Clock, WorkingTime, Group, Role, Organisation, UserRoleOrganisation}
 import Ecto.Query
+import Bcrypt
 
-# Ensure Faker is started
 Faker.start()
 
-# Create users
-for _ <- 1..100 do
-  user = %User{
+# Create organisations
+for org_name <- ["Organisation A", "Organisation B", "Organisation C"] do
+  organisation = %Organisation{name: org_name}
+  Repo.insert!(organisation)
+end
+
+# Create users, clocks, and working times with encrypted passwords
+for _ <- 1..10 do
+  IO.inspect(Bcrypt.hash_pwd_salt("test"))
+  user_attrs = %{
     username: Faker.Internet.user_name(),
     email: Faker.Internet.email(),
-    password_hash: Faker.String.base64()
+    password: Bcrypt.hash_pwd_salt("test")  # Set the password as "test" and hash it
   }
 
-  Repo.insert!(user)
+  changeset = User.changeset(%User{}, user_attrs)
+  user = Repo.insert!(changeset)
 
-  # Create clocks for the user
+  # Create clocks for each user
   for _ <- 1..5 do
     clock = %Clock{
-      time: Faker.DateTime.backward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second),  # Remove microseconds
+      time: Faker.DateTime.backward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second),
       status: Enum.random([true, false]),
       user_id: user.id
     }
-
     Repo.insert!(clock)
   end
 
-  # Create workingtimes for the user
+  # Create working times for each user
   for _ <- 1..5 do
-    start_time = Faker.DateTime.backward(30) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)  # Remove microseconds
-    end_time = Faker.DateTime.forward(1) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)  # Remove microseconds
+    start_time = Faker.DateTime.backward(30) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
+    end_time = Faker.DateTime.forward(1) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
 
-    workingtime = %WorkingTime{
+    working_time = %WorkingTime{
       start: start_time,
       end: end_time,
       user_id: user.id,
       total_time: NaiveDateTime.diff(end_time, start_time)
     }
-
-    Repo.insert!(workingtime)
+    Repo.insert!(working_time)
   end
 end
 
@@ -54,34 +52,33 @@ end
 for _ <- 1..5 do
   group = %Group{
     name: Faker.Team.name(),
-    start_date: Faker.DateTime.backward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second),  # Remove microseconds
-    end_date: Faker.DateTime.forward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)  # Remove microseconds
+    start_date: Faker.DateTime.backward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second),
+    end_date: Faker.DateTime.forward(365) |> DateTime.to_naive() |> NaiveDateTime.truncate(:second)
   }
-
   Repo.insert!(group)
 end
 
 # Create roles
-for role_name <- ["admin", "manager", "user"] do
-  role = %Role{
-    name: role_name
-  }
-
+for role_name <- ["admin", "manager", "employee"] do
+  role = %Role{name: role_name}
   Repo.insert!(role)
 end
 
-# Assign users to groups and roles
+# Assign users to organisations and roles
 for user <- Repo.all(User) do
-  group = Repo.one!(from g in Group, order_by: fragment("RANDOM()"), limit: 1)
+  organisation = Repo.one!(from o in Organisation, order_by: fragment("RANDOM()"), limit: 1)
   role = Repo.one!(from r in Role, order_by: fragment("RANDOM()"), limit: 1)
 
-  user_role_org = %UserRoleOrganisation{
-    user_id: user.id,
-    role_id: role.id,
-    organisation_ids: [group.id]
-  }
+  existing_user_role = Repo.get_by(UserRoleOrganisation, user_id: user.id, role_id: role.id, organisation_id: organisation.id)
 
-  Repo.insert!(user_role_org)
+  unless existing_user_role do
+    IO.inspect("Adding user #{user.id} to organisation #{organisation.id} with role #{role.id}")
+
+    user_role_org = %UserRoleOrganisation{
+      user_id: user.id,
+      role_id: role.id,
+      organisation_id: organisation.id
+    }
+    Repo.insert!(user_role_org)
+  end
 end
-
-IO.puts("100 users seeded successfully!")

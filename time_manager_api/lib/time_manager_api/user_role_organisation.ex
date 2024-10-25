@@ -7,13 +7,15 @@ defmodule TimeManagerApi.UserRoleOrganisation do
     belongs_to :organisation, TimeManagerApi.Organisation
     belongs_to :role, TimeManagerApi.Role
 
-    # Autres champs si nécessaire
     timestamps()
   end
 
   def changeset(user_role_organisation, attrs) do
     user_role_organisation
-    |> cast(attrs, [:user_id, :organisation_id, :role_id])
-    |> validate_required([:user_id, :organisation_id, :role_id])
+    |> cast(attrs, [:user_id, :role_id, :organisation_id])
+    |> validate_required([:user_id, :role_id, :organisation_id])
+    |> foreign_key_constraint(:organisation_id)
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:role_id)
   end
 end

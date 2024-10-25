@@ -5,7 +5,7 @@ defmodule TimeManagerApi.Role do
   schema "roles" do
     field :name, :string
 
-    has_many :user_role_organisations, TimeManagerApi.UserRoleOrganisation
+    has_many :user_role_organisation, TimeManagerApi.UserRoleOrganisation
 
     timestamps(type: :utc_datetime)
   end

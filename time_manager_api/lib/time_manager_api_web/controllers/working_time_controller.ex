@@ -190,6 +190,52 @@ defmodule TimeManagerApiWeb.WorkingTimeController do
       |> json(%{message: "The working time has been updated successfully", working_time: %{start: start_time, end: end_time, total_time: total_time}})
     end
 
+    # Récupérer les working times quotidiens des 7 derniers jours
+def get_workingtimes_daily(conn, %{"userID" => user_id}) do
+  user_id = String.to_integer(user_id)
+  working_times = WorkingTimeService.get_workingtimes_for_last_days(user_id, 7)
+
+  conn
+  |> put_status(:ok)
+  |> json(working_times)
+end
+
+# Récupérer les working times hebdomadaires des 4 dernières semaines
+def get_workingtimes_weekly(conn, %{"userID" => user_id}) do
+  user_id = String.to_integer(user_id)
+  working_times = WorkingTimeService.get_workingtimes_for_last_weeks(user_id, 4)
+
+  conn
+  |> put_status(:ok)
+  |> json(working_times)
+end
+
+# Récupérer les working times mensuels des 6 derniers mois
+def get_workingtimes_monthly(conn, %{"userID" => user_id}) do
+  user_id = String.to_integer(user_id)
+  working_times = WorkingTimeService.get_workingtimes_for_last_months(user_id, 6)
+
+  conn
+  |> put_status(:ok)
+  |> json(working_times)
+end
+
+
+    # GET /api/workingtime/today/:userID
+  def get_working_times_today(conn, %{"userID" => user_id}) do
+    IO.inspect(user_id, label: "User ID")
+    today = Date.utc_today()
+    # convert user id to int
+    user_id = String.to_integer(user_id)
+
+    working_times = WorkingTimeService.get_workingtimes_for_today(user_id)
+
+    conn
+    |> put_status(:ok)
+    |> json(working_times)
+
+  end
+
   # DELETE: /api/workingtime/:id
   def delete(conn, %{"id" => id}) do
     working_time = WorkingTimeService.get_working_time_by_id(id)

@@ -1,27 +1,57 @@
 <template>
   <div class="modal fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg p-6 w-1/2">
+    <div class="bg-white rounded-lg p-6 w-2/3">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Organisation's Users</h2>
-        <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
+        
+        <!-- Bouton + et fermeture -->
+        <div class="flex items-center space-x-2">
+          <!-- Bouton + qui se transforme en Add -->
+          <button @click="toggleAddUser" class="relative flex items-center space-x-1 p-2 transition-all duration-300 ease-in-out">
+            <span v-if="!showEmailInput">+</span>
+          </button>
+
+          <!-- Bouton de fermeture -->
+          <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
+        </div>      
+      </div>  
+
+      <!-- Barre de recherche qui apparaît avec animation -->
+      <div class="relative flex items-center overflow-hidden transition-all duration-500 ease-in-out" :style="showEmailInput ? 'max-width: 300px;' : 'max-width: 0px;'">
+        <input
+          v-show="showEmailInput"
+          v-model="searchEmail"
+          placeholder="Enter email to add user"
+          class="border rounded-lg p-2 w-[250px] transition-all duration-500 ease-in-out"
+        />
+        <button v-if="showEmailInput" @click="addUser" class="ml-2 bg-blue-500 text-white p-2 rounded-lg">Add</button>
       </div>
 
-      <table class="w-full table-auto">
+      <table class="w-full table-auto mt-4">
         <thead>
           <tr class="bg-gray-200">
             <th class="p-2">Member Name</th>
             <th class="p-2">Email</th>
             <th class="p-2">Role</th>
             <th class="p-2">Status</th>
-            <th class="p-2">Edit</th>
-            <th class="p-2">Delete</th>
+            <th class="p-2"></th>
+            <th class="p-2"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id" class="border-b">
+          <tr v-for="user in sortedUsers" :key="user.id" class="border-b">
             <td class="p-2">{{ user.username }}</td>
             <td class="p-2">{{ user.email }}</td>
-            <td class="p-2">User</td>
+            <td class="p-4 border-b border-slate-200">
+              <!-- Afficher "Admin" en lecture seule si le rôle est Admin -->
+              <div v-if="user.role_id === 1">Admin</div>
+              <!-- Sinon, afficher le select pour Manager et Employee -->
+              <select v-else v-model="user.role_id" @change="updateUserRole(user)" class="w-[120px]">
+                <option value="2">Manager</option>
+                <option value="3">Employee</option>
+              </select>
+            </td>
+
             <!-- Toggle button for Clock In/Out -->
             <td class="p-2">
               <label class="switch">
@@ -33,7 +63,7 @@
               <button class="text-blue-600 hover:underline">Edit</button>
             </td>
             <td class="p-2">
-              <button class="text-red-600 hover:underline">Delete</button>
+              <button @click="deleteUser(user.id)" class="text-red-600 hover:underline">Delete</button>
             </td>
           </tr>
         </tbody>
@@ -60,12 +90,30 @@ export default {
   data() {
     return {
       users: [],
+      showEmailInput: false, // Contrôle la visibilité du champ d'email
+      searchEmail: "", // Stocke l'email à rechercher
     };
   },
   mounted() {
     this.fetchUsers();
   },
+  computed: {
+    // Trier les utilisateurs : Admin (1), Manager (2), Employee (3)
+    sortedUsers() {
+      return this.users.slice().sort((a, b) => a.role_id - b.role_id);
+    },
+  },
   methods: {
+    async addUser(){
+      try{
+        const response = await axios.post(`http://localhost:4000/api/organisations/${this.organisationId}/users`);
+      } catch (error){
+        console.error("Error on add an user to this organisation", error);
+      }
+    },
+    toggleAddUser() {
+      this.showEmailInput = !this.showEmailInput;
+    },
     async fetchUsers() {
       try {
         const response = await axios.get(`http://localhost:4000/api/organisations/${this.organisationId}/users`);
@@ -75,45 +123,61 @@ export default {
       }
     },
 
-    // Méthode pour gérer le basculement de la clock
+    // Méthode pour gérer le changement de rôle
+    async updateUserRole(user) {
+      if (user.role_id === 1) {
+        this.showErrorToast("Le rôle d'un administrateur ne peut pas être modifié.");
+        return;
+      }
+
+      try {
+        await axios.put(`http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`);
+        this.showSuccessToast("Role mis à jour avec succès !");
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du rôle:", error);
+        this.showErrorToast("Échec de la mise à jour du rôle.");
+      }
+    },
+
     async handleClockToggle(user) {
       try {
-        // Envoie une requête POST pour effectuer un clock in ou clock out selon le statut actuel
         await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
-          status: user.clock.status ? 'clock_in' : 'clock_out'
+          status: user.clock.status ? "clock_in" : "clock_out",
         });
-        await this.fetchUsers();
+        this.fetchUsers();
         this.showSuccessToast("Clock action successful!");
-        console.log(`Le statut de la clock pour l'utilisateur ${user.username} a été mis à jour.`);
       } catch (error) {
         console.error("Erreur lors de la mise à jour du statut de la clock:", error);
         this.showErrorToast("Failed to toggle clock.");
-
       }
     },
 
     showSuccessToast(message = "Successful operation") {
       this.toast.success(message);
-      console.log("this.toast : ", this.toast);
     },
 
-    // params in english
     showErrorToast(message = "An error occurred") {
       this.toast.error(message);
+    },
+
+
+    async deleteUser(userId) {
+      try {
+        await axios.delete(`http://localhost:4000/api/organisations/${this.organisationId}/users/${userId}`);
+        this.showSuccessToast("Utilisateur supprimé avec succès !");
+        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
+      } catch (error) {
+        console.error("Erreur lors de la suppression de l'utilisateur:", error);
+        this.showErrorToast("Échec de la suppression de l'utilisateur.");
+      }
     },
   },
 };
 </script>
 
-
 <style scoped>
 .modal {
   z-index: 9999;
-}
-
-.table-auto {
-  width: 100%;
-  border-collapse: collapse;
 }
 
 table {
@@ -178,5 +242,4 @@ input:checked + .slider {
 input:checked + .slider:before {
   transform: translateX(14px);
 }
-
 </style>

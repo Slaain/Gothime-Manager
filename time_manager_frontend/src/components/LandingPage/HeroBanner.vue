@@ -15,7 +15,6 @@
     <div class="flex items-center justify-center mt-8 gap-x-6">
       <router-link
         class="px-6 py-3 text-black rounded-md bg-primaryYellow hover:bg-primaryYellow400"
-        to="/register"
       >
         Get Started
       </router-link>

@@ -9,6 +9,7 @@
     >
       <div class="w-1/2 px-8 py-4 bg-white">
         <p class="text-xl font-extrabold text-zinc-950">New User</p>
+        
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
           User's Name
           <p
@@ -19,7 +20,7 @@
         </label>
         <input
           v-model="newUser.username"
-          placeholder="Please enter your full name"
+          placeholder="Username"
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
         />
@@ -28,10 +29,80 @@
         >
         <input
           v-model="newUser.email"
-          placeholder="Please enter your email"
+          placeholder="Email"
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
         />
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
+          >Enter Password </label
+        >
+          <div class="flex items-center">
+            <input
+              v-model="newUser.password"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="Password"
+              class="flex-grow items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <button
+              @click="showPassword = !showPassword"
+              type="button"
+              class="ml-2 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+            >
+              {{ showPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+
+          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+            Confirm Password
+          </label>
+          <div class="flex items-center">
+            <input
+              v-model="newUser.confirmPassword"
+              :type="showPassword ? 'text' : 'password'"
+              placeholder="Confirm Password"
+              class="flex-grow items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+    <button
+      @click="showPassword = !showPassword"
+      type="button"
+      class="ml-2 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+    >
+      {{ showPassword ? 'Hide' : 'Show' }}
+    </button>
+  </div>
+        <button
+        @click="generateRandomPassword"
+        class="ml-2 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+      >
+        Generate random Password
+      </button>
+        
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          Select Organisation
+        </label>
+        <select
+          v-model="newUser.selectedOrganisation"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="" disabled>Select an organisation</option>
+          <option v-for="organisation in organisations_list" :key="organisation.id" :value="organisation.id">
+            {{ organisation.name }}
+          </option>
+        </select>
+
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+        Select Role
+        </label>
+        <select
+          v-model="newUser.selectedRole"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="" disabled>Select a role</option>
+          <option v-for="role in roles" :key="role.id" :value="role.id">
+            {{ role.name }}
+          </option>
+        </select>
+        
         <p class="h-6 text-red-600">{{ error }}</p>
         <button
           @click="createUser"
@@ -302,29 +373,54 @@ export default {
   name: "EmployeeList",
   data() {
     return {
+      organisations_list: [],
       employees: [],
       currentPage: 1,
       limit: 5,
       totalPages: 10,
       totalUsers: null,
-      showCreateUserModal: false, // Ajout de la variable pour le formulaire
+      showCreateUserModal: false,
       newUser: {
         username: "",
         email: "",
+        password: "",
+        confirmPassword: "",
+        selectedOrganisation: null,
+        selectedRole: null,
       },
+      
+      roles: [
+      { id: 1, name: "Admin" },
+      { id: 2, name: "Manager" },
+      { id: 3, name: "Employe" }
+    ],
       error: "",
+      showPassword: false,
       showCreateUserModal: false,
       showDeleteUserModal: false,
       showUpdateUserModal: false,
       selectedUserId: null,
       selectedUserEmail: "",
       selectedUserUsername: "",
+      selectedRole: null,
     };
   },
   methods: {
 
+
+    generateRandomPassword() {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+    let password = "";
+    for (let i = 0; i < 12; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    this.newUser.password = password;
+    this.newUser.confirmPassword = password; // Remplit aussi la confirmation de mot de passe
+  },
+
   // Handle the toggle switch when clock in/out is triggered
-    handleClockToggle(employee) {
+  handleClockToggle(employee) {
         // On fait un POST vers /api/clocks/:user_id
         this.toggleClock(employee.id);
       },
@@ -334,6 +430,7 @@ export default {
       userService
         .toggleClock(userID)
         .then((response) => {
+          this.getCurrentUsers();
           this.showSuccessToast("Clock action successful!");
           this.fetchEmployees(); // Rafraîchir la liste si nécessaire
         })
@@ -398,20 +495,25 @@ export default {
       this.toast.error(message);
     },
     createUser() {
+      if (this.newUser.password !== this.newUser.confirmPassword) {
+        this.error = "Passwords do not match";
+        console.log("Passwords do not match");
+        return;
+      }
       const userData = {
-        user: {
           username: this.newUser.username,
           email: this.newUser.email,
-        },
+          password: this.newUser.password,
+          organisation_id: this.newUser.selectedOrganisation,
+          role_id: this.newUser.selectedRole,
       };
-      console.log("this.$toast : ", this.$toast);
+      console.log("userData : ", userData);
 
-      if (userData.user.username === "" || userData.user.email === "") {
+      if (userData.username === "" || userData.email === "" || userData.password === "" || userData.organisation_id === "" || userData.role === "") {
         this.error = "Please fill in all fields.";
         return;
       }
 
-      console.log("Creating user:", userData);
 
       userService
         .createUser(userData)
@@ -438,7 +540,6 @@ export default {
           // this.toast.info(error.response.data.message)
           this.error = error.response.data.message;
 
-          // alert("Une erreur s'est produite lors de la création de l'utilisateur.");
         });
     },
     updateUser() {
@@ -451,7 +552,7 @@ export default {
 
       console.log("DATATATATA : ", userData);
 
-      if (userData.user.username === "" || userData.user.email === "") {
+      if (userData.username === "" || userData.email === "" || userData.password === "") {
         this.error = "Please fill in all fields.";
         return;
       }
@@ -464,8 +565,8 @@ export default {
           const updatedUser = this.employees.find(
             (user) => user.id === this.selectedUserId
           );
-          updatedUser.username = userData.user.username;
-          updatedUser.email = userData.user.email;
+          updatedUser.username = userData.username;
+          updatedUser.email = userData.email;
           this.newUser.username = "";
           this.newUser.email = "";
           this.error = "";
@@ -518,6 +619,20 @@ export default {
         });
     },
 
+
+    fetchOrganisations() {
+      console.log("Fetching organisations");
+      userService
+        .getOrganisations()
+        .then((data) => {
+          this.organisations_list = data.data;
+          console.log(data)
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération des organisations:", error);
+        });
+    },
+
     nextPage() {
       console.log("Next page");
       if (this.currentPage < this.totalPages) {
@@ -554,6 +669,8 @@ export default {
   },
   mounted() {
     this.fetchEmployees();
+    this.fetchOrganisations();
+    console.log("this.organisations_list : ", this.organisations_list);
   },
 };
 </script>

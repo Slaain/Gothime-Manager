@@ -14,8 +14,8 @@ defmodule TimeManagerApi.User do
     field :password_hash, :string
 
     has_one :clock, TimeManagerApi.Clock
-    has_many :user_role_organisations, TimeManagerApi.UserRoleOrganisation, on_delete: :delete_all
-    has_many :organisations, through: [:user_role_organisations, :organisation]
+    has_many :user_role_organisation, TimeManagerApi.UserRoleOrganisation, on_delete: :delete_all
+    has_many :organisations, through: [:user_role_organisation, :organisation]
 
 
     timestamps(type: :utc_datetime)

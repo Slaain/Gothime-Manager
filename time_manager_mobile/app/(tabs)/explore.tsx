@@ -1,102 +1,327 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text as DefaultText, View, ActivityIndicator, ImageBackground, Dimensions, ScrollView, Pressable, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import axios from 'axios';
+import { BarChart } from 'react-native-chart-kit';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import moment from 'moment';
+import Icon from 'react-native-vector-icons/Ionicons'; // Import Icon
+import { useSession } from "@/components/ctx";
+import { jwtDecode } from 'jwt-decode';
+// Custom Text component with Orbitron font
+const TextOrbitron = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Orbitron' }]} />;
+const TextOrbitronBold = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'OrbitronBold' }]} />;
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function GothamNeedsYouScreen() {
 
-export default function TabTwoScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-          to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
-  );
+    const { userName } = useLocalSearchParams();
+    const [workingTimes, setWorkingTimes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [chartData, setChartData] = useState([]);
+    const [viewMode, setViewMode] = useState('daily'); // Default to 'daily'
+    const router = useRouter(); // Utilisation de router pour redirection
+    const { session } = useSession();
+    const userId = jwtDecode(session).sub;
+    const [loadingChart, setLoadingChart] = useState(true);
+
+    const colors = {
+        primary: "#FDCB12"
+    }
+
+    const fetchDataForViewMode = async (mode) => {
+        let url = '';
+
+        switch (mode) {
+            case 'daily':
+                url = `http://10.79.216.9:4000/api/workingtimes/daily/${userId}`;
+                break;
+            case 'weekly':
+                url = `http://10.79.216.9:4000/api/workingtimes/weekly/${userId}`;
+                break;
+            case 'monthly':
+                url = `http://10.79.216.9:4000/api/workingtimes/monthly/${userId}`;
+                break;
+            default:
+                return;
+        }
+
+        try {
+            setLoadingChart(true);
+            setLoading(true);
+            const response = await axios.get(url);
+
+            console.log("response.data.data : ", response.data);
+
+            setWorkingTimes(response.data);
+            setLoadingChart(false);
+            setLoading(false);
+            processChartData(response.data, mode);
+        } catch (error) {
+            console.error(`Error fetching ${mode} working times:`, error.response?.data || error.message);
+            setLoadingChart(false);
+            setLoading(false);
+        }
+    };
+
+    // Fetch working times
+    const getWorkingTimes = async () => {
+        try {
+            if (!userId) {
+                console.error("Error: userId is undefined or null");
+                setLoading(false);
+                return;
+            }
+            const response = await axios.get(`http://10.79.216.9:4000/api/workingtimes/${userId}`);
+            setWorkingTimes(response.data.data);
+            setLoading(false);
+            processChartData(response.data.data, 'day'); // Process initial data
+        } catch (error) {
+            console.error('Error fetching working times:', error.response?.data || error.message);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchDataForViewMode(viewMode);
+    }, [viewMode]);
+
+    // Process chart data depending on view mode (day, week, month)
+    const processChartData = (data, mode) => {
+        let groupedData = {};
+        data.forEach(item => {
+            let dateKey;
+            switch (mode) {
+                case 'day':
+                    dateKey = moment(item.start).format('DD/MM');
+                    break;
+                case 'week':
+                    dateKey = moment(item.start).startOf('isoWeek').format('WW/YYYY');
+                    break;
+                case 'month':
+                    dateKey = moment(item.start).format('MM/YYYY');
+                    break;
+                default:
+                    dateKey = moment(item.start).format('DD/MM/YYYY');
+            }
+            if (!groupedData[dateKey]) {
+                groupedData[dateKey] = 0;
+            }
+            groupedData[dateKey] += item.total_time ? parseFloat(item.total_time) / 60 : 0; // Conversion en heures
+        });
+
+        const labels = Object.keys(groupedData);
+        const durations = Object.values(groupedData);
+        setChartData({ labels, durations });
+    };
+
+    // Format date and time
+    const formatDateTime = (dateTime) => moment(dateTime).format('DD/MM/YYYY');
+    const formatTime = (dateTime) => moment(dateTime).format('HH:mm');
+
+    // Redirection vers la page profil
+    const goToProfile = () => {
+        router.push({
+            pathname: '/profil',
+            params: { userId, userName },
+        });
+    };
+
+    return (
+        <ImageBackground
+            source={require('../../assets/images/batground.png')}
+            style={styles.backgroundImage}
+            resizeMode="cover"
+        >
+            {/* LinearGradient couvrant toute la zone défilante */}
+            <LinearGradient
+                colors={['#00000080', '#00000080', '#3e3e3e']}
+                style={styles.overlay}
+            >
+                <ScrollView
+                    contentContainerStyle={styles.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                    horizontal={false}  // Assurer que le ScrollView global soit seulement en vertical
+                    nestedScrollEnabled={true}  // Permet aux sous-ScrollView de fonctionner correctement
+                >
+                    {loading && <ActivityIndicator size="large" color="#FDCB12" />}
+                    {!loading &&
+                        <>
+
+                            <View style={styles.iconContainer} pointerEvents="box-none">
+                                <Pressable onPress={goToProfile}>
+                                    <Icon name="person-circle-outline" size={40} color="#FDCB12" />
+                                </Pressable>
+                            </View>
+
+                            <View style={styles.contentContainer}>
+                                {/* Buttons for Day/Week/Month */}
+                                <View style={styles.buttonContainer}>
+                                    <TouchableOpacity style={[viewMode === 'daily' ? { backgroundColor: colors.primary } : { backgroundColor: '#3e3e3e' }, styles.button]} onPress={() => setViewMode('daily')}>
+                                        <TextOrbitron style={[viewMode === 'daily' ? { color: "white" } : { color: colors.primary }, styles.buttonText]}>Day</TextOrbitron>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={[viewMode === 'weekly' ? { backgroundColor: colors.primary } : { backgroundColor: '#3e3e3e' }, styles.button]} onPress={() => setViewMode('weekly')}>
+                                        <TextOrbitron style={[viewMode === 'weekly' ? { color: "white" } : { color: colors.primary }, styles.buttonText]}>Week</TextOrbitron>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={[viewMode === 'monthly' ? { backgroundColor: colors.primary } : { backgroundColor: '#3e3e3e' }, styles.button]} onPress={() => setViewMode('monthly')}>
+                                        <TextOrbitron style={[viewMode === 'monthly' ? { color: "white" } : { color: colors.primary }, styles.buttonText]}>Month</TextOrbitron>
+                                    </TouchableOpacity>
+                                </View>
+
+                                <BarChart
+                                    data={{
+                                        labels: chartData.labels || [],
+                                        datasets: [
+                                            {
+                                                data: chartData.durations || [],
+                                            },
+                                        ],
+                                    }}
+                                    width={Dimensions.get('window').width * 0.9} // from react-native
+                                    height={220}
+                                    chartConfig={{
+                                        backgroundColor: '#000',
+                                        backgroundGradientFrom: '#000',
+                                        backgroundGradientTo: '#3e3e3e',
+                                        decimalPlaces: 0,
+                                        color: (opacity = 1) => `rgba(253, 203, 18, ${opacity})`,
+                                        labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                        style: {
+                                            borderRadius: 16,
+                                        },
+                                        propsForDots: {
+                                            r: '6',
+                                            strokeWidth: '2',
+                                            stroke: '#FDCB12',
+                                        },
+                                    }}
+                                    style={styles.chart}
+                                />
+
+                                <TextOrbitronBold style={styles.userNameText}>
+                                    Your history, <TextOrbitronBold style={styles.highlight}>{userName}</TextOrbitronBold>
+                                </TextOrbitronBold>
+
+                                {loading ? (
+                                    <ActivityIndicator size="large" color="#E3B75B" />
+                                ) : (
+                                    workingTimes
+                                        .sort((a, b) => new Date(a.start) - new Date(b.start))
+                                        .map((item) => (
+                                            <View key={item.id} style={styles.workingTimeItem}>
+                                                <TextOrbitronBold style={styles.workingTimeDateText}>
+                                                    {formatDateTime(item.start)}
+                                                </TextOrbitronBold>
+                                                <TextOrbitron style={styles.workingTimeGroupText}>Groupe A</TextOrbitron>
+                                                <TextOrbitron style={styles.workingTimeHourText}>
+                                                    {formatTime(item.start)} - {formatTime(item.end)}
+                                                </TextOrbitron>
+                                                <TextOrbitron style={styles.workingTimeHourText}>
+                                                    {item.total_time ? `${(item.total_time / 60).toFixed(2)} heures` : 'Non disponible'}
+                                                </TextOrbitron>
+                                            </View>
+                                        ))
+                                )}
+                            </View>
+                        </>
+                    }
+                </ScrollView>
+            </LinearGradient>
+        </ImageBackground >
+    );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
+    backgroundImage: {
+        flex: 1,
+        width: Dimensions.get('window').width,
+        height: '100%',
+    },
+    scrollContainer: {
+        paddingBottom: 100,
+        minHeight: Dimensions.get('window').height,
+    },
+    overlay: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        padding: 20,
+        width: '100%',
+    },
+    contentContainer: {
+        paddingTop: 80,
+        width: '100%',
+        alignItems: 'center',
+    },
+    userNameText: {
+        fontSize: 24,
+        color: '#FDCB12',
+        textAlign: 'center',
+        marginBottom: 30,
+    },
+    highlight: {
+        color: '#FDCB12',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+        marginBottom: 20,
+    },
+    button: {
+        // backgroundColor: '#3e3e3e',
+        padding: 10,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#FDCB12',
+    },
+    buttonText: {
+        // color: '#FDCB12',
+        fontSize: 16,
+    },
+    chartContainer: {
+        backgroundColor: '#00000080',
+        padding: 10,
+        borderRadius: 16,
+        marginVertical: 10,
+    },
+    chart: {
+        borderRadius: 16,
+    },
+    workingTimeItem: {
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        padding: 25,
+        marginVertical: 15,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 1)',
+        width: '100%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 6,
+        position: 'relative',
+        overflow: 'hidden',
+    },
+    workingTimeDateText: {
+        color: '#FDCB12',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    workingTimeGroupText: {
+        color: '#FFF',
+        fontSize: 18,
+        marginTop: 10,
+    },
+    workingTimeHourText: {
+        color: '#FFF',
+        fontSize: 16,
+        marginTop: 5,
+    },
+    iconContainer: {
+        position: 'absolute',
+        top: 30,
+        right: 20,
+        zIndex: 10,
+    },
 });

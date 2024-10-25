@@ -12,6 +12,48 @@ defmodule TimeManagerApi.WorkingTimeService do
   alias TimeManagerApi.WorkingTime
   alias TimeManagerApi.ClockService
 
+  def get_workingtimes_for_last_days(user_id, days) do
+    start_date = Date.add(Date.utc_today(), -days)
+    query_workingtimes_for_range(user_id, start_date, Date.utc_today())
+  end
+
+  def get_workingtimes_for_last_weeks(user_id, weeks) do
+    start_date = Date.add(Date.utc_today(), -weeks * 7)
+    query_workingtimes_for_range(user_id, start_date, Date.utc_today())
+  end
+
+  def get_workingtimes_for_last_months(user_id, months) do
+    start_date = Date.add(Date.utc_today(), -months * 30)  # Approximation pour les mois
+    query_workingtimes_for_range(user_id, start_date, Date.utc_today())
+  end
+
+  defp query_workingtimes_for_range(user_id, start_date, end_date) do
+    WorkingTime
+    |> where([wt], wt.user_id == ^user_id)
+    |> where([wt], fragment("date(?) >= ?", wt.start, ^start_date) and fragment("date(?) <= ?", wt.start, ^end_date))
+    |> Repo.all()
+  end
+
+
+  def get_workingtimes_for_today(user_id) do
+    today = Date.utc_today()
+
+    IO.inspect(user_id, label: "User ID")
+    IO.inspect(today, label: "Today's Date")
+
+    query =
+      WorkingTime
+      |> where([wt], wt.user_id == ^user_id)
+      |> where([wt], fragment("date(?) = ?", wt.start, ^today))
+
+    IO.inspect(query, label: "Generated Query")
+
+    result = Repo.all(query)
+    IO.inspect(result, label: "Query Result")
+
+    result
+  end
+
   # Récupérer le dernière working_time d'un utilisateur
   def get_last_working_time_by_user(user_id) do
     WorkingTime
@@ -91,5 +133,8 @@ defmodule TimeManagerApi.WorkingTimeService do
       )
       |> Repo.aggregate(:count, :user_id)
     end
+
+
+
 
 end
