@@ -12,21 +12,29 @@ defmodule TimeManagerApiWeb.GroupController do
     render(conn, "index.json", groups: groups)
   end
   # Créer un groupe
-  # Créer un groupe
-  def create(conn, %{"group" => group_params}) do
+  def create(conn, %{"group" => group_params, "organisation_id" => organisation_id}) do
     changeset = Group.changeset(%Group{}, group_params)
 
     case Repo.insert(changeset) do
       {:ok, group} ->
-        conn
-        |> put_status(:created)
-        |> json(%{group: %{id: group.id, name: group.name, start_date: group.start_date, end_date: group.end_date}})
+        # Associate the group with the organisation
+        now = NaiveDateTime.utc_now()
+
+        case Repo.insert_all("organisation_groups", [%{organisation_id: organisation_id, group_id: group.id, inserted_at: now, updated_at: now}]) do
+          {1, } ->
+            conn
+            |> put_status(:created)
+            |> json(%{group: %{id: group.id, name: group.name, start_date: group.start_date, end_date: group.end_date}})
+           _->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> json(%{message: "Error associating group with organisation"})
+        end
 
       {:error, changeset} ->
-        errors = Ecto.Changeset.traverse_errors(changeset, fn {msg, _opts} -> msg end)
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{errors: errors})
+        |> json(%{errors: Ecto.Changeset.traverse_errors(changeset, &(&1))})
     end
   end
 

@@ -9,14 +9,49 @@
         @view-group="handleViewGroup"
         @view-users="handleViewUsers"
       />
-    </div>
 
-    <!-- Modale pour afficher les utilisateurs -->
-    <UserModal
-      v-if="showUserModal"
-      :organisation-id="selectedOrganisationId"
-      @close-modal="handleCloseUserModal"
-    />
+      <!-- Détails du groupe sélectionné -->
+      <div v-if="selectedGroup" class="p-4 mt-6 bg-white rounded shadow-md">
+        <h3 class="mb-4 text-2xl font-bold">Group: {{ selectedGroup.name }}</h3>
+        <p class="mb-4">
+          Start: {{ selectedGroup.start_date }} | End:
+          {{ selectedGroup.end_date }}
+        </p>
+
+        <!-- Liste des utilisateurs -->
+        <h4 class="mb-2 text-lg font-bold">Users in this Group</h4>
+        <ul>
+          <li
+            v-for="user in selectedGroupUsers"
+            :key="user.id"
+            class="flex justify-between mb-2"
+          >
+            <span>{{ user.username }} ({{ user.email }})</span>
+            <button
+              @click="removeUserFromGroup(user.id)"
+              class="text-red-600 hover:underline"
+            >
+              Remove
+            </button>
+          </li>
+        </ul>
+
+        <!-- Bouton pour ajouter un utilisateur -->
+        <button
+          @click="openUserModal"
+          class="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600"
+        >
+          Add User
+        </button>
+      </div>
+
+      <!-- Modale pour afficher les utilisateurs -->
+      <UserModal
+        v-if="showUserModal"
+        :organisation-id="selectedOrganisationId"
+        @close-modal="handleCloseUserModal"
+      />
+    </div>
   </div>
 </template>
 
@@ -35,8 +70,10 @@ export default {
   data() {
     return {
       organisations: [],
+      selectedOrganisationId: null,
+      selectedGroup: null, // Stocker le groupe sélectionné
+      selectedGroupUsers: [], // Stocker les utilisateurs du groupe sélectionné
       showUserModal: false, // Variable pour contrôler l'affichage de la modale des utilisateurs
-      selectedOrganisationId: null, // ID de l'organisation sélectionnée pour voir les utilisateurs
     };
   },
   methods: {
@@ -61,14 +98,17 @@ export default {
       }
     },
 
-    // Gestion des événements pour la modification d'une organisation
-    handleModifyOrganisation(organisationId) {
-      console.log("Modifier l'organisation :", organisationId);
-    },
-
     // Gestion de l'affichage d'un groupe
-    handleViewGroup(groupId) {
-      console.log("Afficher le groupe :", groupId);
+    async handleViewGroup(groupId) {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/groups/${groupId}`
+        );
+        this.selectedGroup = response.data.group;
+        this.selectedGroupUsers = this.selectedGroup.users || [];
+      } catch (error) {
+        console.error("Erreur lors de la récupération du groupe :", error);
+      }
     },
 
     // Gestion de l'affichage des utilisateurs d'une organisation
@@ -79,9 +119,36 @@ export default {
       );
       this.selectedOrganisationId = organisationId;
       this.showUserModal = true; // Affiche la modale pour afficher les utilisateurs
+      // Ajouter un utilisateur à un groupe
+    },
+    async addUserToGroup(userId) {
+      try {
+        await axios.post(
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users`,
+          { user_id: userId }
+        );
+        this.handleViewGroup(this.selectedGroup.id); // Rafraîchir les utilisateurs du groupe
+        this.closeUserModal();
+      } catch (error) {
+        console.error("Erreur lors de l'ajout de l'utilisateur :", error);
+      }
     },
 
-    // Fermeture de la modale des utilisateurs
+    // Supprimer un utilisateur d'un groupe
+    async removeUserFromGroup(userId) {
+      try {
+        await axios.delete(
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${userId}`
+        );
+        this.handleViewGroup(this.selectedGroup.id); // Rafraîchir les utilisateurs du groupe
+      } catch (error) {
+        console.error(
+          "Erreur lors de la suppression de l'utilisateur :",
+          error
+        );
+      }
+    },
+
     handleCloseUserModal() {
       this.showUserModal = false;
     },
