@@ -16,10 +16,15 @@
           <i class="fas fa-check"></i>
         </button>
       </div>
-      <!-- Bouton avec icône de stylo pour l'édition -->
-      <button @click="toggleEdit" class="btn-edit" v-if="!isEditing">
-        <i class="fas fa-pencil-alt"></i> <!-- Icône de stylo -->
-      </button>
+      <!-- Regrouper les boutons d'édition et de suppression ensemble à droite -->
+      <div class="action-buttons flex">
+        <button @click="toggleEdit" class="btn-edit" v-if="!isEditing">
+          <i class="fas fa-pencil-alt"></i> <!-- Icône de stylo -->
+        </button>
+        <button @click="deleteOrganisation" class="btn-delete" v-if="!isEditing">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
     </div>
 
     <div class="groups-container overflow-y-auto mb-4">
@@ -35,6 +40,7 @@
     <button @click="viewUsers" class="btn btn-secondary mt-2">Voir Users</button>
   </div>
 </template>
+
 
 <script>
 import axios from "axios";
@@ -72,6 +78,7 @@ export default {
         console.error("Erreur lors de la récupération des groupes:", error);
       }
     },
+    
     viewGroup(group) {
       this.$emit("view-group", group.id);
     },
@@ -87,6 +94,11 @@ export default {
       if (this.isEditing) {
         this.isEditing = false; // Désactiver le mode édition
         this.organisationName = this.organisation.name; // Réinitialiser le nom si non sauvegardé
+      }
+    },
+    deleteOrganisation() {
+      if (confirm('Are you sure you want to delete this organisation?')) {
+        this.$emit('delete-organisation', this.organisation.id);
       }
     },
     async saveOrganisationName() {
@@ -147,6 +159,14 @@ export default {
 
 .btn-edit:hover {
   color: #f5b900;
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fd2d12;
+  margin-left: 10px; 
 }
 
 /* Bouton de coche pour sauvegarder */

@@ -3,10 +3,32 @@
     <div class="bg-white rounded-lg p-6 w-2/3">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Organisation's Users</h2>
-        <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
+        
+        <!-- Bouton + et fermeture -->
+        <div class="flex items-center space-x-2">
+          <!-- Bouton + qui se transforme en Add -->
+          <button @click="toggleAddUser" class="relative flex items-center space-x-1 p-2 transition-all duration-300 ease-in-out">
+            <span v-if="!showEmailInput">+</span>
+          </button>
+
+          <!-- Bouton de fermeture -->
+          <button @click="$emit('close-modal')" class="text-gray-500 hover:text-gray-700">X</button>
+        </div>      
+      </div>  
+
+      <!-- Barre de recherche pour ajouter un utilisateur avec l'email -->
+      <div class="relative flex items-center overflow-hidden transition-all duration-500 ease-in-out" :style="showEmailInput ? 'max-width: 300px;' : 'max-width: 0px;'">
+        <input
+          v-show="showEmailInput"
+          v-model="searchEmail"
+          placeholder="Enter email to add user"
+          class="border rounded-lg p-2 w-[250px] transition-all duration-500 ease-in-out"
+          
+        />
+        <button v-if="showEmailInput" @click="addUserToOrganisation" class="ml-2 bg-blue-500 text-white p-2 rounded-lg">Add</button>
       </div>
 
-      <table class="w-full table-auto">
+      <table class="w-full table-auto mt-4">
         <thead>
           <tr class="bg-gray-200">
             <th class="p-2">Member Name</th>
@@ -69,6 +91,8 @@ export default {
   data() {
     return {
       users: [],
+      showEmailInput: false, // Contrôle la visibilité du champ d'email
+      searchEmail: "", // Stocke l'email saisi
     };
   },
   mounted() {
@@ -81,6 +105,35 @@ export default {
     },
   },
   methods: {
+
+    
+    // Ajouter un utilisateur sélectionné à l'organisation
+    async addUserToOrganisation() {
+      try {
+        // Requête pour ajouter un utilisateur via son email
+        const response = await axios.post(
+          `http://localhost:4000/api/organisations/${this.organisationId}/users`,
+          {
+            email: this.searchEmail,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json', // Assure que le contenu est envoyé comme JSON
+            },
+          }
+        );
+        
+        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
+        this.showSuccessToast("Utilisateur ajouté avec succès !");
+      } catch (error) {
+        console.error("Erreur lors de l'ajout de l'utilisateur à l'organisation:", error);
+        this.showErrorToast(error.response.data.error);
+      }
+    },
+
+    toggleAddUser() {
+      this.showEmailInput = !this.showEmailInput;
+    },
     async fetchUsers() {
       try {
         const response = await axios.get(`http://localhost:4000/api/organisations/${this.organisationId}/users`);
@@ -98,9 +151,7 @@ export default {
       }
 
       try {
-        await axios.put(`http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}`, {
-          role_id: user.role_id,
-        });
+        await axios.put(`http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`);
         this.showSuccessToast("Role mis à jour avec succès !");
       } catch (error) {
         console.error("Erreur lors de la mise à jour du rôle:", error);
@@ -135,11 +186,6 @@ export default {
 <style scoped>
 .modal {
   z-index: 9999;
-}
-
-.table-auto {
-  width: 100%;
-  border-collapse: collapse;
 }
 
 table {

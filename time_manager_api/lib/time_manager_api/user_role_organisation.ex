@@ -13,9 +13,12 @@ defmodule TimeManagerApi.UserRoleOrganisation do
 
   def changeset(user_role_organisation, attrs) do
     user_role_organisation
-    |> cast(attrs, [:role_id])
+    |> cast(attrs, [:user_id, :organisation_id, :role_id]) # Ajout des associations
     |> validate_required([:role_id])
     |> validate_number(:role_id, greater_than: 0, message: "Le role_id doit être un entier positif.")
+    |> assoc_constraint(:user)
+    |> assoc_constraint(:organisation)
+    |> assoc_constraint(:role)
   end
 
 end

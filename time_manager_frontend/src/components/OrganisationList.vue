@@ -9,6 +9,8 @@
         @modify-users="modifyUsers"
         @organisation-updated="handleOrganisationUpdated"
         @view-users="$emit('view-users', organisation.id)" 
+        @delete-organisation="handleDeleteOrganisation"
+
 
       />
     </div>
@@ -32,11 +34,15 @@
         this.$emit('modify-organisation', organisationId);
       },
 
+      handleDeleteOrganisation(){
+        this.$emit('delete-organisation');
+      },
+
       handleOrganisationUpdated() {
-      // Émettre un événement pour que le composant parent (Organisation.vue) puisse réagir
-      this.$emit('organisation-updated');
-    },
-    
+        // Émettre un événement pour que le composant parent (Organisation.vue) puisse réagir
+        this.$emit('organisation-updated');
+      },
+
       viewGroup(groupId) {
         this.$emit('view-group', groupId);
       },

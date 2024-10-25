@@ -17,6 +17,7 @@
         @organisation-updated="fetchOrganisations"
         @view-group="handleViewGroup"
         @view-users="handleViewUsers"
+        @delete-organisation="handleDeleteOrganisation"
       />
     </div>
 
@@ -72,6 +73,15 @@ export default {
       }
     },
 
+    async handleDeleteOrganisation(organisationId) {
+      try {
+        await axios.delete(`http://localhost:4000/api/organisations/${organisationId}`);
+        this.fetchOrganisations(); // Recharge la liste après la suppression
+      } catch (error) {
+        console.error("Erreur lors de la suppression de l'organisation:", error);
+      }
+    },
+
     // Gestion de l'affichage d'un groupe
     handleViewGroup(groupId) {
       console.log("Afficher le groupe :", groupId);
@@ -90,7 +100,6 @@ export default {
 
     // Fermeture de la modale des utilisateurs
     handleCloseUserModal() {
-      console.log('ferme la creation');
       this.showUserModal = false;
     },
   },

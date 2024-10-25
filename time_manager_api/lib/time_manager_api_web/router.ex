@@ -52,6 +52,7 @@ defmodule TimeManagerApiWeb.Router do
       get "/", UserController, :paginated_users
       post "/", UserController, :create
       resources "/", UserController, except: [:new, :edit]
+      get "/search", UserController, :search_users
     end
 
     # Scope pour les clocks
@@ -74,8 +75,8 @@ defmodule TimeManagerApiWeb.Router do
 
 
     # Routes pour gérer les utilisateurs dans les groupes
-  post "/groups/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
-  delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
+    post "/groups/:group_id/users/:user_id", GroupController, :add_user    # Ajouter un utilisateur à un groupe
+    delete "/groups/:group_id/users/:user_id", GroupController, :remove_user # Retirer un utilisateur d'un groupe
 
   # routes pour les organisations
   scope "/organisations" do
@@ -86,6 +87,7 @@ defmodule TimeManagerApiWeb.Router do
     delete "/:id", OrganisationController, :delete
     put "/:id", OrganisationController, :update
     put "/:organisation_id/users/:user_id/:role_id", OrganisationController, :update_user_role
+    post "/:organisation_id/users", RoleController, :add_user_to_organisation
 
   end
 
