@@ -34,13 +34,14 @@
         <button @click="closeGroupModal" class="close-button absolute top-2 right-2 bg-yellow-400 text-black font-bold px-3 py-1 rounded">X</button>
 
         <h3 class="text-2xl font-bold mb-4 text-white">Group: {{ selectedGroup.groupname }}</h3>
-        <p class="mb-4 text-white">Start: {{ selectedGroup.start_date }} | End: {{ selectedGroup.end_date }}</p>
+        <p class="mb-4 text-white">Start: {{ formatDate(selectedGroup.start_date) }} | End: {{ formatDate(selectedGroup.end_date) }}</p>
 
         <!-- Working Times associés -->
         <h4 class="text-lg font-bold mb-2 text-white">Working Times</h4>
         <ul>
           <li v-for="time in selectedGroupWorkingTimes" :key="time.id" class="flex justify-between mb-2">
-            <span class="text-white">Start: {{ time.start }} - End: {{ time.end }}</span>
+            <span class="text-white">Start: {{ formatDate(time.start) }} - End: {{ formatDate(time.end) }}</span>
+
           </li>
         </ul>
 
@@ -53,8 +54,11 @@
           </li>
         </ul>
 
-        <!-- Bouton pour ajouter un utilisateur -->
-        <button @click="openUserModal" class="bg-blue-500 text-white px-4 py-2 mt-4 rounded hover:bg-blue-600">Add User</button>
+        <!-- Boutons pour ajouter un utilisateur ou supprimer le groupe -->
+        <div class="flex justify-between mt-4">
+          <button @click="openUserModal" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add User</button>
+          <button @click="deleteGroup" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Delete Group</button>
+        </div>
       </div>
     </div>
 
@@ -63,7 +67,7 @@
       <div class="modal-content glassmorphism-bg-white relative p-10 rounded-lg shadow-lg w-full max-w-3xl pt-9">
         <button @click="closeCreateGroupModal" class="close-button absolute top-2 right-2 bg-yellow-400 text-black font-bold px-3 py-1 rounded">X</button>
         <!-- Appel du composant CreaGroupComponent -->
-        <CreaGroupComponent @close="closeCreateGroupModal" />
+        <CreaGroupComponent @group-created="handleGroupCreated" @close="closeCreateGroupModal" />
       </div>
     </div>
 
@@ -91,7 +95,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from "axios";
@@ -138,6 +141,10 @@ export default {
         console.error("Erreur lors de la récupération des groupes:", error);
       }
     },
+    formatDate(date) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+      return new Date(date).toLocaleDateString('fr-FR', options).replace(',', '');
+    },
     async fetchAllUsers() {
       try {
         const response = await axios.get(
@@ -181,6 +188,11 @@ export default {
     closeCreateGroupModal() {
       this.showCreateGroupModal = false;
     },
+    handleGroupCreated() {
+      // Relancer la requête pour obtenir la liste mise à jour des groupes après ajout
+      this.fetchGroups();
+      this.closeCreateGroupModal();
+    },
     openUserModal() {
       this.showUserModal = true;
     },
@@ -215,6 +227,21 @@ export default {
         );
       } catch (error) {
         console.error("Erreur lors de la suppression de l'utilisateur :", error);
+      }
+    },
+    async deleteGroup() {
+      if (!this.selectedGroup) {
+        console.error("Aucun groupe sélectionné");
+        return;
+      }
+      try {
+        await axios.delete(
+            `http://localhost:4000/api/groups/${this.selectedGroup.id}`
+        );
+        this.closeGroupModal();
+        this.fetchGroups(); // Mettre à jour la liste des groupes après suppression
+      } catch (error) {
+        console.error("Erreur lors de la suppression du groupe :", error);
       }
     },
   },
