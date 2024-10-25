@@ -21,7 +21,7 @@ defmodule TimeManagerApi.RoleService do
     user_role_query =
       from uro in UserRoleOrganisation,
       where: uro.user_id == ^user_id,
-      select: uro.organisation_ids
+      select: uro.organisation_id
 
     # Exécuter la requête et récupérer le nom du rôle
     Repo.one(user_role_query)

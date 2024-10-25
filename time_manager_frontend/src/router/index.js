@@ -46,10 +46,12 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authToken = localStorage.getItem('authToken'); // Exemple: récupérer le token
-  const isAdmin = isUserAdmin(authToken); // Fonction pour vérifier si l'utilisateur est admin
+  const isAdmin = await isUserAdmin(authToken); // Fonction pour vérifier si l'utilisateur est admin
 
+  console.log("isAdmin : ", isAdmin);
+  
   // Vérifie si la route nécessite un accès admin
   if (to.matched.some(record => record.meta.requiresAdmin)) {
     // Si l'utilisateur n'est pas admin, redirige vers la page de connexion

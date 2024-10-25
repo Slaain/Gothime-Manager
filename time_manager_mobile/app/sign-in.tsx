@@ -18,33 +18,61 @@ import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
 import { storeToken } from '../components/asyncStorage'; // Chemin relatif vers asyncStorage.tsx
 import { useRouter } from 'expo-router'; // Utilisation de la route
+import { useSession } from "@/components/ctx";
+import { useRoute } from '@react-navigation/native';
+import useUserStatsStore from '@/stores/useUserStatsStore';
+
 
 // Custom Text component with Orbitron font
 const TextOrbitron = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Orbitron' }]} />;
 const TextOrbitronBold = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'OrbitronBold' }]} />;
 
 export default function HomeScreen() {
-    const [email, setEmail] = useState('');
+    const [emailInput, setEmailInput] = useState('');
     const [password, setPassword] = useState('');
     const router = useRouter();
+    const { signIn, session } = useSession();
+    console.log("sign in session : ", session);
+    const { setUsername, setEmail } = useUserStatsStore();
+
+
+    const route = useRoute();
+    console.log(route.name);
+
+    // actual route
+    // console.log(router)
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://10.79.216.151:4000/api/login', {
-                email,
+            const response = await axios.post('http://10.79.216.9:4000/api/login', {
+                email: emailInput,
                 password,
             }, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
+
+            console.log("response : ", response);
+
             const { token, user } = response.data;
-            await storeToken(token);
+
+            console.log("user : ", user);
+
+            signIn(token)
+            setEmail(user.email);
+            setUsername(user.username);
+
+            console.log("email : ", user.email);
+            console.log("username : ", user.username);
+
+            // await storeToken(token);
+
             Alert.alert('Login Successful', 'You are now logged in!');
 
             router.push({
-                pathname: '/explore', // Change this to your new screen's path
-                params: { email, userId: user.id, userName: user.username },  // Pass the email as a parameter
+                pathname: '/', // Change this to your new screen's path
+                // params: { email: emailInput, userId: user.id, userName: user.username },  // Pass the email as a parameter
             });
             console.log("userName is " + user.username);
         } catch (error) {
@@ -84,8 +112,8 @@ export default function HomeScreen() {
                     <View style={styles.formContainer}>
                         <TextInput
                             placeholder="Email"
-                            value={email}
-                            onChangeText={setEmail}
+                            value={emailInput}
+                            onChangeText={setEmailInput}
                             style={styles.input}
                             placeholderTextColor="#F3F3F3"
                             keyboardType="email-address"

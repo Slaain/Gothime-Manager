@@ -12,6 +12,10 @@ defmodule TimeManagerApiWeb.Router do
     plug TimeManagerApiWeb.Plugs.CheckManagerRole
   end
 
+  pipeline :checkManagerOrAdminRole do
+    plug TimeManagerApiWeb.Plugs.CheckManagerOrAdminRole
+  end
+
   scope "/api", TimeManagerApiWeb do
     pipe_through :api
 
@@ -20,21 +24,26 @@ defmodule TimeManagerApiWeb.Router do
       post "/beep", QRCodeController, :beep
       get "/:organizationId", QRCodeController, :get_token
 
-      pipe_through :checkManager
+      pipe_through :checkManagerOrAdminRole
       post "/generate/:organizationId", QRCodeController, :generate_qr
       post "/test", QRCodeController, :test
     end
 
     # Scope pour les workingtimes
     scope "/workingtimes" do
+      get "/daily/:userID", WorkingTimeController, :get_workingtimes_daily
+  get "/weekly/:userID", WorkingTimeController, :get_workingtimes_weekly
+  get "/monthly/:userID", WorkingTimeController, :get_workingtimes_monthly
       get "/count", WorkingTimeController, :count
       get "/", WorkingTimeController, :index
       get "/:userID", WorkingTimeController, :indexA
       get "/:userID/:id", WorkingTimeController, :show
+
     end
 
     # Scope pour les workingtimes avec des routes personnalisées pour les utilisateurs
     scope "/workingtime" do
+      get "/today/:userID", WorkingTimeController, :get_working_times_today
       get "/:userID", WorkingTimeController, :index
       get "/:userID/:id", WorkingTimeController, :show
       post "/:userID", WorkingTimeController, :create
@@ -71,6 +80,8 @@ defmodule TimeManagerApiWeb.Router do
   get "/groups/:id", GroupController, :show   # Afficher un groupe spécifique
   delete "/groups/:id", GroupController, :delete
   put "/groups/:id", GroupController, :update
+  get "/groups/user/:user_id", GroupController, :get_group_by_user
+
 
 
     # Routes pour gérer les utilisateurs dans les groupes
@@ -87,6 +98,10 @@ defmodule TimeManagerApiWeb.Router do
     put "/:id", OrganisationController, :update
     put "/:organisation_id/users/:user_id/:role_id", OrganisationController, :update_user_role
 
+  end
+
+  scope "/roles" do
+    get "/", RoleController, :show
   end
 
   #Routes pour l'authentification

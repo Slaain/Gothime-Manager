@@ -1,51 +1,72 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs, usePathname } from 'expo-router';
 import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-
-function getTabBarVisibility(route) {
-    const routeName = getFocusedRouteNameFromRoute(route) ?? '';
-
-    // Si vous souhaitez masquer la barre d'onglets pour certains écrans
-    if (routeName === 'Camera') {
-        return false;
-    }
-    return true;
-}
+import { AntDesign, Entypo, Ionicons } from '@expo/vector-icons';
+import MyTabBar from '@/components/MyTabBar';
+import { Text } from 'react-native';
+import { useSession } from '@/components/ctx';
 
 export default function TabLayout() {
-    const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();
+  const pathname = usePathname();
+  const colors = { primary: "#FDCB12" };
 
-    return (
-        <Tabs
-            screenOptions={{
-                tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-                headerShown: false,
-            }}
-        >
-            <Tabs.Screen
-                name="Camera"
-                options={({ route }) => ({
-                    title: 'QR CODE',
-                    tabBarIcon: ({ color, focused }) => (
-                        <TabBarIcon name={focused ? 'camera' : 'camera-outline'} color={color} />
-                    ),
-                    tabBarVisible: getTabBarVisibility(route),
-                })}
-            />
-            <Tabs.Screen
-                name="explore"
-                options={({ route }) => ({
-                    title: 'Working Times',
-                    tabBarIcon: ({ color, focused }) => (
-                        <TabBarIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} />
-                    ),
-                    tabBarVisible: getTabBarVisibility(route),
-                })}
-            />
+  const { session, isLoading } = useSession();
 
-        </Tabs>
-    );
+
+  if (isLoading) return <Text>Loading...</Text>;
+
+  if (!session) {
+    // On web, static rendering will stop here as the user is not authenticated
+    // in the headless Node process that the pages are rendered in.
+    return <Redirect href="/sign-in" />;
+  }
+
+  console.log("pathname : ", pathname);
+
+  return (
+    <Tabs
+      tabBar={props => <MyTabBar {...props} pathname={pathname} />}
+      screenOptions={({ route }) => ({
+
+
+        tabBarIcon: ({ focused, color, size }) => {
+          if (route.name === 'index') {
+            return <Entypo name="home" size={24} color={pathname === '/' ? colors.primary : 'black'} />
+          } else if (route.name === 'camera') {
+            return <AntDesign name="camera" size={24} color={pathname === '/camera' ? colors.primary : 'black'} />
+          } else if (route.name === 'explore') {
+            return <Ionicons name="stats-chart" size={24} color={pathname === '/explore' ? colors.primary : 'black'} />
+          }
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: 'gray',
+        headerShown: false, // Cacher le header
+      })}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+
+        }}
+      />
+      <Tabs.Screen
+        name="camera"
+        options={{
+          title: 'Camera',
+
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: 'Explore',
+
+        }}
+      />
+
+    </Tabs>
+  );
 }
