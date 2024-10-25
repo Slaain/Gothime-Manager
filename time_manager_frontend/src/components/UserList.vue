@@ -9,7 +9,7 @@
     >
       <div class="w-1/2 px-8 py-4 bg-white">
         <p class="text-xl font-extrabold text-zinc-950">New User</p>
-        
+
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
           User's Name
           <p
@@ -34,49 +34,49 @@
           type="text"
         />
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-          >Enter Password </label
-        >
-          <div class="flex items-center">
-            <input
-              v-model="newUser.password"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="Password"
-              class="flex-grow items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <button
-              @click="showPassword = !showPassword"
-              type="button"
-              class="ml-2 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
-            >
-              {{ showPassword ? 'Hide' : 'Show' }}
-            </button>
-          </div>
+          >Enter Password
+        </label>
+        <div class="flex items-center">
+          <input
+            v-model="newUser.password"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Password"
+            class="items-center justify-center flex-grow w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button
+            @click="showPassword = !showPassword"
+            type="button"
+            class="px-4 py-2 ml-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+          >
+            {{ showPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
 
-          <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
-            Confirm Password
-          </label>
-          <div class="flex items-center">
-            <input
-              v-model="newUser.confirmPassword"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="Confirm Password"
-              class="flex-grow items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-    <button
-      @click="showPassword = !showPassword"
-      type="button"
-      class="ml-2 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
-    >
-      {{ showPassword ? 'Hide' : 'Show' }}
-    </button>
-  </div>
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          Confirm Password
+        </label>
+        <div class="flex items-center">
+          <input
+            v-model="newUser.confirmPassword"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Confirm Password"
+            class="items-center justify-center flex-grow w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button
+            @click="showPassword = !showPassword"
+            type="button"
+            class="px-4 py-2 ml-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+          >
+            {{ showPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
         <button
-        @click="generateRandomPassword"
-        class="ml-2 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
-      >
-        Generate random Password
-      </button>
-        
+          @click="generateRandomPassword"
+          class="px-4 py-2 ml-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+        >
+          Generate random Password
+        </button>
+
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
           Select Organisation
         </label>
@@ -85,13 +85,17 @@
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="" disabled>Select an organisation</option>
-          <option v-for="organisation in organisations_list" :key="organisation.id" :value="organisation.id">
+          <option
+            v-for="organisation in organisations_list"
+            :key="organisation.id"
+            :value="organisation.id"
+          >
             {{ organisation.name }}
           </option>
         </select>
 
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
-        Select Role
+          Select Role
         </label>
         <select
           v-model="newUser.selectedRole"
@@ -102,7 +106,7 @@
             {{ role.name }}
           </option>
         </select>
-        
+
         <p class="h-6 text-red-600">{{ error }}</p>
         <button
           @click="createUser"
@@ -281,7 +285,11 @@
               >
                 <!-- Toggle button for Clock In/Out -->
                 <label class="switch">
-                  <input type="checkbox" v-model="employee.isWorking" @change="handleClockToggle(employee)">
+                  <input
+                    type="checkbox"
+                    v-model="employee.isWorking"
+                    @change="handleClockToggle(employee)"
+                  />
                   <span class="slider round"></span>
                 </label>
               </td>
@@ -388,12 +396,12 @@ export default {
         selectedOrganisation: null,
         selectedRole: null,
       },
-      
+
       roles: [
-      { id: 1, name: "Admin" },
-      { id: 2, name: "Manager" },
-      { id: 3, name: "Employe" }
-    ],
+        { id: 1, name: "Admin" },
+        { id: 2, name: "Manager" },
+        { id: 3, name: "Employe" },
+      ],
       error: "",
       showPassword: false,
       showCreateUserModal: false,
@@ -406,24 +414,23 @@ export default {
     };
   },
   methods: {
-
-
     generateRandomPassword() {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
-    let password = "";
-    for (let i = 0; i < 12; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      password += charset[randomIndex];
-    }
-    this.newUser.password = password;
-    this.newUser.confirmPassword = password; // Remplit aussi la confirmation de mot de passe
-  },
+      const charset =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+      let password = "";
+      for (let i = 0; i < 12; i++) {
+        const randomIndex = Math.floor(Math.random() * charset.length);
+        password += charset[randomIndex];
+      }
+      this.newUser.password = password;
+      this.newUser.confirmPassword = password; // Remplit aussi la confirmation de mot de passe
+    },
 
-  // Handle the toggle switch when clock in/out is triggered
-  handleClockToggle(employee) {
-        // On fait un POST vers /api/clocks/:user_id
-        this.toggleClock(employee.id);
-      },
+    // Handle the toggle switch when clock in/out is triggered
+    handleClockToggle(employee) {
+      // On fait un POST vers /api/clocks/:user_id
+      this.toggleClock(employee.id);
+    },
 
     // Méthode pour faire le POST vers /api/clocks/:user_id
     toggleClock(userID) {
@@ -501,19 +508,24 @@ export default {
         return;
       }
       const userData = {
-          username: this.newUser.username,
-          email: this.newUser.email,
-          password: this.newUser.password,
-          organisation_id: this.newUser.selectedOrganisation,
-          role_id: this.newUser.selectedRole,
+        username: this.newUser.username,
+        email: this.newUser.email,
+        password: this.newUser.password,
+        organisation_id: this.newUser.selectedOrganisation,
+        role_id: this.newUser.selectedRole,
       };
       console.log("userData : ", userData);
 
-      if (userData.username === "" || userData.email === "" || userData.password === "" || userData.organisation_id === "" || userData.role === "") {
+      if (
+        userData.username === "" ||
+        userData.email === "" ||
+        userData.password === "" ||
+        userData.organisation_id === "" ||
+        userData.role === ""
+      ) {
         this.error = "Please fill in all fields.";
         return;
       }
-
 
       userService
         .createUser(userData)
@@ -539,7 +551,6 @@ export default {
           );
           // this.toast.info(error.response.data.message)
           this.error = error.response.data.message;
-
         });
     },
     updateUser() {
@@ -552,7 +563,11 @@ export default {
 
       console.log("DATATATATA : ", userData);
 
-      if (userData.username === "" || userData.email === "" || userData.password === "") {
+      if (
+        userData.username === "" ||
+        userData.email === "" ||
+        userData.password === ""
+      ) {
         this.error = "Please fill in all fields.";
         return;
       }
@@ -571,6 +586,7 @@ export default {
           this.newUser.email = "";
           this.error = "";
           this.showUpdateUserModal = false;
+          this.fetchEmployees();
           console.log("User updated successfully:", response);
 
           if (response.result) {
@@ -593,7 +609,7 @@ export default {
     },
 
     editEmployee(id) {
-       console.log(`Editing employee with ID: ${id}`);
+      console.log(`Editing employee with ID: ${id}`);
       this.selectedUserId = id;
       this.showAccountDetails(id);
     },
@@ -603,13 +619,15 @@ export default {
     fetchEmployees() {
       const offset = (this.currentPage - 1) * this.limit;
 
-      console.log(`Fetching employees with limit ${this.limit} and offset ${offset}`);
+      console.log(
+        `Fetching employees with limit ${this.limit} and offset ${offset}`
+      );
       userService
         .getUsers(this.limit, offset)
         .then((data) => {
-          this.employees = data.users.map(user => ({
+          this.employees = data.users.map((user) => ({
             ...user,
-            isWorking: user.clock ? user.clock.status : false // Set the clock status
+            isWorking: user.clock ? user.clock.status : false, // Set the clock status
           }));
           this.totalPages = data.total_pages;
           this.totalUsers = data.total_users;
@@ -619,17 +637,19 @@ export default {
         });
     },
 
-
     fetchOrganisations() {
       console.log("Fetching organisations");
       userService
         .getOrganisations()
         .then((data) => {
           this.organisations_list = data.data;
-          console.log(data)
+          console.log(data);
         })
         .catch((error) => {
-          console.error("Erreur lors de la récupération des organisations:", error);
+          console.error(
+            "Erreur lors de la récupération des organisations:",
+            error
+          );
         });
     },
 
