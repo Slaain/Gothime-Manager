@@ -68,7 +68,12 @@ export default {
     },
     async removeUser(userId) {
       try {
-        await axios.delete(`http://localhost:4000/api/users/${userId}`);
+        await axios.delete(`http://localhost:4000/api/users/${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
         this.users = this.users.filter((user) => user.id !== userId);
       } catch (error) {
         console.error("Erreur lors de la suppression de l'utilisateur:", error);

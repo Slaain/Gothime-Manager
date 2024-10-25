@@ -125,7 +125,13 @@ export default {
       try {
         await axios.post(
           `http://localhost:4000/api/groups/${this.selectedGroup.id}/users`,
-          { user_id: userId }
+          { user_id: userId },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.handleViewGroup(this.selectedGroup.id); // Rafraîchir les utilisateurs du groupe
         this.closeUserModal();
@@ -138,7 +144,13 @@ export default {
     async removeUserFromGroup(userId) {
       try {
         await axios.delete(
-          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${userId}`
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${userId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.handleViewGroup(this.selectedGroup.id); // Rafraîchir les utilisateurs du groupe
       } catch (error) {

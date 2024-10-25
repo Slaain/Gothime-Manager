@@ -310,7 +310,12 @@ export default {
         await axios.post(
           `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${this.selectedUser}`,
           {},
-          { headers: { "Content-Type": "application/json" } }
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.viewGroup(this.selectedGroup);
         this.closeUserModal();
@@ -321,7 +326,13 @@ export default {
     async removeUserFromGroup(userId) {
       try {
         await axios.delete(
-          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${userId}`
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${userId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.selectedGroupUsers = this.selectedGroupUsers.filter(
           (user) => user.id !== userId
@@ -340,7 +351,13 @@ export default {
       }
       try {
         await axios.delete(
-          `http://localhost:4000/api/groups/${this.selectedGroup.id}`
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.closeGroupModal();
         this.fetchGroups(); // Mettre à jour la liste des groupes après suppression

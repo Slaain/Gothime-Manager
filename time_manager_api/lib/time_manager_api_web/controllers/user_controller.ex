@@ -102,24 +102,31 @@ defmodule TimeManagerApiWeb.UserController do
 
   # Action pour mettre à jour un utilisateur
   def update(conn, %{"id" => id, "user" => user_params}) do
-
-    # Vérifier si l'utilisateur existe
     user = UserService.get_user(id)
 
+    IO.inspect(user_params, label: "user_params")
+
     if user do
-      # Mettre à jour l'utilisateur avec les nouveaux paramètres
-      updated_user = UserService.update_user(user, user_params)
-      user = UserService.get_user(id)
-      conn
-      |> put_status(:ok) # Indique que la requête a réussi
-      |> json(%{message: "User updated", result: true, user: user}) # Renvoyer l'utilisateur mis à jour
+      case UserService.update_user(user, user_params) do
+        {:ok, updated_user} ->
+          conn
+          |> put_status(:ok)
+          |> json(%{message: "User updated", result: true, user: updated_user})
+
+          {:error, changeset} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> json(%{
+              message: "Update failed",
+              result: false,
+              errors: Ecto.Changeset.traverse_errors(changeset, fn {msg, _opts} -> msg end)
+            })
+      end
     else
       conn
-      |> put_status(:not_found) # Indique que la ressource n'a pas été trouvée
-      |> json(%{message: "Invalid credentials", result: false}) # Renvoyer un message d'erreur
+      |> put_status(:not_found)
+      |> json(%{message: "User not found", result: false})
     end
-
-
   end
 
   # Action pour supprimer un utilisateur

@@ -231,7 +231,13 @@ export default {
     async deleteUser(userId) {
       try {
         await axios.delete(
-          `http://localhost:4000/api/organisations/${this.organisationId}/users/${userId}`
+          `http://localhost:4000/api/organisations/${this.organisationId}/users/${userId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         );
         this.showSuccessToast("Utilisateur supprimé avec succès !");
         this.fetchUsers(); // Rafraîchir la liste des utilisateurs

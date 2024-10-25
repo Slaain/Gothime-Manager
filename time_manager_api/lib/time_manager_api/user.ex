@@ -25,11 +25,22 @@ defmodule TimeManagerApi.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:username, :email, :password])
-    |> validate_required([:username, :email, :password])
-    |> validate_length(:password, min: 6)
+    |> validate_required([:username, :email])
+    |> validate_password()
     |> unique_constraint(:email)
     |> put_password_hash()
   end
+
+  defp validate_password(changeset) do
+    if get_field(changeset, :password) do
+      changeset
+      |> validate_length(:password, min: 6)
+      |> validate_required([:password])
+    else
+      changeset
+    end
+  end
+
 
   defp put_password_hash(changeset) do
     case get_change(changeset, :password) do
