@@ -1,6 +1,7 @@
 <template>
   <div class="bat-container">
     <div class="dashboard">
+    <SidebarManager />
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
           <h1 class="text-3xl font-bold text-white">Dashboard : {{ organisation?.name }}</h1>
@@ -10,49 +11,272 @@
               src="../assets/avatar.jpg"
               alt="User Avatar"
               class="w-10 h-10 rounded-full"
+              @click="toggleDropdown"
             />
+            <div
+              v-if="isDropdownOpen"
+              ref="dropdown"
+              class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10"
+            >
+            <ul class="py-1 text-gray-700">
+                <li>
+                  <button
+                    @click="logout"
+                    class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    Se déconnecter
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
         </header>
-
+        
         <div v-if="organisation" class="organisation-card">
           <h2>{{ organisation.name }}</h2>
           <p>{{ organisation.description }}</p>
 
-          <div class="groups-container overflow-y-auto mb-4">
+          <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
+          {{ organisation.name }}
+        </h2>
+          <div v-if="isEditing" class="flex items-center">
+            <input
+              v-model="organisationName"
+              @keyup.enter="saveOrganisationName"
+              @blur="toggleEdit"
+              class="text-xl font-semibold input-field"
+              type="text"
+            />
+            <!-- Bouton de coche pour sauvegarder -->
+            <button @click="saveOrganisationName" class="ml-2 btn-save">
+              <i class="fas fa-check"></i>
+            </button>
+          </div>
+        <!-- Regrouper les boutons d'édition et de suppression ensemble à droite -->
+          <div class="flex action-buttons">
+          <button @click="toggleEdit" class="btn-edit" v-if="!isEditing">
+            <i class="fas fa-pencil-alt"></i>
+            <!-- Icône de stylo -->
+          </button>
+          <button
+            @click="deleteOrganisation"
+            class="btn-delete"
+            v-if="!isEditing"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      <!-- Bouton "Add Group" au centre -->
+        <div class="flex justify-center mb-4">
+          <button @click="openCreateGroupModal" class="btn btn-primary">
+            Add Group
+          </button>
+        </div>
+
+
+          <div class="mb-4 overflow-y-auto groups-container">
             <h3 class="font-medium text-white">List Groups:</h3>
             <ul>
-              <li v-for="group in groups" :key="group.id" class="flex justify-between items-center mb-2 text-white">
+              <li v-for="group in groups" :key="group.id" 
+                class="flex justify-between items-center mb-2 text-white">
                 {{ group.groupname }}
-                <button @click="viewGroup(group)" class="btn btn-secondary ml-4">Voir</button>
+
+                <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
+                  Voir
+                </button>
               </li>
             </ul>
           </div>
+          
+          <!-- Modale pour afficher les utilisateurs -->
+          <div
+            v-if="showGroupModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
+            >
+            <div
+              class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9"
+              >
+              <button
+                @click="closeGroupModal"
+                class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2"
+              >
+                X
+              </button>
+              <h3 class="mb-4 text-2xl font-bold text-white">
+                Group: {{ selectedGroup.groupname }}
+              </h3>
+              <p class="mb-4 text-white">
+                Start: {{ formatDate(selectedGroup.start_date) }} | End:
+                {{ formatDate(selectedGroup.end_date) }}
+              </p>
 
-          <button @click="viewUsers" class="btn btn-secondary mt-2">Voir Les employés</button>
+               <!-- Working Times associés -->
+              <h4 class="mb-2 text-lg font-bold text-white">Working Times</h4>
+              <ul>
+                <li
+                  v-for="time in selectedGroupWorkingTimes"
+                  :key="time.id"
+                  class="flex justify-between mb-2"
+                >
+                  <span class="text-white"
+                    >Start: {{ formatDate(time.start) }} - End:
+                    {{ formatDate(time.end) }}</span
+                  >
+                </li>
+              </ul>
+              <!-- Liste des utilisateurs -->
+              <h4 class="mb-2 text-lg font-bold text-white">Users in this Group</h4>
+              <ul>
+                <li
+                  v-for="user in selectedGroupUsers"
+                  :key="user.id"
+                  class="flex justify-between mb-2"
+                >
+                  <span class="text-white"
+                    >{{ user.username }} ({{ user.email }})</span
+                  >
+                  <button
+                    @click="removeUserFromGroup(user.id)"
+                    class="text-red-600 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </li>
+              </ul>
+              <!-- Boutons pour ajouter un utilisateur ou supprimer le groupe -->
+              <div class="flex justify-between mt-4">
+                <button
+                  @click="openUserModal"
+                  class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                >
+                  Add User
+                </button>
+                <button
+                  @click="deleteGroup"
+                  class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                >
+                  Delete Group
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modale pour créer un groupe avec CreaGroupComponent -->
+          <div
+            v-if="showCreateGroupModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
+          >
+            <div
+              class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9"
+            >
+            <button
+              @click="closeCreateGroupModal"
+              class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2"
+            >
+              X
+            </button>
+            <CreaGroupComponent
+              @group-created="handleGroupCreated"
+              @close="closeCreateGroupModal"
+            />
+            </div>
+          </div>
+
+          <!-- Modale d'ajout d'utilisateur -->
+          <div
+            v-if="showUserModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            >
+            <div
+              class="w-1/2 px-8 py-4 rounded-lg shadow-md modal-content glassmorphism-bg-white"
+            >
+            <h3 class="mb-4 text-lg font-semibold text-yellow-400">
+              Add User to Group
+            </h3>
+            <select
+              v-model="selectedUser"
+              class="w-full p-2 mb-4 text-white border rounded"
+              >
+              <option
+                class="text-black"
+                v-for="user in allUsers"
+                :key="user.id"
+                :value="user.id"
+                >
+                {{ user.username }} ({{ user.email }})
+              </option>
+            </select>
+            <div class="flex justify-end gap-4 mt-4">
+              <button
+                @click="addUserToGroup"
+                class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+                >
+                Add
+              </button>
+              <button
+                @click="closeUserModal"
+                class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+            <CreateOrganisationModal
+            v-if="showCreateModal"
+            @close-modal="handleCloseCreateModal"
+            @organisation-created="fetchOrganisation"
+          />
+
           <button @click="handleModifyOrganisation(organisation.id)" class="btn">Modifier</button>
         </div>
 
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
-          <LineChartManager :organizationId="'1'"/>
+          <LineChart />
         </section>
 
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
-          <div v-for="chart in chartsData" :key="chart.id" class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
-            <h2 class="mb-4 text-xl text-white">{{ chart.title }}</h2>
-            <div class="h-40 flex items-center justify-center working-times-number">
-              {{ chart.value }}
+          <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
+            <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
+              {{ monthlyUsers }}
+            </div>
+          </div>
+
+          <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
+            <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
+              {{ currentUsers }}
+            </div>
+          </div>
+
+          <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
+            <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
+              {{ workingTimesThisMonth }}
             </div>
           </div>
         </section>
+
+        <section class="p-0 users">
+          <h2 class="mb-4 text-xl text-white">Listes des employés</h2>
+          <div class="overflow-x-auto">
+            <UserListManager :organisationId="specifiedOrganisationId" @updateUserId="selectUser" />
+          </div>
+        </section>
+
+        <section v-if="selectedUserId" class="w-full mt-6">
+          <WorkingTimeUserContainer :userID="selectedUserId" />
+        </section>
       </main>
     </div>
-
-    <UserModal
-      v-if="showUserModal"
-      :organisation-id="selectedOrganisationId"
-      @close-modal="handleCloseUserModal"
-    />
   </div>
 </template>
 
@@ -60,20 +284,25 @@
 import axios from 'axios';
 import LineChartManager from '../components/LineChartManager.vue';
 import UserModal from '../components/OrganisationUserList.vue'; 
-import BarChart from "@/components/WorkingTimesChart.vue";
-import UserList from '../components/UserList.vue';
+import SidebarManager from "../components/SidebarManager.vue";
+import UserListManager from '../components/UserListManager.vue';
 import LineChart from '../components/LineChart.vue';
 import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
+import BarChart from "@/components/WorkingTimesChart.vue";
+import CreateOrganisationModal from "../components/CreateOrganisationModal.vue"; // Import de la modale
+import { useToast } from "vue-toastification";
 
 export default {
   components: {
+    SidebarManager,
     LineChart,
     BarChart,
     UserModal,
-    UserList,
+    UserListManager,
     WorkingTimeUserContainer,
     CreaGroupComponent,
+    CreateOrganisationModal,
   },
   props: {
     organisationId: {
@@ -81,92 +310,320 @@ export default {
       required: true,
     },
   },
+  setup() {
+    const toast = useToast(); // Utiliser le toast via setup
+    return { toast };
+  },
   data() {
     return {
       organisation: null,
       currentUsers: 0,
-
-      showUserModal: false,
       workingTimes: [],
-      showUserModal: false,
+      selectedUserId: null,
+      showGroupComponent: false,
       groups: [],
-      chartsData: [
-        { id: 1, title: 'Users Worked This Month', value: 0 },
-        { id: 2, title: 'Users Currently Working', value: 0 },
-        { id: 3, title: 'Working Times This Month', value: 0 },
-      ],
-      selectedOrganisationId: null,
+      selectedGroup: null,
+      selectedGroupUsers: [],
+      selectedGroupWorkingTimes: [],
+      allUsers: [],
+      showCreateGroupModal: false,
+      showGroupModal: false,
+      showUserModal: false,
+      selectedUser: null,
+      isEditing: false, 
+      isDropdownOpen: false,
     };
   },
   methods: {
     async fetchOrganisation() {
       try {
-        const response = await axios.get(`http://localhost:4000/api/organisations/${this.organisationId}`);
+        const response = await axios.get(
+          `http://localhost:4000/api/organisations/${this.organisationId}`,
+          {headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
         this.organisation = response.data.data;
         this.groups = response.data.data.groups;
       } catch (error) {
         console.error("Erreur lors de la récupération de l'organisation:", error);
       }
     },
-    
-    async fetchChartData() {
-  try {
-    const [usersResponse, timesResponse] = await Promise.all([
-      axios.get(`http://localhost:4000/api/clocks/countactive_by_organisation/${this.organisationId}`),
-      axios.get(`http://localhost:4000/api/workingtimes/count_by_organisation/${this.organisationId}`)
-    ]);
 
-    console.log("Users Response:", usersResponse.data);
-    console.log("Times Response:", timesResponse.data);
-
-    this.chartsData[0].value = timesResponse.data.users_count || 0;
-    this.chartsData[1].value = usersResponse.data.count || 0;
-    this.chartsData[2].value = timesResponse.data.working_times_count || 0;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des données", error);
-  }
-},
-
- // Récupérer et filtrer les working times en fonction de l'organisation
- async fetchWorkingTimesByOrganisation() {
-  try {
-    const response = await axios.get(`http://localhost:4000/api/workingtimes/by_organisation/${this.organisationId}`);
-    this.workingTimes = response.data;
-    this.updateCharts(); // Ajouter cette ligne
-  } catch (error) {
-    console.error("Erreur lors de la récupération des working times:", error);
-  }
-} ,
-    updateCharts() {
-      const usersWorkedThisMonth = this.workingTimes.length;
-      const usersCurrentlyWorking = this.workingTimes.filter(time => !time.end).length;
-      const workingTimesThisMonth = this.workingTimes.length;
-
-      this.chartsData = [
-        { id: 1, title: 'Users Worked This Month', value: usersWorkedThisMonth },
-        { id: 2, title: 'Users Currently Working', value: usersCurrentlyWorking },
-        { id: 3, title: 'Working Times This Month', value: workingTimesThisMonth },
-      ];
+    modifyOrganisation() {
+      this.$emit("modify-organisation", this.organisation.id);
     },
 
-    viewGroup(group) {
-      this.$emit("view-group", group.id);
+    async saveOrganisationName() {
+      try {
+        await axios.put(
+          `http://localhost:4000/api/organisations/${this.organisation.id}`,
+          {
+            organisation: { name: this.organisationName },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        this.toast.success("Organisation name updated successfully.");
+        this.isEditing = false; // Fermer l'édition après la sauvegarde
+        this.organisation.name = this.organisationName; // Mettre à jour le nom affiché
+      } catch (error) {
+        this.toast.error("Failed to update organisation name.");
+        console.error("Error updating organisation name:", error);
+      }
     },
+
+    async fetchWorkingTimesByOrganisation() {
+      try {
+        const response = await axios.get(`http://localhost:4000/api/workingtimes/by_organisation/${this.organisationId}`);
+        this.workingTimes = response.data;
+        this.updateCharts();
+      } catch (error) {
+        console.error("Erreur lors de la récupération des working times:", error);
+        }
+    } ,
+    // Récupérer et filtrer les working times en fonction de l'organisation
+
+    async getWorkingTimesThisMonthByOrganisation() {
+        try {
+          const response = await axios.get(
+            `http://localhost:4000/api/workingtimes/count_by_organisation/${this.organisationId}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              },
+            }
+          );
+          this.monthlyUsers = response.data.users_count;
+          this.workingTimesThisMonth = response.data.working_times_count;
+        } catch (error) {
+          console.error(
+            "Erreur lors de la récupération des working times",
+            error
+          );
+        }
+      },
+
+      async getCurrentUsers() {
+        try {
+          const response = await axios.get(
+            `http://localhost:4000/api/clocks/countactive_by_organisation/${this.organisationId}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              },
+            }
+          );
+
+          this.currentUsers = response.data.count;
+        } catch (error) {
+          console.error(
+            "Erreur lors de la récupération des utilisateurs actifs",
+            error
+          );
+        }
+      },
+
+      toggleEdit() {
+        this.isEditing = !this.isEditing;
+      },
+
+    cancelEdit() {
+      if (this.isEditing) {
+        this.isEditing = false; // Désactiver le mode édition
+        this.organisationName = this.organisation.name; // Réinitialiser le nom si non sauvegardé
+      }
+    },
+
+    deleteOrganisation() {
+      if (confirm("Are you sure you want to delete this organisation?")) {
+        this.$emit("delete-organisation", this.organisation.id);
+      }
+    },
+
     viewUsers() {
-      this.selectedOrganisationId = this.organisation.id;
+      this.$emit("view-users", this.organisation.id);
+    },
+    formatDate(date) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      return new Date(date)
+        .toLocaleDateString("fr-FR", options)
+        .replace(",", "");
+    },
+
+    async fetchGroups() {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/organisations/${this.organisation.id}`
+        );
+        this.groups = response.data.data.groups;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des groupes:", error);
+      }
+    },
+
+    async fetchAllUsers() {
+      try {
+        const response = await axios.get(
+          "http://localhost:4000/api/users?limit=100&offset=0"
+        );
+        this.allUsers = response.data.users || [];
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des utilisateurs :",
+          error
+        );
+      }
+    },
+    async viewGroup(group) {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/groups/${group.id}`
+        );
+        this.selectedGroup = { ...group, ...response.data.data };
+        this.selectedGroupUsers = response.data.data.users || [];
+        this.selectedGroupWorkingTimes = response.data.data.workingtimes || [];
+        this.showGroupModal = true;
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des détails du groupe :",
+          error
+        );
+      }
+    },
+    
+    closeGroupModal() {
+      this.showGroupModal = false;
+      this.selectedGroup = null;
+      this.selectedGroupUsers = [];
+      this.selectedGroupWorkingTimes = [];
+    },
+    openCreateGroupModal() {
+      this.showCreateGroupModal = true;
+    },
+    closeCreateGroupModal() {
+      this.showCreateGroupModal = false;
+    },
+    handleGroupCreated() {
+      this.fetchGroups();
+      this.closeCreateGroupModal();
+    },
+    openUserModal() {
       this.showUserModal = true;
     },
-    handleModifyOrganisation(organisationId) {
-      console.log("Modifier l'organisation :", organisationId);
-    },
-    handleCloseUserModal() {
+    closeUserModal() {
       this.showUserModal = false;
+      this.selectedUser = null;
     },
+    async addUserToGroup() {
+      if (!this.selectedUser) {
+        console.error("Aucun utilisateur sélectionné");
+        return;
+      }
+      try {
+        await axios.post(
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${this.selectedUser}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        this.viewGroup(this.selectedGroup);
+        this.closeUserModal();
+      } catch (error) {
+        console.error("Erreur lors de l'ajout de l'utilisateur :", error);
+      }
+    },
+    async removeUserFromGroup(userId) {
+      try {
+        await axios.delete(
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}/users/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        this.selectedGroupUsers = this.selectedGroupUsers.filter(
+          (user) => user.id !== userId
+        );
+      } catch (error) {
+        console.error(
+          "Erreur lors de la suppression de l'utilisateur :",
+          error
+        );
+      }
+    },
+    async deleteGroup() {
+      if (!this.selectedGroup) return;
+      try {
+        await axios.delete(
+          `http://localhost:4000/api/groups/${this.selectedGroup.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        this.closeGroupModal();
+        this.fetchGroups();
+      } catch (error) {
+        console.error("Erreur lors de la suppression du groupe :", error);
+      }
+      
+    },
+
+    toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  },
+  logout() {
+      // Logique de déconnexion
+      localStorage.removeItem("authToken"); // Supprime le token de l'utilisateur
+      this.$router.push("/login"); // Redirige vers la page de connexion
+    },
+    handleClickOutside(event) {
+      const dropdown = this.$refs.dropdown;
+      if (
+        dropdown &&
+        !dropdown.contains(event.target) &&
+        !this.$el.contains(event.target)
+      ) {
+        this.isDropdownOpen = false;
+      }
+    },
+
+ // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
+   
   },
   mounted() {
+    console.log("Dashboard mounted : ", localStorage.getItem("authToken"));
+   
     this.fetchOrganisation();
-    this.fetchChartData();
     this.fetchWorkingTimesByOrganisation();
+    this.getWorkingTimesThisMonthByOrganisation();
+    this.getCurrentUsers();
+    this.fetchGroups();
+    this.fetchAllUsers();
+    document.addEventListener("click", this.handleClickOutside);
+
+  },
+  beforeUnmount() {
+    document.removeEventListener("click", this.handleClickOutside);
   },
 };
 </script>
@@ -194,13 +651,59 @@ export default {
     pointer-events: none;
     z-index: 1; 
   } 
+/* Bouton d'édition avec icône */
+.btn-edit {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fdcb12;
+  margin-left: 10px; /* Espace entre le nom et l'icône */
+}
+
+.btn-edit:hover {
+  color: #f5b900;
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fd2d12;
+  margin-left: 10px;
+}
+
+/* Bouton de coche pour sauvegarder */
+.btn-save {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #00ff00;
+}
+
+.btn-save:hover {
+  color: #00cc00;
+}
 
   .chart {
     background-color: #2d3748; 
     padding: 20px;
     border-radius: 10px;
   } 
+  .btn-primary {
+  background-color: #fdcb12;
+  color: black;
+}
+.btn-primary:hover {
+  background-color: #f5b900;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
 
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
   .chart:hover .working-times-number {
     color: #fdcb12;
     -webkit-text-stroke: 0px;
@@ -336,6 +839,18 @@ export default {
     color: #fdcb12;
   }
 
+  /* Champ d'édition plus petit et adapté à la carte */
+.input-field {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #fdcb12;
+  color: #fdcb12;
+  padding: 0.2em;
+  border-radius: 4px;
+  outline: none;
+  width: 180px; /* Agrandir légèrement */
+}
+
+
   .line-chart {
     padding: 20px;
     border-radius: 10px;
@@ -366,6 +881,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    position: center;
   }
 
   .organisation-card:hover {
@@ -408,6 +924,12 @@ export default {
   .organisation-card .btn:hover {
     background-color: #f5b900;
   }
+
+  /* .sidebar {
+  width: 200px;
+  background-color: #212327;
+  padding: 20px;
+} */
   
   .working-times-number {
     font-size: 6rem;
@@ -416,4 +938,10 @@ export default {
     border-radius: 10px;
     transition: all 0.3s ease;
   }
+
+  .working-time-container {
+  /* background-color: #2d3748; */
+  padding: 20px;
+  border-radius: 10px;
+}
 </style>

@@ -118,6 +118,16 @@ export default {
         console.error('Erreur lors de la récupération des organisations:', error);
         throw error;
       });
-  }
+  },
+
+  async getUsersByOrganisation(organisationId, limit, offset) {
+    const response = await axios.get(`/api/organisations/${organisationId}/users`, {
+      params: {
+        limit,
+        offset
+      }
+    });
+    return response.data;
+  },
   
 };
