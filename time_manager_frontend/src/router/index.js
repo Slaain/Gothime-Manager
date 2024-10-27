@@ -68,9 +68,6 @@ router.beforeEach(async (to, from, next) => {
   // Vérifie si la route nécessite un accès admin
   if (to.matched.some(record => record.meta.requiresAdmin)) {
     // Si l'utilisateur n'est pas admin, redirige vers la page de connexion
-    if(isManager){
-      next('/manager/1');
-    }
     if (!authToken || !isAdmin) {
       next('/login'); // Redirige vers la page de connexion si l'utilisateur n'est pas admin
     } else {
