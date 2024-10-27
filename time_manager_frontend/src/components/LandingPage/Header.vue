@@ -5,7 +5,6 @@
     <div>
       <router-link to="/" class="text-2xl bold">Goth'time Manager</router-link>
     </div>
-
     <nav>
       <ul class="flex items-center justify-between gap-x-8">
         <li class="cursor-pointer hover:underline">
