@@ -1,29 +1,19 @@
 <template>
   <div class="bat-container">
     <div class="dashboard">
-    <SidebarManager />
+      <SidebarManager />
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
           <h1 class="text-3xl font-bold text-white">Dashboard : {{ organisation?.name }}</h1>
           <div class="flex items-center space-x-4 text-white user-info">
             <span>Manager</span>
-            <img
-              src="../assets/avatar.jpg"
-              alt="User Avatar"
-              class="w-10 h-10 rounded-full"
-              @click="toggleDropdown"
-            />
-            <div
-              v-if="isDropdownOpen"
-              ref="dropdown"
-              class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10"
-            >
-            <ul class="py-1 text-gray-700">
+            <img src="../assets/avatar.jpg" alt="User Avatar" class="w-10 h-10 rounded-full" @click="toggleDropdown" />
+            <div v-if="isDropdownOpen" ref="dropdown"
+              class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10">
+              <ul class="py-1 text-gray-700">
                 <li>
-                  <button
-                    @click="logout"
-                    class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900"
-                  >
+                  <button @click="logout"
+                    class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900">
                     Se déconnecter
                   </button>
                 </li>
@@ -31,203 +21,141 @@
             </div>
           </div>
         </header>
-        
-        <div v-if="organisation" class="organisation-card">
-          <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
-            {{ organisation.name }}
-          </h2>
-          <p>{{ organisation.description }}</p>
 
-          <div v-if="isEditing" class="flex items-center">
-            <input
-              v-model="organisationName"
-              @keyup.enter="saveOrganisationName"
-              @blur="toggleEdit"
-              class="text-xl font-semibold input-field"
-              type="text"
-            />
-            <!-- Bouton de coche pour sauvegarder -->
-            <button @click="saveOrganisationName" class="ml-2 btn-save">
-              <i class="fas fa-check"></i>
-            </button>
-          </div>
-        <!-- Regrouper les boutons d'édition et de suppression ensemble à droite -->
-          <div class="flex action-buttons">
-          <button @click="toggleEdit" class="btn-edit" v-if="!isEditing">
-            <i class="fas fa-pencil-alt"></i>
-            <!-- Icône de stylo -->
-          </button>
-          <button
-            @click="deleteOrganisation"
-            class="btn-delete"
-            v-if="!isEditing"
-          >
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      <!-- Bouton "Add Group" au centre -->
-        <div class="flex justify-center mb-4">
-          <button @click="openCreateGroupModal" class="btn btn-primary">
-            Add Group
-          </button>
-        </div>
+        <div class="container">
+          <div v-if="organisation" class="organisation-card">
+            <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
+              {{ organisation.name }}
+            </h2>
+            <p>{{ organisation.description }}</p>
 
-
-          <div class="mb-4 overflow-y-auto groups-container">
-            <h3 class="font-medium text-white">List Groups:</h3>
-            <ul>
-              <li v-for="group in groups" :key="group.id" 
-                class="flex justify-between items-center mb-2 text-white">
-                {{ group.groupname }}
-
-                <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
-                  Voir
-                </button>
-              </li>
-            </ul>
-          </div>
-          
-          <!-- Modale pour afficher les utilisateurs -->
-          <div
-            v-if="showGroupModal"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
-            >
-            <div
-              class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9"
-              >
-              <button
-                @click="closeGroupModal"
-                class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2"
-              >
-                X
+            <div v-if="isEditing" class="flex items-center">
+              <input v-model="organisationName" @keyup.enter="saveOrganisationName" @blur="toggleEdit"
+                class="text-xl font-semibold input-field" type="text" />
+              <!-- Bouton de coche pour sauvegarder -->
+              <button @click="saveOrganisationName" class="ml-2 btn-save">
+                <i class="fas fa-check"></i>
               </button>
-              <h3 class="mb-4 text-2xl font-bold text-white">
-                Group: {{ selectedGroup.groupname }}
-              </h3>
-              <p class="mb-4 text-white">
-                Start: {{ formatDate(selectedGroup.start_date) }} | End:
-                {{ formatDate(selectedGroup.end_date) }}
-              </p>
+            </div>
 
-               <!-- Working Times associés -->
-              <h4 class="mb-2 text-lg font-bold text-white">Working Times</h4>
+            <!-- Regrouper les boutons d'édition et de suppression ensemble à droite -->
+            <div class="flex action-buttons">
+              <button @click="toggleEdit" class="btn-edit" v-if="!isEditing">
+                <i class="fas fa-pencil-alt"></i>
+                <!-- Icône de stylo -->
+              </button>
+              <button @click="deleteOrganisation" class="btn-delete" v-if="!isEditing">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            <!-- Bouton "Add Group" au centre -->
+            <div class="flex justify-center mb-4">
+              <button @click="openCreateGroupModal" class="btn btn-primary">
+                Add Group
+              </button>
+            </div>
+
+            <div class="mb-4 overflow-y-auto groups-container">
+              <h3 class="font-medium text-white">List Groups:</h3>
               <ul>
-                <li
-                  v-for="time in selectedGroupWorkingTimes"
-                  :key="time.id"
-                  class="flex justify-between mb-2"
-                >
-                  <span class="text-white"
-                    >Start: {{ formatDate(time.start) }} - End:
-                    {{ formatDate(time.end) }}</span
-                  >
-                </li>
-              </ul>
-              <!-- Liste des utilisateurs -->
-              <h4 class="mb-2 text-lg font-bold text-white">Users in this Group</h4>
-              <ul>
-                <li
-                  v-for="user in selectedGroupUsers"
-                  :key="user.id"
-                  class="flex justify-between mb-2"
-                >
-                  <span class="text-white"
-                    >{{ user.username }} ({{ user.email }})</span
-                  >
-                  <button
-                    @click="removeUserFromGroup(user.id)"
-                    class="text-red-600 hover:underline"
-                  >
-                    Remove
+                <li v-for="group in groups" :key="group.id" class="flex justify-between items-center mb-2 text-white">
+                  {{ group.groupname }}
+
+                  <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
+                    Voir
                   </button>
                 </li>
               </ul>
-              <!-- Boutons pour ajouter un utilisateur ou supprimer le groupe -->
-              <div class="flex justify-between mt-4">
-                <button
-                  @click="openUserModal"
-                  class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
-                >
-                  Add User
+            </div>
+
+            <!-- Modale pour afficher les utilisateurs -->
+            <div v-if="showGroupModal"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+              <div
+                class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9">
+                <button @click="closeGroupModal"
+                  class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2">
+                  X
                 </button>
-                <button
-                  @click="deleteGroup"
-                  class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                >
-                  Delete Group
-                </button>
+                <h3 class="mb-4 text-2xl font-bold text-white">
+                  Group: {{ selectedGroup.groupname }}
+                </h3>
+                <p class="mb-4 text-white">
+                  Start: {{ formatDate(selectedGroup.start_date) }} | End:
+                  {{ formatDate(selectedGroup.end_date) }}
+                </p>
+
+                <!-- Working Times associés -->
+                <h4 class="mb-2 text-lg font-bold text-white">Working Times</h4>
+                <ul>
+                  <li v-for="time in selectedGroupWorkingTimes" :key="time.id" class="flex justify-between mb-2">
+                    <span class="text-white">Start: {{ formatDate(time.start) }} - End:
+                      {{ formatDate(time.end) }}</span>
+                  </li>
+                </ul>
+                <!-- Liste des utilisateurs -->
+                <h4 class="mb-2 text-lg font-bold text-white">Users in this Group</h4>
+                <ul>
+                  <li v-for="user in selectedGroupUsers" :key="user.id" class="flex justify-between mb-2">
+                    <span class="text-white">{{ user.username }} ({{ user.email }})</span>
+                    <button @click="removeUserFromGroup(user.id)" class="text-red-600 hover:underline">
+                      Remove
+                    </button>
+                  </li>
+                </ul>
+                <!-- Boutons pour ajouter un utilisateur ou supprimer le groupe -->
+                <div class="flex justify-between mt-4">
+                  <button @click="openUserModal" class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+                    Add User
+                  </button>
+                  <button @click="deleteGroup" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">
+                    Delete Group
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Modale pour créer un groupe avec CreaGroupComponent -->
-          <div
-            v-if="showCreateGroupModal"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
-          >
-            <div
-              class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9"
-            >
-            <button
-              @click="closeCreateGroupModal"
-              class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2"
-            >
-              X
-            </button>
-            <CreaGroupComponent
-              @group-created="handleGroupCreated"
-              @close="closeCreateGroupModal"
-            />
+            <!-- Modale pour créer un groupe avec CreaGroupComponent -->
+            <div v-if="showCreateGroupModal"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+              <div
+                class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9">
+                <button @click="closeCreateGroupModal"
+                  class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2">
+                  X
+                </button>
+                <CreaGroupComponent @group-created="handleGroupCreated" @close="closeCreateGroupModal" />
+              </div>
             </div>
-          </div>
 
-          <!-- Modale d'ajout d'utilisateur -->
-          <div
-            v-if="showUserModal"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-            >
-            <div
-              class="w-1/2 px-8 py-4 rounded-lg shadow-md modal-content glassmorphism-bg-white"
-            >
-            <h3 class="mb-4 text-lg font-semibold text-yellow-400">
-              Add User to Group
-            </h3>
-            <select
-              v-model="selectedUser"
-              class="w-full p-2 mb-4 text-white border rounded"
-              >
-              <option
-                class="text-black"
-                v-for="user in allUsers"
-                :key="user.id"
-                :value="user.id"
-                >
-                {{ user.username }} ({{ user.email }})
-              </option>
-            </select>
-            <div class="flex justify-end gap-4 mt-4">
-              <button
-                @click="addUserToGroup"
-                class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
-                >
-                Add
-              </button>
-              <button
-                @click="closeUserModal"
-                class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
-                >
-                Cancel
-              </button>
+            <!-- Modale d'ajout d'utilisateur -->
+            <div v-if="showUserModal"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div class="w-1/2 px-8 py-4 rounded-lg shadow-md modal-content glassmorphism-bg-white">
+                <h3 class="mb-4 text-lg font-semibold text-yellow-400">
+                  Add User to Group
+                </h3>
+                <select v-model="selectedUser" class="w-full p-2 mb-4 text-white border rounded">
+                  <option class="text-black" v-for="user in allUsers" :key="user.id" :value="user.id">
+                    {{ user.username }} ({{ user.email }})
+                  </option>
+                </select>
+                <div class="flex justify-end gap-4 mt-4">
+                  <button @click="addUserToGroup" class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600">
+                    Add
+                  </button>
+                  <button @click="closeUserModal" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-            <CreateOrganisationModal
-            v-if="showCreateModal"
-            @close-modal="handleCloseCreateModal"
-            @organisation-created="fetchOrganisation"
-          />
 
-          <button @click="handleModifyOrganisation(organisation.id)" class="btn">Modifier</button>
+            <CreateOrganisationModal v-if="showCreateModal" @close-modal="handleCloseCreateModal"
+              @organisation-created="fetchOrganisation" />
+
+            <button @click="handleModifyOrganisation(organisation.id)" class="btn">Modifier</button>
+          </div>
         </div>
 
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
@@ -238,27 +166,21 @@
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
-            <div
-              class="flex items-center justify-center h-40 working-times-number"
-            >
+            <div class="flex items-center justify-center h-40 working-times-number">
               {{ monthlyUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
-            <div
-              class="flex items-center justify-center h-40 working-times-number"
-            >
+            <div class="flex items-center justify-center h-40 working-times-number">
               {{ currentUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
-            <div
-              class="flex items-center justify-center h-40 working-times-number"
-            >
+            <div class="flex items-center justify-center h-40 working-times-number">
               {{ workingTimesThisMonth }}
             </div>
           </div>
@@ -282,7 +204,7 @@
 <script>
 import axios from 'axios';
 import LineChartManager from '../components/LineChartManager.vue';
-import UserModal from '../components/OrganisationUserList.vue'; 
+import UserModal from '../components/OrganisationUserList.vue';
 import SidebarManager from "../components/SidebarManager.vue";
 import UserListManager from '../components/UserListManager.vue';
 import LineChart from '../components/LineChart.vue';
@@ -328,10 +250,10 @@ export default {
       showGroupModal: false,
       showUserModal: false,
       selectedUser: null,
-      isEditing: false, 
+      isEditing: false,
       isDropdownOpen: false,
       specifiedOrganisationId: '1',
-      allEmployees:[],
+      allEmployees: [],
       selectedUserId: null,
     };
   },
@@ -340,7 +262,8 @@ export default {
       try {
         const response = await axios.get(
           `http://localhost:4000/api/organisations/${this.organisationId}`,
-          {headers: {
+          {
+            headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
             },
@@ -356,7 +279,7 @@ export default {
     selectUser(userId) {
       this.selectedUserId = userId;
       console.log("Selected user ID:", this.selectedUserId);
-     },
+    },
 
     modifyOrganisation() {
       this.$emit("modify-organisation", this.organisation.id);
@@ -391,55 +314,55 @@ export default {
         this.updateCharts();
       } catch (error) {
         console.error("Erreur lors de la récupération des working times:", error);
-        }
-    } ,
+      }
+    },
     // Récupérer et filtrer les working times en fonction de l'organisation
 
     async getWorkingTimesThisMonthByOrganisation() {
-        try {
-          const response = await axios.get(
-            `http://localhost:4000/api/workingtimes/count_by_organisation/${this.organisationId}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            }
-          );
-          this.monthlyUsers = response.data.users_count;
-          this.workingTimesThisMonth = response.data.working_times_count;
-        } catch (error) {
-          console.error(
-            "Erreur lors de la récupération des working times",
-            error
-          );
-        }
-      },
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/workingtimes/count_by_organisation/${this.organisationId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        this.monthlyUsers = response.data.users_count;
+        this.workingTimesThisMonth = response.data.working_times_count;
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des working times",
+          error
+        );
+      }
+    },
 
-      async getCurrentUsers() {
-        try {
-          const response = await axios.get(
-            `http://localhost:4000/api/clocks/countactive_by_organisation/${this.organisationId}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            }
-          );
+    async getCurrentUsers() {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/clocks/countactive_by_organisation/${this.organisationId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
 
-          this.currentUsers = response.data.count;
-        } catch (error) {
-          console.error(
-            "Erreur lors de la récupération des utilisateurs actifs",
-            error
-          );
-        }
-      },
+        this.currentUsers = response.data.count;
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des utilisateurs actifs",
+          error
+        );
+      }
+    },
 
-      toggleEdit() {
-        this.isEditing = !this.isEditing;
-      },
+    toggleEdit() {
+      this.isEditing = !this.isEditing;
+    },
 
     cancelEdit() {
       if (this.isEditing) {
@@ -591,13 +514,13 @@ export default {
       } catch (error) {
         console.error("Erreur lors de la suppression du groupe :", error);
       }
-      
+
     },
 
     toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
-  },
-  logout() {
+      this.isDropdownOpen = !this.isDropdownOpen;
+    },
+    logout() {
       // Logique de déconnexion
       localStorage.removeItem("authToken"); // Supprime le token de l'utilisateur
       this.$router.push("/login"); // Redirige vers la page de connexion
@@ -612,9 +535,9 @@ export default {
         this.isDropdownOpen = false;
       }
     },
-   
+
   },
-  
+
   mounted() {
     console.log("Dashboard mounted : ", localStorage.getItem("authToken"));
     this.fetchOrganisation();
@@ -634,34 +557,36 @@ export default {
 
 
 <style scoped>
-  .bat-container {
-    background: #333333;
-    background-image: url("../assets/images/bat.png");
-    background-repeat: repeat;
-    background-size: 100px 100px;
-    background-position: 0 0;
-  }
+.bat-container {
+  background: #333333;
+  background-image: url("../assets/images/bat.png");
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  background-position: 0 0;
+}
 
-  .bat-container::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("../assets/images/noise.png"); 
-    background-repeat: repeat;
-    opacity: 0.1; 
-    pointer-events: none;
-    z-index: 1; 
-  } 
+.bat-container::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../assets/images/noise.png");
+  background-repeat: repeat;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* Bouton d'édition avec icône */
 .btn-edit {
   background: none;
   border: none;
   cursor: pointer;
   color: #fdcb12;
-  margin-left: 10px; /* Espace entre le nom et l'icône */
+  margin-left: 10px;
+  /* Espace entre le nom et l'icône */
 }
 
 .btn-edit:hover {
@@ -688,18 +613,21 @@ export default {
   color: #00cc00;
 }
 
-  .chart {
-    background-color: #2d3748; 
-    padding: 20px;
-    border-radius: 10px;
-  } 
-  .btn-primary {
+.chart {
+  background-color: #2d3748;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.btn-primary {
   background-color: #fdcb12;
   color: black;
 }
+
 .btn-primary:hover {
   background-color: #f5b900;
 }
+
 .btn-secondary {
   background-color: #6c757d;
   color: white;
@@ -708,142 +636,139 @@ export default {
 .btn-secondary:hover {
   background-color: #5a6268;
 }
-  .chart:hover .working-times-number {
-    color: #fdcb12;
-    -webkit-text-stroke: 0px;
-    text-shadow: 0 0 10px rgba(253, 203, 18, 0.8),
-                 0 0 20px rgba(253, 203, 18, 0.6);
-  }
 
-  .dashboard {
-    display: flex;
-    min-height: 100vh;
-    position: relative;
-    background-image: url("../assets/images/noise.png"); 
-    z-index: 2; 
-  } 
-    
-  .groups-container {
-    max-height: 150px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-  }
+.chart:hover .working-times-number {
+  color: #fdcb12;
+  -webkit-text-stroke: 0px;
+  text-shadow: 0 0 10px rgba(253, 203, 18, 0.8),
+    0 0 20px rgba(253, 203, 18, 0.6);
+}
 
-  .groups-container ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background-image: url("../assets/images/noise.png");
+  z-index: 2;
+}
 
-  .groups-container li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
+.groups-container {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
 
-  .groups-container li button {
-    background-color: #6c757d;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
+.groups-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-  .groups-container li button:hover {
-    background-color: #5a6268;
-  }
+.groups-container li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
 
-  .glassmorphism {
-      position: relative;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-radius: 10px;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      color: white;
-      overflow: hidden; 
-    }
-  
-  .glassmorphism::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 2px;
-    border-radius: 10px;
-    background: linear-gradient(
-      to bottom right,
+.groups-container li button {
+  background-color: #6c757d;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.groups-container li button:hover {
+  background-color: #5a6268;
+}
+
+.glassmorphism {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: white;
+  overflow: hidden;
+}
+
+.glassmorphism::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  border-radius: 10px;
+  background: linear-gradient(to bottom right,
       #ffffff,
       rgba(255, 255, 255, 0.5),
-      #fdcb12
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: destination-out;
-    mask-composite: exclude;
-    pointer-events: none; 
-  }
-  
-  .glassmorphism h2 {
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.85);
-  }
-  
-  .glassmorphism .line-chart {
-    padding: 1rem;
-    border-radius: 8px;
-  }
-  
-  .glassmorphism-bg-white {
-    position: relative;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 10px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    color: white;
-    overflow: hidden; 
-  }
+      #fdcb12);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+}
 
-  .glassmorphism-bg-white::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 2px;
-    border-radius: 10px;
-    background: linear-gradient(
-      to bottom right,
+.glassmorphism h2 {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.glassmorphism .line-chart {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.glassmorphism-bg-white {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: white;
+  overflow: hidden;
+}
+
+.glassmorphism-bg-white::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  border-radius: 10px;
+  background: linear-gradient(to bottom right,
       #ffffff,
       rgba(255, 255, 255, 0.8),
-      #ffffff
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: destination-out;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  
-  .glassmorphism-bg-white h2 {
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.85);
-  }
-  
-  .glassmorphism-bg-white .line-chart {
-    padding: 1rem;
-    border-radius: 8px;
-  }
+      #ffffff);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+}
 
-  h1 {
-    color: #fdcb12;
-  }
+.glassmorphism-bg-white h2 {
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.85);
+}
 
-  /* Champ d'édition plus petit et adapté à la carte */
+.glassmorphism-bg-white .line-chart {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+h1 {
+  color: #fdcb12;
+}
+
+/* Champ d'édition plus petit et adapté à la carte */
 .input-field {
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid #fdcb12;
@@ -851,99 +776,105 @@ export default {
   padding: 0.2em;
   border-radius: 4px;
   outline: none;
-  width: 180px; /* Agrandir légèrement */
+  width: 180px;
+  /* Agrandir légèrement */
 }
 
 
-  .line-chart {
-    padding: 20px;
-    border-radius: 10px;
-    width: 100%;
-    color: white;
-  }
+.line-chart {
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  color: white;
+}
 
-  .main-content {
-    flex: 1;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-  } 
+.main-content {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+}
 
-  .organisation-card {
-    position: relative;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    color: white;
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out;
-    z-index: 2;
-    width: 450px;  /* Largeur fixe */
-    height: 400px; /* Hauteur fixe */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: center;
-  }
+.container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  /* height: 50vh;  */
+}
 
-  .organisation-card:hover {
-    transform: translateY(-10px);
-  }
+.organisation-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  color: white;
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+  z-index: 2;
+  width: 500px;
+  height: 355px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: center;
+}
 
-  .organisation-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    background: linear-gradient(
-      to bottom right,
+.organisation-card:hover {
+  transform: translateY(-10px);
+}
+
+.organisation-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(to bottom right,
       rgba(255, 255, 255, 0.2),
       rgba(255, 255, 255, 0.1),
-      #fdcb12
-    );
-    opacity: 0.4;
-    z-index: 1;
-    pointer-events: none;
-  }
+      #fdcb12);
+  opacity: 0.4;
+  z-index: 1;
+  pointer-events: none;
+}
 
-  .organisation-card h2 {
-    font-size: 1.5rem;
-    color: #fdcb12;
-    margin-bottom: 10px;
-  }
+.organisation-card h2 {
+  font-size: 1.5rem;
+  color: #fdcb12;
+  margin-bottom: 10px;
+}
 
-  .organisation-card .btn {
-    padding: 0.5em 1em;
-    background-color: #fdcb12;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    color: black;
-  }
+.organisation-card .btn {
+  padding: 0.5em 1em;
+  background-color: #fdcb12;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  color: black;
+}
 
-  .organisation-card .btn:hover {
-    background-color: #f5b900;
-  }
+.organisation-card .btn:hover {
+  background-color: #f5b900;
+}
 
-  /* .sidebar {
+/* .sidebar {
   width: 200px;
   background-color: #212327;
   padding: 20px;
 } */
-  
-  .working-times-number {
-    font-size: 6rem;
-    color: transparent;
-    -webkit-text-stroke: 2px #fdcb12;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-  }
 
-  .working-time-container {
+.working-times-number {
+  font-size: 6rem;
+  color: transparent;
+  -webkit-text-stroke: 2px #fdcb12;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.working-time-container {
   /* background-color: #2d3748; */
   padding: 20px;
   border-radius: 10px;
