@@ -160,7 +160,7 @@
 
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
-          <LineChart />
+          <LineChartManager :organisationId="organisationId" />
         </section>
 
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
@@ -207,7 +207,6 @@ import LineChartManager from '../components/LineChartManager.vue';
 import UserModal from '../components/OrganisationUserList.vue';
 import SidebarManager from "../components/SidebarManager.vue";
 import UserListManager from '../components/UserListManager.vue';
-import LineChart from '../components/LineChart.vue';
 import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import BarChart from "@/components/WorkingTimesChart.vue";
@@ -217,7 +216,7 @@ import { useToast } from "vue-toastification";
 export default {
   components: {
     SidebarManager,
-    LineChart,
+    LineChartManager,
     BarChart,
     UserModal,
     UserListManager,
