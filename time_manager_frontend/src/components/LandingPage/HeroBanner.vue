@@ -14,6 +14,7 @@
 
     <div class="flex items-center justify-center mt-8 gap-x-6">
       <router-link
+      to="/contact"
         class="px-6 py-3 text-black rounded-md bg-primaryYellow hover:bg-primaryYellow400"
       >
         Get Started
@@ -21,7 +22,7 @@
       <button
         class="px-6 py-3 bg-white border rounded-md hover:bg-neutral-100 text-primaryYellow400 border-primaryYellow400"
       >
-        Explore Goth'time
+        Explore Gothime
       </button>
     </div>
   </div>

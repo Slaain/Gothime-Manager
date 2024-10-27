@@ -3,7 +3,7 @@
     class="flex flex-row items-center justify-between w-full px-16 py-4 text-white"
   >
     <div>
-      <router-link to="/" class="text-2xl bold">Goth'time Manager</router-link>
+      <router-link to="/" class="text-2xl bold">Gothime Manager</router-link>
     </div>
     <nav>
       <ul class="flex items-center justify-between gap-x-8">
