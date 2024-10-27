@@ -120,14 +120,27 @@ export default {
       });
   },
 
-  async getUsersByOrganisation(organisationId, limit, offset) {
-    const response = await axios.get(`/api/organisations/${organisationId}/users`, {
-      params: {
-        limit,
-        offset
-      }
-    });
-    return response.data;
-  },
+  getUsersByOrganisationAndGroups(organisationId, limit, offset) {
+    return axios
+      .get(`${ORGANISATION_API_URL}/${organisationId}/users_with_groups`, {
+        params: { limit, offset },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      })
+      .then((response) => {
+        console.log("API Response:", response.data);
+        if (response.data && response.data.users) {
+          return response.data;
+        } else {
+          throw new Error("Invalid response structure");
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des employés avec groupes:", error);
+        throw error;
+      });
+  },  
   
 };

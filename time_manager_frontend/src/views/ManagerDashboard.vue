@@ -33,12 +33,11 @@
         </header>
         
         <div v-if="organisation" class="organisation-card">
-          <h2>{{ organisation.name }}</h2>
+          <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
+            {{ organisation.name }}
+          </h2>
           <p>{{ organisation.description }}</p>
 
-          <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
-          {{ organisation.name }}
-        </h2>
           <div v-if="isEditing" class="flex items-center">
             <input
               v-model="organisationName"
@@ -268,7 +267,7 @@
         <section class="p-0 users">
           <h2 class="mb-4 text-xl text-white">Listes des employés</h2>
           <div class="overflow-x-auto">
-            <UserListManager :organisationId="specifiedOrganisationId" @updateUserId="selectUser" />
+            <UserListManager :organisationId="organisationId" @updateUserId="selectUser" />
           </div>
         </section>
 
@@ -319,7 +318,6 @@ export default {
       organisation: null,
       currentUsers: 0,
       workingTimes: [],
-      selectedUserId: null,
       showGroupComponent: false,
       groups: [],
       selectedGroup: null,
@@ -332,6 +330,9 @@ export default {
       selectedUser: null,
       isEditing: false, 
       isDropdownOpen: false,
+      specifiedOrganisationId: '1',
+      allEmployees:[],
+      selectedUserId: null,
     };
   },
   methods: {
@@ -347,10 +348,15 @@ export default {
         );
         this.organisation = response.data.data;
         this.groups = response.data.data.groups;
+
       } catch (error) {
         console.error("Erreur lors de la récupération de l'organisation:", error);
       }
     },
+    selectUser(userId) {
+      this.selectedUserId = userId;
+      console.log("Selected user ID:", this.selectedUserId);
+     },
 
     modifyOrganisation() {
       this.$emit("modify-organisation", this.organisation.id);
@@ -504,7 +510,7 @@ export default {
         );
       }
     },
-    
+
     closeGroupModal() {
       this.showGroupModal = false;
       this.selectedGroup = null;
@@ -606,13 +612,11 @@ export default {
         this.isDropdownOpen = false;
       }
     },
-
- // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
    
   },
+  
   mounted() {
     console.log("Dashboard mounted : ", localStorage.getItem("authToken"));
-   
     this.fetchOrganisation();
     this.fetchWorkingTimesByOrganisation();
     this.getWorkingTimesThisMonthByOrganisation();
