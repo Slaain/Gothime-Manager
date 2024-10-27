@@ -33,13 +33,13 @@ export default function GothamNeedsYouScreen() {
 
         switch (mode) {
             case 'daily':
-                url = `http://10.79.216.9:4000/api/workingtimes/daily/${userId}`;
+                url = `http://192.168.1.133:4000/api/workingtimes/daily/${userId}`;
                 break;
             case 'weekly':
-                url = `http://10.79.216.9:4000/api/workingtimes/weekly/${userId}`;
+                url = `http://192.168.1.133:4000/api/workingtimes/weekly/${userId}`;
                 break;
             case 'monthly':
-                url = `http://10.79.216.9:4000/api/workingtimes/monthly/${userId}`;
+                url = `http://192.168.1.133:4000/api/workingtimes/monthly/${userId}`;
                 break;
             default:
                 return;
@@ -71,7 +71,7 @@ export default function GothamNeedsYouScreen() {
                 setLoading(false);
                 return;
             }
-            const response = await axios.get(`http://10.79.216.9:4000/api/workingtimes/${userId}`);
+            const response = await axios.get(`http://192.168.1.133:4000/api/workingtimes/${userId}`);
             setWorkingTimes(response.data.data);
             setLoading(false);
             processChartData(response.data.data, 'day'); // Process initial data

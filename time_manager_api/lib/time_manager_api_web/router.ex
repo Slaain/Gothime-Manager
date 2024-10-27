@@ -143,6 +143,8 @@ defmodule TimeManagerApiWeb.Router do
   end
   post "/login", AuthController, :login        # Route pour la connexion
   post "/decrypt_token", AuthController, :decrypt_token  # Route pour décrypter le token
+  put "/update_password/:id", AuthController, :update_password
+
 
 
 

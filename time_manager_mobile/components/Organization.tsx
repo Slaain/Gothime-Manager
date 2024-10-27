@@ -28,7 +28,7 @@ export default function HelloWave() {
     if (!groups) return;
     const groupId = groups[0].id;
 
-    const response = await axios.get(`http://10.79.216.9:4000/api/groups/${groupId}`);
+    const response = await axios.get(`http://192.168.1.133:4000/api/groups/${groupId}`);
 
     setUsersGroup(response.data.data.users);
 

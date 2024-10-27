@@ -9,9 +9,10 @@ import { useLocalSearchParams } from 'expo-router'; // Hook fourni par expo-rout
 
 export default function HelloWave() {
   const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
-  const { session } = useSession();
+  const { session, signOut } = useSession();
   const { refreshQrCode } = useLocalSearchParams(); // Récupérer le paramètre "refresh" à partir de l'URL
 
+  // signOut(); // Déconnexion de l'utilisateur 
 
   const userId = jwtDecode(session).sub;
   const [userInfo, setUserInfo] = useState(null);
@@ -38,7 +39,7 @@ export default function HelloWave() {
 
 
   const fetchGetUserData = async () => {
-    const response = await axios.get(`http://10.79.216.9:4000/api/users/${userId}`)
+    const response = await axios.get(`http://192.168.1.133:4000/api/users/${userId}`)
 
     console.log("UUU : ", response.data.user)
     setUserInfo(response.data.user)
@@ -48,11 +49,17 @@ export default function HelloWave() {
   }
 
   const fetchUserOfOrganization = async () => {
-    const response = await axios.get(`http://10.79.216.9:4000/api/organisations/${userId}/users`)
+    try {
 
-    console.log("response org: ", response.data);
+      const response = await axios.get(`http://192.168.1.133:4000/api/organisations/${userId}/users`)
 
-    setOrganization(response.data)
+      console.log("response org: ", response.data);
+
+      setOrganization(response.data)
+    } catch (error) {
+      console.log("error : ", error);
+
+    }
   }
 
   const fetchGetUserGroup = async () => {
@@ -60,7 +67,7 @@ export default function HelloWave() {
     try {
 
 
-      const response = await axios.get(`http://10.79.216.9:4000/api/groups/user/${userId}`)
+      const response = await axios.get(`http://192.168.1.133:4000/api/groups/user/${userId}`)
 
       console.log("response group: ", response.data.groups);
       if (response.data.groups) {
@@ -72,7 +79,7 @@ export default function HelloWave() {
   }
 
   const getDayWorkingTime = async () => {
-    const response = await axios.get(`http://10.79.216.9:4000/api/workingtime/today/${userId}`)
+    const response = await axios.get(`http://192.168.1.133:4000/api/workingtime/today/${userId}`)
 
     console.log("response day working time: ", response.data);
 
