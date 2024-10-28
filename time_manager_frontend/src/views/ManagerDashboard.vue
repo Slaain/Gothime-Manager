@@ -214,7 +214,7 @@ import SidebarManager from "../components/SidebarManager.vue";
 import UserListManager from '../components/UserListManager.vue';
 import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
-import BarChart from "@/components/WorkingTimesChart.vue";
+import BarChartManager from '../components/BarChartManager.vue';
 import { useToast } from "vue-toastification";
 
 export default {
@@ -222,7 +222,7 @@ export default {
   components: {
     SidebarManager,
     LineChartManager,
-    BarChart,
+    BarChartManager,
     UserModal,
     UserListManager,
     WorkingTimeUserContainer,
