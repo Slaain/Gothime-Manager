@@ -56,14 +56,14 @@
           >
             {{ group.groupname }}
             <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
-              Voir
+              Show
             </button>
           </li>
         </ul>
       </div>
 
       <button @click="viewUsers" class="mt-2 btn btn-secondary">
-        Voir Users
+        Show Users
       </button>
     </div>
 

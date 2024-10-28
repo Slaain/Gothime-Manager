@@ -10,9 +10,6 @@
         <router-link to="/charts" class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
           Charts
         </router-link>
-        <router-link to="/users" class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-          Users
-        </router-link>
         <!-- Bouton pour les Organisations -->
         <router-link to="/organisations" class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
           Organisations
