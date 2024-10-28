@@ -17,6 +17,11 @@ const routes = [
     component: () => import("@/views/Contact.vue"),
   },
   {
+    path: '/charts',
+    name: 'Charts',
+    component: () => import("@/views/Chart.vue"),
+  },
+  {
     path: '/manager/:organisationId',
     name: 'ManagerDashboard',
     component: () => import("@/views/ManagerDashboard.vue"),

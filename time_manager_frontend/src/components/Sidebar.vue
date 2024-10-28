@@ -15,7 +15,7 @@
         </router-link>
         <!-- Bouton pour les Organisations -->
         <router-link to="/organisations" class="p-2 bg-gray-700 rounded-md hover:bg-gray-800">
-          Organizations
+          Organisations
         </router-link>
       </nav>
     </aside>
