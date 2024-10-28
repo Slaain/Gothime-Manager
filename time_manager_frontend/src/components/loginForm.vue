@@ -43,14 +43,6 @@
     </form>
 
     <!-- <p v-if="success" class="mt-4 text-center text-green-500">{{ success }}</p> -->
-
-    <!-- Lien vers la page d'inscription -->
-    <p class="mt-4 text-center text-white">
-      Don't have an account?
-      <a href="/register" class="text-primaryYellow hover:text-primaryYellow400"
-        >Sign up</a
-      >
-    </p>
   </div>
 </template>
 
@@ -64,7 +56,7 @@ import HeroBanner from "../components/LandingPage/HeroBanner.vue";
 export default {
   components: {
     Header,
-    HeroBanner
+    HeroBanner,
   },
   setup() {
     const form = ref({
