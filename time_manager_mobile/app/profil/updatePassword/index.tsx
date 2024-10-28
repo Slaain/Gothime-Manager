@@ -26,7 +26,7 @@ export default function ChangePasswordScreen() {
 
     try {
 
-      const response = await axios.put(`http://10.79.216.9:4000/api/update_password/${userId}`,
+      const response = await axios.put(`http://10.79.216.202:4000/api/update_password/${userId}`,
         {
           current_password: oldPassword,
           new_password: newPassword,
