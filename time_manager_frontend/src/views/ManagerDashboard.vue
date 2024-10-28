@@ -1,6 +1,6 @@
 <template>
   <div class="bat-container">
-    <div class="dashboard">
+    <div class="dashboard">  
       <SidebarManager />
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
@@ -151,10 +151,10 @@
               </div>
             </div>
 
-            <CreateOrganisationModal v-if="showCreateModal" @close-modal="handleCloseCreateModal"
-              @organisation-created="fetchOrganisation" />
+              <button @click="viewUsers" class="mt-2 btn btn-secondary">
+                Voir les employés
+              </button>
 
-            <button @click="handleModifyOrganisation(organisation.id)" class="btn">Modifier</button>
           </div>
         </div>
 
@@ -186,7 +186,7 @@
           </div>
         </section>
 
-        <section class="p-0 users">
+        <section id="employeeList"  class="p-0 users">
           <h2 class="mb-4 text-xl text-white">Listes des employés</h2>
           <div class="overflow-x-auto">
             <UserListManager :organisationId="organisationId" @updateUserId="selectUser" />
@@ -210,7 +210,6 @@ import UserListManager from '../components/UserListManager.vue';
 import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import BarChart from "@/components/WorkingTimesChart.vue";
-import CreateOrganisationModal from "../components/CreateOrganisationModal.vue"; // Import de la modale
 import { useToast } from "vue-toastification";
 
 export default {
@@ -222,7 +221,6 @@ export default {
     UserListManager,
     WorkingTimeUserContainer,
     CreaGroupComponent,
-    CreateOrganisationModal,
   },
   props: {
     organisationId: {
@@ -254,6 +252,7 @@ export default {
       specifiedOrganisationId: '1',
       allEmployees: [],
       selectedUserId: null,
+      
     };
   },
   methods: {
@@ -377,8 +376,11 @@ export default {
     },
 
     viewUsers() {
-      this.$emit("view-users", this.organisation.id);
-    },
+    const element = document.getElementById("employeeList");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  },
     formatDate(date) {
       const options = {
         year: "numeric",
@@ -456,6 +458,7 @@ export default {
       this.showUserModal = false;
       this.selectedUser = null;
     },
+    
     async addUserToGroup() {
       if (!this.selectedUser) {
         console.error("Aucun utilisateur sélectionné");
@@ -577,6 +580,8 @@ export default {
   pointer-events: none;
   z-index: 1;
 }
+
+
 
 /* Bouton d'édition avec icône */
 .btn-edit {
@@ -859,11 +864,11 @@ h1 {
   background-color: #f5b900;
 }
 
-/* .sidebar {
+.sidebarManager {
   width: 200px;
   background-color: #212327;
   padding: 20px;
-} */
+}
 
 .working-times-number {
   font-size: 6rem;
