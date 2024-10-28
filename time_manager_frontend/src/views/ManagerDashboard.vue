@@ -252,6 +252,7 @@ export default {
       specifiedOrganisationId: '1',
       allEmployees: [],
       selectedUserId: null,
+      organisationName: null,
       
     };
   },
@@ -297,12 +298,52 @@ export default {
           }
         );
         this.toast.success("Organisation name updated successfully.");
+        this.$emit("organisation-updated");
         this.isEditing = false; // Fermer l'édition après la sauvegarde
-        this.organisation.name = this.organisationName; // Mettre à jour le nom affiché
       } catch (error) {
-        this.toast.error("Failed to update organisation name.");
-        console.error("Error updating organisation name:", error);
+        this.toast.error("Error updating the organisation's name.");
+        console.error(
+          "Erreur lors de la mise à jour du nom de l'organisation:",
+          error
+        );      
       }
+    },
+    toggleEdit() {
+      if (!this.isEditing) {
+        this.isEditing = true; 
+      }
+    },
+
+    cancelEdit() {
+      if (this.isEditing) {
+        this.isEditing = false; // Désactiver le mode édition
+        this.organisationName = this.organisation.name; // Réinitialiser le nom si non sauvegardé
+      }
+    },
+
+    deleteOrganisation() {
+      if (confirm("Are you sure you want to delete this organisation?")) {
+        this.$emit("delete-organisation", this.organisation.id);
+      }
+    },
+    viewUsers() {
+    const element = document.getElementById("employeeList");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  },
+  
+  formatDate(date) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      return new Date(date)
+        .toLocaleDateString("fr-FR", options)
+        .replace(",", "");
     },
 
     async fetchWorkingTimesByOrganisation() {
@@ -358,41 +399,10 @@ export default {
       }
     },
 
-    toggleEdit() {
-      this.isEditing = !this.isEditing;
-    },
-
-    cancelEdit() {
-      if (this.isEditing) {
-        this.isEditing = false; // Désactiver le mode édition
-        this.organisationName = this.organisation.name; // Réinitialiser le nom si non sauvegardé
-      }
-    },
-
-    deleteOrganisation() {
-      if (confirm("Are you sure you want to delete this organisation?")) {
-        this.$emit("delete-organisation", this.organisation.id);
-      }
-    },
-
-    viewUsers() {
-    const element = document.getElementById("employeeList");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  },
-    formatDate(date) {
-      const options = {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      };
-      return new Date(date)
-        .toLocaleDateString("fr-FR", options)
-        .replace(",", "");
-    },
+    
+  
+   
+    
 
     async fetchGroups() {
       try {
