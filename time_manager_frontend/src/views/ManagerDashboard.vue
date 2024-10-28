@@ -294,7 +294,9 @@
           <div class="overflow-x-auto">
             <UserListManager
               :organisationId="organisationId"
+              :organisationName="organisation?.name" 
               @updateUserId="selectUser"
+
             />
           </div>
         </section>
@@ -408,6 +410,8 @@ export default {
         );
         this.organisation = response.data.data;
         this.groups = response.data.data.groups;
+        console.log("Organisation fetched:", this.organisation); // Vérification du nom
+
       } catch (error) {
         console.error(
           "Erreur lors de la récupération de l'organisation:",
