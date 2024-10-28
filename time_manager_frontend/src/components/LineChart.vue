@@ -2,7 +2,11 @@
   <div class="line-chart-container">
     <div class="filter-container">
       <label for="filterSelect" class="filter-label">Select Time Period:</label>
-      <select v-model="selectedFilter" @change="fetchWorkingTimes" id="filterSelect">
+      <select
+        v-model="selectedFilter"
+        @change="fetchWorkingTimes"
+        id="filterSelect"
+      >
         <option value="lastSixMonths">Last 6 Months (Monthly)</option>
         <option value="lastWeek">Last Week (Daily)</option>
         <option value="month">This Month (Weekly)</option>
@@ -10,7 +14,9 @@
     </div>
     <canvas id="myChart"></canvas>
     <div v-if="displayPeriod" class="period-display">
-      <p>Data from: <strong>{{ displayPeriod }}</strong></p>
+      <p>
+        Data from: <strong>{{ displayPeriod }}</strong>
+      </p>
     </div>
   </div>
 </template>
@@ -56,7 +62,13 @@ export default {
   methods: {
     async fetchWorkingTimes() {
       try {
-        const response = await fetch("http://localhost:4000/api/workingtimes");
+        const response = await fetch("http://localhost:4000/api/workingtimes", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
         const data = await response.json();
 
         let transformedData;
@@ -74,7 +86,10 @@ export default {
 
         this.renderChart(transformedData.labels, transformedData.hoursWorked);
       } catch (error) {
-        console.error("Erreur lors de la récupération des working times:", error);
+        console.error(
+          "Erreur lors de la récupération des working times:",
+          error
+        );
       }
     },
 

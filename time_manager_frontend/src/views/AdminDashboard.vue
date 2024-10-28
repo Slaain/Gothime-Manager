@@ -41,7 +41,7 @@
 
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
-          <DonutChart />
+          <LineChart />
         </section>
 
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
