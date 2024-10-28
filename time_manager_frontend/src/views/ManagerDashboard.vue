@@ -4,20 +4,29 @@
       <SidebarManager />
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
-          <h1 class="text-3xl font-bold text-white">Dashboard : {{ organisation?.name }}</h1>
+          <h1 class="text-3xl font-bold text-white">
+            Dashboard : {{ organisation?.name }}
+          </h1>
           <div class="flex items-center space-x-4 text-white user-info">
             <span>Manager</span>
-            <img src="../assets/avatar.jpg" 
-              alt="User Avatar" 
+            <img
+              src="../assets/avatar.jpg"
+              alt="User Avatar"
               class="w-10 h-10 rounded-full"
-              @click="toggleDropdown" />
+              @click="toggleDropdown"
+            />
 
-            <div v-if="isDropdownOpen" ref="dropdown"
-              class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10">
+            <div
+              v-if="isDropdownOpen"
+              ref="dropdown"
+              class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10"
+            >
               <ul class="py-1 text-gray-700">
                 <li>
-                  <button @click="logout"
-                    class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900">
+                  <button
+                    @click="logout"
+                    class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900"
+                  >
                     Se déconnecter
                   </button>
                 </li>
@@ -26,16 +35,36 @@
           </div>
         </header>
 
-          <div class="container ">
-          <div v-if="organisation" class="organisation-card p-6 mb-6 rounded-lg shadow-lg glassmorphism">
+        <div class="container flex flex-col">
+          <div>
+            <button
+              @click="generateQRCode"
+              class="px-6 py-3 mb-6 font-bold text-white rounded-lg bg-primaryYellow hover:bg-yellowPrimary400"
+            >
+              Generate QR Code
+            </button>
+
+            <div class="h-64">
+              <canvas ref="qrcodeCanvas" class="mx-auto"></canvas>
+            </div>
+          </div>
+          <div
+            v-if="organisation"
+            class="p-6 mb-6 rounded-lg shadow-lg organisation-card glassmorphism"
+          >
             <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
               {{ organisation.name }}
             </h2>
             <p>{{ organisation.description }}</p>
 
             <div v-if="isEditing" class="flex items-center">
-              <input v-model="organisationName" @keyup.enter="saveOrganisationName" @blur="toggleEdit"
-                class="text-xl font-semibold input-field" type="text" />
+              <input
+                v-model="organisationName"
+                @keyup.enter="saveOrganisationName"
+                @blur="toggleEdit"
+                class="text-xl font-semibold input-field"
+                type="text"
+              />
               <!-- Bouton de coche pour sauvegarder -->
               <button @click="saveOrganisationName" class="ml-2 btn-save">
                 <i class="fas fa-check"></i>
@@ -48,7 +77,11 @@
                 <i class="fas fa-pencil-alt"></i>
                 <!-- Icône de stylo -->
               </button>
-              <button @click="deleteOrganisation" class="btn-delete" v-if="!isEditing">
+              <button
+                @click="deleteOrganisation"
+                class="btn-delete"
+                v-if="!isEditing"
+              >
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -62,10 +95,17 @@
             <div class="mb-4 overflow-y-auto groups-container">
               <h3 class="font-medium text-white">List Groups:</h3>
               <ul>
-                <li v-for="group in groups" :key="group.id" class="flex justify-between items-center mb-2 text-white">
+                <li
+                  v-for="group in groups"
+                  :key="group.id"
+                  class="flex items-center justify-between mb-2 text-white"
+                >
                   {{ group.groupname }}
 
-                  <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
+                  <button
+                    @click="viewGroup(group)"
+                    class="ml-4 btn btn-secondary"
+                  >
                     Voir
                   </button>
                 </li>
@@ -73,12 +113,17 @@
             </div>
 
             <!-- Modale pour afficher les utilisateurs -->
-            <div v-if="showGroupModal"
-              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+            <div
+              v-if="showGroupModal"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
+            >
               <div
-                class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9">
-                <button @click="closeGroupModal"
-                  class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2">
+                class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9"
+              >
+                <button
+                  @click="closeGroupModal"
+                  class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2"
+                >
                   X
                 </button>
                 <h3 class="mb-4 text-2xl font-bold text-white">
@@ -92,27 +137,50 @@
                 <!-- Working Times associés -->
                 <h4 class="mb-2 text-lg font-bold text-white">Working Times</h4>
                 <ul>
-                  <li v-for="time in selectedGroupWorkingTimes" :key="time.id" class="flex justify-between mb-2">
-                    <span class="text-white">Start: {{ formatDate(time.start) }} - End:
-                      {{ formatDate(time.end) }}</span>
+                  <li
+                    v-for="time in selectedGroupWorkingTimes"
+                    :key="time.id"
+                    class="flex justify-between mb-2"
+                  >
+                    <span class="text-white"
+                      >Start: {{ formatDate(time.start) }} - End:
+                      {{ formatDate(time.end) }}</span
+                    >
                   </li>
                 </ul>
                 <!-- Liste des utilisateurs -->
-                <h4 class="mb-2 text-lg font-bold text-white">Users in this Group</h4>
+                <h4 class="mb-2 text-lg font-bold text-white">
+                  Users in this Group
+                </h4>
                 <ul>
-                  <li v-for="user in selectedGroupUsers" :key="user.id" class="flex justify-between mb-2">
-                    <span class="text-white">{{ user.username }} ({{ user.email }})</span>
-                    <button @click="removeUserFromGroup(user.id)" class="text-red-600 hover:underline">
+                  <li
+                    v-for="user in selectedGroupUsers"
+                    :key="user.id"
+                    class="flex justify-between mb-2"
+                  >
+                    <span class="text-white"
+                      >{{ user.username }} ({{ user.email }})</span
+                    >
+                    <button
+                      @click="removeUserFromGroup(user.id)"
+                      class="text-red-600 hover:underline"
+                    >
                       Remove
                     </button>
                   </li>
                 </ul>
                 <!-- Boutons pour ajouter un utilisateur ou supprimer le groupe -->
                 <div class="flex justify-between mt-4">
-                  <button @click="openUserModal" class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+                  <button
+                    @click="openUserModal"
+                    class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+                  >
                     Add User
                   </button>
-                  <button @click="deleteGroup" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">
+                  <button
+                    @click="deleteGroup"
+                    class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                  >
                     Delete Group
                   </button>
                 </div>
@@ -120,35 +188,61 @@
             </div>
 
             <!-- Modale pour créer un groupe avec CreaGroupComponent -->
-            <div v-if="showCreateGroupModal"
-              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+            <div
+              v-if="showCreateGroupModal"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70"
+            >
               <div
-                class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9">
-                <button @click="closeCreateGroupModal"
-                  class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2">
+                class="relative w-full max-w-3xl p-10 rounded-lg shadow-lg modal-content glassmorphism-bg-white pt-9"
+              >
+                <button
+                  @click="closeCreateGroupModal"
+                  class="absolute px-3 py-1 font-bold text-black bg-yellow-400 rounded close-button top-2 right-2"
+                >
                   X
                 </button>
-                <CreaGroupComponent @group-created="handleGroupCreated" @close="closeCreateGroupModal" />
+                <CreaGroupComponent
+                  @group-created="handleGroupCreated"
+                  @close="closeCreateGroupModal"
+                />
               </div>
             </div>
 
             <!-- Modale d'ajout d'utilisateur -->
-            <div v-if="showUserModal"
-              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-              <div class="w-1/2 px-8 py-4 rounded-lg shadow-md modal-content glassmorphism-bg-white">
+            <div
+              v-if="showUserModal"
+              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            >
+              <div
+                class="w-1/2 px-8 py-4 rounded-lg shadow-md modal-content glassmorphism-bg-white"
+              >
                 <h3 class="mb-4 text-lg font-semibold text-yellow-400">
                   Add User to Group
                 </h3>
-                <select v-model="selectedUser" class="w-full p-2 mb-4 text-white border rounded">
-                  <option class="text-black" v-for="user in allUsers" :key="user.id" :value="user.id">
+                <select
+                  v-model="selectedUser"
+                  class="w-full p-2 mb-4 text-white border rounded"
+                >
+                  <option
+                    class="text-black"
+                    v-for="user in allUsers"
+                    :key="user.id"
+                    :value="user.id"
+                  >
                     {{ user.username }} ({{ user.email }})
                   </option>
                 </select>
                 <div class="flex justify-end gap-4 mt-4">
-                  <button @click="addUserToGroup" class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600">
+                  <button
+                    @click="addUserToGroup"
+                    class="px-4 py-2 text-white bg-green-500 rounded hover:bg-green-600"
+                  >
                     Add
                   </button>
-                  <button @click="closeUserModal" class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600">
+                  <button
+                    @click="closeUserModal"
+                    class="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600"
+                  >
                     Cancel
                   </button>
                 </div>
@@ -158,11 +252,9 @@
             <button @click="viewUsers" class="mt-2 btn btn-secondary">
               Voir les employés
             </button>
-
           </div>
         </div>
 
-        
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
           <LineChartManager :organisationId="organisationId" />
@@ -171,21 +263,27 @@
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
-            <div class="flex items-center justify-center h-40 working-times-number">
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
               {{ monthlyUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
-            <div class="flex items-center justify-center h-40 working-times-number">
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
               {{ currentUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
-            <div class="flex items-center justify-center h-40 working-times-number">
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
               {{ workingTimesThisMonth }}
             </div>
           </div>
@@ -194,7 +292,10 @@
         <section id="employeeList" class="p-0 users">
           <h2 class="mb-4 text-xl text-white">Listes des employés</h2>
           <div class="overflow-x-auto">
-            <UserListManager :organisationId="organisationId" @updateUserId="selectUser" />
+            <UserListManager
+              :organisationId="organisationId"
+              @updateUserId="selectUser"
+            />
           </div>
         </section>
 
@@ -207,15 +308,16 @@
 </template>
 
 <script>
-import axios from 'axios';
-import LineChartManager from '../components/LineChartManager.vue';
-import UserModal from '../components/OrganisationUserList.vue';
+import axios from "axios";
+import LineChartManager from "../components/LineChartManager.vue";
+import UserModal from "../components/OrganisationUserList.vue";
 import SidebarManager from "../components/SidebarManager.vue";
-import UserListManager from '../components/UserListManager.vue';
-import WorkingTimeUserContainer from '../components/WorkingTimesUsersContainer.vue';
+import UserListManager from "../components/UserListManager.vue";
+import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import BarChart from "@/components/WorkingTimesChart.vue";
 import { useToast } from "vue-toastification";
+import QRCode from "qrcode";
 
 export default {
   name: "Dashboard",
@@ -256,15 +358,43 @@ export default {
       selectedUser: null,
       isEditing: false,
       isDropdownOpen: false,
-      specifiedOrganisationId: '1',
+      specifiedOrganisationId: "1",
       allEmployees: [],
       selectedUserId: null,
       organisationName: null,
       monthlyUsers: 0,
-
     };
   },
   methods: {
+    generateQRCode() {
+      axios
+        .post(
+          `http://localhost:4000/api/qrcode/generate/2`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response.data);
+
+          this.url = `http://localhost:4000/api/clocks/2/2?token=${response.data.qr_code}`; // Organization ID/Employee ID
+          if (response.data.qr_code) {
+            const canvas = this.$refs.qrcodeCanvas;
+            QRCode.toCanvas(
+              canvas,
+              this.url,
+              { width: 200, margin: 2 },
+              function (error) {
+                if (error) console.error(error);
+                console.log("QR code generated successfully!");
+              }
+            );
+          }
+        });
+    },
     async fetchOrganisation() {
       try {
         const response = await axios.get(
@@ -278,9 +408,11 @@ export default {
         );
         this.organisation = response.data.data;
         this.groups = response.data.data.groups;
-
       } catch (error) {
-        console.error("Erreur lors de la récupération de l'organisation:", error);
+        console.error(
+          "Erreur lors de la récupération de l'organisation:",
+          error
+        );
       }
     },
     selectUser(userId) {
@@ -356,11 +488,16 @@ export default {
 
     async fetchWorkingTimesByOrganisation() {
       try {
-        const response = await axios.get(`http://localhost:4000/api/workingtimes/by_organisation/${this.organisationId}`);
+        const response = await axios.get(
+          `http://localhost:4000/api/workingtimes/by_organisation/${this.organisationId}`
+        );
         this.workingTimes = response.data;
         this.updateCharts();
       } catch (error) {
-        console.error("Erreur lors de la récupération des working times:", error);
+        console.error(
+          "Erreur lors de la récupération des working times:",
+          error
+        );
       }
     },
 
@@ -529,7 +666,6 @@ export default {
       } catch (error) {
         console.error("Erreur lors de la suppression du groupe :", error);
       }
-
     },
 
     toggleDropdown() {
@@ -556,7 +692,6 @@ export default {
     toggleGroupView() {
       this.showGroupComponent = !this.showGroupComponent;
     },
-
   },
 
   mounted() {
@@ -568,7 +703,6 @@ export default {
     this.fetchGroups();
     this.fetchAllUsers();
     document.addEventListener("click", this.handleClickOutside);
-
   },
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);
@@ -599,8 +733,6 @@ export default {
   pointer-events: none;
   z-index: 1;
 }
-
-
 
 /* Bouton d'édition avec icône */
 .btn-edit {
@@ -738,10 +870,12 @@ export default {
   height: 100%;
   padding: 2px;
   border-radius: 10px;
-  background: linear-gradient(to bottom right,
-      #ffffff,
-      rgba(255, 255, 255, 0.5),
-      #fdcb12);
+  background: linear-gradient(
+    to bottom right,
+    #ffffff,
+    rgba(255, 255, 255, 0.5),
+    #fdcb12
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
@@ -779,10 +913,12 @@ export default {
   height: 100%;
   padding: 2px;
   border-radius: 10px;
-  background: linear-gradient(to bottom right,
-      #ffffff,
-      rgba(255, 255, 255, 0.8),
-      #ffffff);
+  background: linear-gradient(
+    to bottom right,
+    #ffffff,
+    rgba(255, 255, 255, 0.8),
+    #ffffff
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
@@ -816,7 +952,6 @@ h1 {
   /* Agrandir légèrement */
 }
 
-
 .line-chart {
   padding: 20px;
   border-radius: 10px;
@@ -834,19 +969,19 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
- height: 80vh;
+  height: 80vh;
 }
 
 .organisation-card {
-  background: rgba(255, 255, 255, 0.1); 
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 30px; 
-  border-radius: 15px; 
+  padding: 30px;
+  border-radius: 15px;
   box-shadow: 0 4px 40px rgba(0, 0, 0, 0.2);
   color: white;
-  width: 80%; 
-  max-width: 900px; 
+  width: 80%;
+  max-width: 900px;
   text-align: center;
 }
 
