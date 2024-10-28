@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text as DefaultText, View, TextInput, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { StyleSheet, Text as DefaultText, View, TextInput, TouchableOpacity, Alert, Dimensions, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { useSession } from "@/components/ctx";
+import axios from 'axios';
+import { AntDesign } from '@expo/vector-icons';
+import { jwtDecode } from 'jwt-decode';
 
 // Custom Text component with Orbitron font
 const TextOrbitron = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Orbitron' }]} />;
@@ -10,32 +13,62 @@ const TextOrbitronBold = (props) => <DefaultText {...props} style={[props.style,
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
-  const { session } = useSession();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const { session } = useSession();
+  const userId = jwtDecode(session).sub;
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!oldPassword || !newPassword) {
       Alert.alert('Erreur', 'Veuillez remplir les deux champs.');
       return;
     }
 
+    try {
 
-    Alert.alert(
-      'Succès',
-      'Votre mot de passe a été changé avec succès.',
-      [
+      const response = await axios.put(`http://10.79.216.9:4000/api/update_password/${userId}`,
         {
-          text: 'OK',
-          onPress: () => router.goBack(),
+          current_password: oldPassword,
+          new_password: newPassword,
         },
-      ]
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${session}`,
+          },
+        }
+      )
+
+      console.log("response update password : ", response);
+
+
+      Alert.alert(
+        'Succès',
+        'Votre mot de passe a été changé avec succès.',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.goBack(),
+          },
+        ]
+      );
+    } catch (error) {
+      console.log("error : ", error);
+      Alert.alert('Erreur', 'L\'ancien mot de passe est incorrect.');
+    }
   };
+
+  const navigation = useNavigation();
 
   return (
     <LinearGradient colors={['#000000', '#1c1c1c', '#3e3e3e']} style={styles.backgroundContainer}>
       <View style={styles.contentContainer}>
+        <AntDesign
+          name="arrowleft"
+          size={26}
+          color="white"
+          style={{ top: Platform.OS === "android" ? StatusBar.currentHeight + 15 : 15, position: 'absolute', left: 15, top: 50 }}
+          onPress={() => navigation.goBack()}
+        />
         <TextOrbitronBold style={styles.headerText}>Changer de mot de passe</TextOrbitronBold>
 
         <TextInput
@@ -72,8 +105,10 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   headerText: {
     fontSize: 24,

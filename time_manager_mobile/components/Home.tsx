@@ -39,7 +39,7 @@ export default function HelloWave() {
 
 
   const fetchGetUserData = async () => {
-    const response = await axios.get(`http://192.168.1.133:4000/api/users/${userId}`)
+    const response = await axios.get(`http://10.79.216.9:4000/api/users/${userId}`)
 
     console.log("UUU : ", response.data.user)
     setUserInfo(response.data.user)
@@ -51,7 +51,7 @@ export default function HelloWave() {
   const fetchUserOfOrganization = async () => {
     try {
 
-      const response = await axios.get(`http://192.168.1.133:4000/api/organisations/${userId}/users`)
+      const response = await axios.get(`http://10.79.216.9:4000/api/organisations/${userId}/users`)
 
       console.log("response org: ", response.data);
 
@@ -67,7 +67,7 @@ export default function HelloWave() {
     try {
 
 
-      const response = await axios.get(`http://192.168.1.133:4000/api/groups/user/${userId}`)
+      const response = await axios.get(`http://10.79.216.9:4000/api/groups/user/${userId}`)
 
       console.log("response group: ", response.data.groups);
       if (response.data.groups) {
@@ -79,7 +79,7 @@ export default function HelloWave() {
   }
 
   const getDayWorkingTime = async () => {
-    const response = await axios.get(`http://192.168.1.133:4000/api/workingtime/today/${userId}`)
+    const response = await axios.get(`http://10.79.216.9:4000/api/workingtime/today/${userId}`)
 
     console.log("response day working time: ", response.data);
 

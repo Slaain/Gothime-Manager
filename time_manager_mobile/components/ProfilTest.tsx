@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text as DefaultText, View, TouchableOpacity, Alert, Dimensions, Image } from 'react-native';
+import { StyleSheet, Text as DefaultText, View, TouchableOpacity, Alert, Dimensions, Image, Platform, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useSession } from "@/components/ctx";
 import useUserStatsStore from '@/stores/useUserStatsStore';
 import { jwtDecode } from "jwt-decode";
+import { AntDesign } from '@expo/vector-icons';
 
 // Custom Text component with Orbitron font
 const TextOrbitron = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Orbitron' }]} />;
@@ -37,9 +38,18 @@ export default function ProfileScreen() {
     router.push('/profil/updatePassword');
   };
 
+  const navigation = useNavigation();
+
   return (
     <LinearGradient colors={['#000000', '#1c1c1c', '#3e3e3e']} style={styles.backgroundContainer}>
       <View style={styles.contentContainer}>
+        <AntDesign
+          name="arrowleft"
+          size={26}
+          color="white"
+          style={{ top: Platform.OS === "android" ? StatusBar.currentHeight + 15 : 15, position: 'absolute', left: 15, top: 50 }}
+          onPress={() => navigation.goBack()}
+        />
         <Image
           source={{ uri: 'https://www.example.com/path-to-profile-pic.jpg' }} // Replace with user's actual profile picture
           style={styles.profilePicture}

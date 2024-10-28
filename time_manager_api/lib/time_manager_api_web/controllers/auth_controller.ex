@@ -5,6 +5,7 @@
     alias Bcrypt
     alias TimeManagerApi.Guardian  # Import Guardian ici
     alias TimeManagerApi.UserService
+    alias TimeManagerApi.TokenService
 
     # Inscription d'un utilisateur
     def register(conn, %{"email" => email, "username" => username, "password" => password, "organisation_id" => organisation_id, "role_id" => role_id}) do
@@ -112,6 +113,39 @@
             |> json(%{message: "Token decoded successfully", claims: claims})
           end
         end
+
+        def update_password_with_token(conn, %{"id" => id, "new_password" => new_password, "token" => token}) do
+          user = Repo.get(User, id)
+
+          IO.inspect(user, label: "user")
+
+          case TokenService.validate_user_token(id, token) do
+            :ok ->
+              changeset =
+                user
+                |> Ecto.Changeset.change()
+                |> Ecto.Changeset.put_change(:password, new_password)
+                |> User.put_password_hash()
+
+              case Repo.update(changeset) do
+                {:ok, _updated_user} ->
+                  conn
+                  |> put_status(:ok)
+                  |> json(%{message: "Password updated successfully"})
+
+                {:error, changeset} ->
+                  conn
+                  |> put_status(:unprocessable_entity)
+                  |> json(%{error: "Failed to update password", details: changeset.errors})
+              end
+
+            :error ->
+              conn
+              |> put_status(:unauthorized)
+              |> json(%{error: "Invalid or expired token"})
+          end
+        end
+
 
         def update_password(conn, %{"id" => id, "current_password" => current_password, "new_password" => new_password}) do
           user = Repo.get(User, id)

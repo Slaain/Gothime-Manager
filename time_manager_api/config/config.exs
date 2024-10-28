@@ -23,14 +23,13 @@ config :time_manager_api, TimeManagerApiWeb.Endpoint,
   pubsub_server: TimeManagerApi.PubSub,
   live_view: [signing_salt: "5HC7/qXo"]
 
-# Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
 # locally. You can see the emails in your browser, at "/dev/mailbox".
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :time_manager_api, TimeManagerApi.Mailer, adapter: Swoosh.Adapters.Local
+# config :time_manager_api, TimeManagerApi.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
@@ -65,6 +64,8 @@ config :phoenix, :json_library, Jason
 config :time_manager_api, TimeManagerApi.Guardian,
   issuer: "time_manager_api",
   secret_key: "JEi6Qjnn+edMIQ6DUL1oIbAwXF+9f2tbSWmDda8uyPD1q3XpkdqN+NP5pbnwkP8W"
+
+
 
 # config :time_manager_api, TimeManagerApi.Mailer,
 #   adapter: Bamboo.SMTPAdapter,

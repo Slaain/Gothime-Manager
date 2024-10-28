@@ -1,7 +1,8 @@
-import { ImageBackground, Image, StyleSheet, Text as DefaultText, View, Dimensions, ScrollView, Pressable } from 'react-native';
-import { useLocalSearchParams, useRouter, useSearchParams } from 'expo-router';
+import { ImageBackground, Image, StyleSheet, Text as DefaultText, View, Dimensions, ScrollView, Pressable, Platform, StatusBar } from 'react-native';
+import { useLocalSearchParams, useNavigation, useRouter, useSearchParams } from 'expo-router';
 import axios from 'axios'
 import { useEffect, useState } from 'react';
+import { AntDesign } from '@expo/vector-icons';
 
 export default function HelloWave() {
   const { width: screenWidth, height: windowHeight } = Dimensions.get('window');
@@ -10,7 +11,7 @@ export default function HelloWave() {
   groups = JSON.parse(groups);
   const [usersGroup, setUsersGroup] = useState(null);
   const router = useRouter();
-
+  const navigation = useNavigation();
   console.log("groups in organization : ", groups);
 
   const navigateToGroup = (group) => {
@@ -28,7 +29,7 @@ export default function HelloWave() {
     if (!groups) return;
     const groupId = groups[0].id;
 
-    const response = await axios.get(`http://192.168.1.133:4000/api/groups/${groupId}`);
+    const response = await axios.get(`http://10.79.216.9:4000/api/groups/${groupId}`);
 
     setUsersGroup(response.data.data.users);
 
@@ -65,6 +66,13 @@ export default function HelloWave() {
         ]}
       >
         <View style={{ flex: 1, flexDirection: 'row' }}>
+          <AntDesign
+            name="arrowleft"
+            size={26}
+            color="white"
+            style={{ top: Platform.OS === "android" ? StatusBar.currentHeight + 15 : 15, position: 'absolute', left: 15, top: 50 }}
+            onPress={() => navigation.goBack()}
+          />
           <TextBold style={{ color: 'white' }}>
             {user.username}
           </TextBold>
