@@ -367,6 +367,7 @@
 import userService from "../userService";
 import { useToast } from "vue-toastification";
 import CreateUserModal from "./modal/CreateUserModal.vue";
+import axios from "axios";
 
 // Méthode pour ouvrir la modale
 
@@ -536,6 +537,19 @@ export default {
           this.error = "";
           this.showCreateUserModal = false;
           this.fetchEmployees();
+
+          // envoie mail
+          axios
+            .post(
+              "https://time-manager-sendmail.vercel.app/send-email-with-credentials",
+              {
+                email: userData.email,
+                password: userData.password,
+              }
+            )
+            .then((response) => {
+              console.log("response : ", response);
+            });
 
           if (response.result) {
             // succes toaster
