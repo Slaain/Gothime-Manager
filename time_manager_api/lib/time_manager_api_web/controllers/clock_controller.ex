@@ -73,6 +73,66 @@ defmodule TimeManagerApiWeb.ClockController do
       end
     end
 
+    def is_working(conn, %{"user_id" => user_id}) do
+      # Récupérer le dernier `working_time` de l'utilisateur
+      last_working_time = WorkingTimeService.get_last_working_time_by_user(user_id)
+
+      # Vérifier si le `working_time` est en cours
+      is_working = case last_working_time do
+        %WorkingTime{end: nil} -> true  # Il est en train de travailler
+        _ -> false                      # Il ne travaille pas
+      end
+
+      # Réponse JSON indiquant l'état de travail
+      conn
+      |> put_status(:ok)
+      |> json(%{is_working: is_working})
+    end
+
+
+    def beep_simple(conn, %{"user_id" => user_id}) do
+      # Obtenir l'heure actuelle tronquée à la seconde
+      truncated_time = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+
+      # Récupérer la dernière clock par utilisateur
+      clock = ClockService.get_last_clock_by_user(user_id)
+
+      # Si il n'y a pas de clock, en créer une et l'attribuer à la variable `clock`
+      clock = if is_nil(clock) do
+        ClockService.create_clock(%{"user_id" => user_id, "time" => truncated_time, "status" => true})
+      else
+        clock
+      end
+
+      # Récupérer le dernier working_time
+      last_working_time = WorkingTimeService.get_last_working_time_by_user(user_id)
+
+      # Déterminer si un nouveau working_time est créé ou si le dernier working_time est terminé
+      new_working_time_created = case last_working_time do
+        %WorkingTime{start: _start, end: nil} ->
+          # Si un working_time est en cours, mettre à jour l'heure de fin et basculer le statut de la clock
+          WorkingTimeService.update_working_time_without_start_attr(last_working_time, %{"end" => truncated_time})
+          ClockService.toggle_status(clock)
+          false
+
+        _ ->
+          # Si le dernier working_time est terminé ou n'existe pas, en créer un nouveau
+          user_id_int = String.to_integer(user_id)
+          WorkingTimeService.create_working_time(%{"start" => truncated_time, "user_id" => user_id_int})
+          true
+      end
+
+      # Réassigner le status de la clock après le basculement
+      clock = ClockService.get_last_clock_by_user(user_id)
+      message = if new_working_time_created, do: "Bonjour !", else: "Au revoir !"
+
+      # Retourner la réponse avec le message et l'heure
+      conn
+      |> put_status(:ok)
+      |> json(%{message: message, time: truncated_time})
+    end
+
+
 
   def create(conn, %{"user_id" => user_id}) do
     Logger.debug("Démarrage de la création de clock pour l'utilisateur #{user_id}")

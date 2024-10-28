@@ -208,7 +208,7 @@
             <p class="text-neutral-300">Review each person before edit</p>
           </div>
           <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
-            <button 
+            <button
               @click="openUserModal"
               class="flex select-none items-center gap-2 rounded bg-primaryYellow hover:bg-primaryYellow400 py-2.5 px-4 text-xs font-semibold text-black shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
@@ -302,8 +302,7 @@
                     openUpdateUserModal(
                       employee.id,
                       employee.username,
-                      employee.email,
-                      
+                      employee.email
                     )
                   "
                   class="text-sm text-blue-600 hover:underline"
@@ -441,7 +440,7 @@ export default {
       userService
         .toggleClock(userID)
         .then((response) => {
-          this.getCurrentUsers();
+          // this.getCurrentUsers();
           this.showSuccessToast("Clock action successful!");
           this.fetchEmployees(); // Rafraîchir la liste si nécessaire
         })
@@ -645,25 +644,34 @@ export default {
     showAccountDetails(employeeId) {
       this.$emit("show-account-details", employeeId);
     },
-    fetchEmployees() {
+    async fetchEmployees() {
       const offset = (this.currentPage - 1) * this.limit;
 
       console.log(
         `Fetching employees with limit ${this.limit} and offset ${offset}`
       );
-      userService
-        .getUsers(this.limit, offset)
-        .then((data) => {
-          this.employees = data.users.map((user) => ({
-            ...user,
-            isWorking: user.clock ? user.clock.status : false, // Set the clock status
-          }));
-          this.totalPages = data.total_pages;
-          this.totalUsers = data.total_users;
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la récupération des employés:", error);
-        });
+
+      try {
+        const data = await userService.getUsers(this.limit, offset);
+
+        // Utiliser Promise.all pour attendre que toutes les promesses dans map soient résolues
+        this.employees = await Promise.all(
+          data.users.map(async (user) => {
+            const isWorking = await userService.checkIfUserIsWorking(user.id);
+            return {
+              ...user,
+              isWorking: isWorking || false, // Définit le statut d'horloge
+            };
+          })
+        );
+
+        console.log("this.employees : ", this.employees);
+
+        this.totalPages = data.total_pages;
+        this.totalUsers = data.total_users;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des employés:", error);
+      }
     },
 
     fetchOrganisations() {

@@ -90,7 +90,10 @@ export default {
   // New method for clock-in/clock-out
   toggleClock(userID) {
     // Juste faire une requête PUT avec l'ID de l'utilisateur
-    return axios.post(`${CLOCK_API_URL}/${userID}`,
+    console.log("request toggle url : ", `${CLOCK_API_URL}/admin/${userID}`);
+    
+    return axios.post(`${CLOCK_API_URL}/admin/${userID}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -103,6 +106,30 @@ export default {
         throw error;
       });
   },
+  checkIfUserIsWorking(userID) {
+    
+    return axios.get(`${CLOCK_API_URL}/is_working/admin/${userID}`,
+
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    )
+      .then(response => response.data)
+      .then(data => {
+        console.log("Data:", data);
+        return data.is_working;
+      }
+    )
+
+      .catch(error => {
+        console.error('Erreur lors de la vérification si l\'utilisateur travaille:', error);
+        throw error;
+      });
+  }
+  ,
+
 
   getOrganisations() {
     return axios.get(ORGANISATION_API_URL,

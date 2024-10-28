@@ -86,13 +86,21 @@ defmodule TimeManagerApiWeb.Router do
     end
 
 
+    scope "/clocks" do
+      pipe_through :checkManagerOrAdminRole
+      post "/admin/:user_id", ClockController, :beep_simple
+      get "/is_working/admin/:user_id", ClockController, :is_working
+
+    end
+
     # Scope pour les clocks
     scope "/clocks" do
       post "/:organization_id/:user_id", ClockController, :beep
       get "/countactive", ClockController, :countactive
       get "/countactive_by_organisation/:organisation_id", ClockController, :countactive_by_organisation
-
     end
+
+
 
 
     # Route pour les requêtes OPTIONS (utilisées pour le CORS)
