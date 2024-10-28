@@ -42,10 +42,12 @@ defmodule TimeManagerApi.User do
   end
 
 
-  defp put_password_hash(changeset) do
+  def put_password_hash(changeset) do
     case get_change(changeset, :password) do
       nil -> changeset
       password -> put_change(changeset, :password_hash, Bcrypt.hash_pwd_salt(password))  # Utilisation correcte
     end
   end
+
+
 end

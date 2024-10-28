@@ -113,6 +113,42 @@
           end
         end
 
+        def update_password(conn, %{"id" => id, "current_password" => current_password, "new_password" => new_password}) do
+          user = Repo.get(User, id)
+
+          if user do
+            case check_password(user, current_password) do
+              {:ok, _user} ->
+                changeset =
+                  user
+                  |> Ecto.Changeset.change()
+                  |> Ecto.Changeset.put_change(:password, new_password)
+                  |> User.put_password_hash()  # Apply password hashing
+
+                case Repo.update(changeset) do
+                  {:ok, _updated_user} ->
+                    conn
+                    |> put_status(:ok)
+                    |> json(%{message: "Password updated successfully"})
+
+                  {:error, changeset} ->
+                    conn
+                    |> put_status(:unprocessable_entity)
+                    |> json(%{error: "Failed to update password", details: changeset.errors})
+                end
+
+              {:error, :invalid_password} ->
+                conn
+                |> put_status(:unauthorized)
+                |> json(%{error: "Current password is incorrect"})
+            end
+          else
+            conn
+            |> put_status(:not_found)
+            |> json(%{error: "User not found"})
+          end
+        end
+
 
       defp check_password(nil, _password), do: {:error, :invalid_user}
       defp check_password(user, password) do

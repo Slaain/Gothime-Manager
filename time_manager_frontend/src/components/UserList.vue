@@ -448,6 +448,13 @@ export default {
     },
 
     openUserModal() {
+      this.newUser.username = "";
+      this.newUser.email = "";
+      this.error = "";
+      this.newUser.password = "";
+      this.newUser.confirmPassword = "";
+      this.newUser.selectedOrganisation = null;
+      this.newUser.selectedRole = null;
       this.showCreateUserModal = true;
     },
 
@@ -455,6 +462,10 @@ export default {
       this.newUser.username = "";
       this.newUser.email = "";
       this.error = "";
+      this.newUser.password = "";
+      this.newUser.confirmPassword = "";
+      this.newUser.selectedOrganisation = null;
+      this.newUser.selectedRole = null;
       this.showCreateUserModal = false;
     },
 
