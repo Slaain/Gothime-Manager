@@ -378,7 +378,6 @@ export default {
     return { toast };
   },
 
-
   name: "EmployeeList",
   data() {
     return {
@@ -619,38 +618,47 @@ export default {
     },
 
     fetchEmployees() {
-  const offset = (this.currentPage - 1) * this.limit;
-  console.log(`Fetching employees for organisation ID: ${this.organisationId} with limit ${this.limit} and offset ${offset}`);
-  userService
-    .getUsersByOrganisationAndGroups(this.organisationId, this.limit, offset)
-    .then((data) => {
-      if (data && data.users) {
-        this.employees = data.users.map((user) => ({
-          ...user,
-          isWorking: user.clock ? user.clock.status : false,
-        }));
-        this.totalPages = data.total_pages;
-        this.totalUsers = data.total_users;
-      } else {
-        console.error("Data or users property is undefined:", data);
-      }
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la récupération des employés:", error);
-    });
-},
-      
+      console.log("Fetching employees");
+      const offset = (this.currentPage - 1) * this.limit;
+      console.log(
+        `Fetching employees for organisation ID: ${this.organisationId} with limit ${this.limit} and offset ${offset}`
+      );
+      userService
+        .getUsersByOrganisationAndGroups(
+          this.organisationId,
+          this.limit,
+          offset
+        )
+        .then((data) => {
+          console.log("dataemployee : ", data);
+
+          if (data && data.users) {
+            this.employees = data.users.map((user) => ({
+              ...user,
+              isWorking: user.clock ? user.clock.status : false,
+            }));
+            this.totalPages = data.total_pages;
+            this.totalUsers = data.total_users;
+          } else {
+            console.error("Data or users property is undefined:", data);
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération des employés:", error);
+        });
+    },
+
     watch: {
-        organisationId: {
-            handler(newValue) {
-              console.log("Organisation ID changed to:", newValue);
-            if (newValue) {
-                this.fetchEmployees();
-            }
-            },
-            immediate: true
-        }
+      organisationId: {
+        handler(newValue) {
+          console.log("Organisation ID changed to:", newValue);
+          if (newValue) {
+            this.fetchEmployees();
+          }
         },
+        immediate: true,
+      },
+    },
 
     fetchOrganisations() {
       console.log("Fetching organisations");
