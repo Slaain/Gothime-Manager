@@ -67,3 +67,42 @@ export async function isUserManager(token) {
     return false;
   }
 }
+
+export async function authorizedOrganizationRoute(token, organizationId){
+  if (!token) {
+    return false;
+  }
+
+  const decoded = VueJwtDecode.decode(token);
+
+  console.log("id : ", decoded.sub);
+  
+
+  try {
+    const response = await axios.get(`http://localhost:4000/api/organisations/${decoded.sub}/organisations`)
+
+    console.log("responseDATA : ", response.data.organisation_id);
+
+    console.log(response.data.organisation_id, organizationId);
+    
+    if(response.data.organisation_id == organizationId){
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+   console.error(error); 
+  }
+}
+
+export async function getOrganization(token){
+  if (!token) {
+    return false;
+  }
+
+  const decoded = VueJwtDecode.decode(token);
+
+  const response = await axios.get(`http://localhost:4000/api/organisations/${decoded.sub}/organisations`)
+
+  return response.data.organisation_id;
+}

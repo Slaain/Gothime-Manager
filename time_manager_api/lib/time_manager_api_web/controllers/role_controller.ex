@@ -62,4 +62,14 @@ defmodule TimeManagerApiWeb.RoleController do
     end
   end
 
+  def get_organisation_id_by_user(conn, %{"user_id" => user_id}) do
+
+
+    organisation_id = RoleService.get_user_organisation_id(user_id)
+
+    conn
+    |> put_status(:ok)
+    |> json(%{organisation_id: organisation_id})
+  end
+
 end

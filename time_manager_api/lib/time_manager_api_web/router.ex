@@ -120,6 +120,7 @@ defmodule TimeManagerApiWeb.Router do
 
   # routes pour les organisations
   scope "/organisations" do
+    get "/:user_id/organisations", RoleController, :get_organisation_id_by_user
     get "/", OrganisationController, :index
     get "/:id/users", OrganisationController, :users
     get "/:id", OrganisationController, :show
