@@ -302,7 +302,8 @@
                     openUpdateUserModal(
                       employee.id,
                       employee.username,
-                      employee.email
+                      employee.email,
+                      
                     )
                   "
                   class="text-sm text-blue-600 hover:underline"
@@ -381,6 +382,8 @@ export default {
   name: "EmployeeList",
   data() {
     return {
+      newPassword: "",
+      confirmNewPassword: "",
       organisations_list: [],
       employees: [],
       currentPage: 1,
@@ -569,6 +572,7 @@ export default {
         user: {
           username: this.newUser.username,
           email: this.newUser.email,
+          ...(this.newPassword && { password: this.newPassword }),
         },
       };
 
