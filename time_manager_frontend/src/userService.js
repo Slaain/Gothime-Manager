@@ -121,9 +121,17 @@ export default {
   },
 
   getUsersByOrganisationAndGroups(organisationId, limit, offset) {
+    // Construire les paramètres de requête de manière dynamique
+    const queryParams = new URLSearchParams();
+    if (limit) queryParams.append("limit", limit);
+    if (offset) queryParams.append("offset", offset);
+  
+    const url = `${ORGANISATION_API_URL}/${organisationId}/users_with_groups${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+  
+    console.log("URL de requête:", url);
+  
     return axios
-      .get(`${ORGANISATION_API_URL}/${organisationId}/users_with_groups`, {
-        params: { limit, offset },
+      .get(url, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -141,6 +149,7 @@ export default {
         console.error("Erreur lors de la récupération des employés avec groupes:", error);
         throw error;
       });
-  },  
+  }
+  
   
 };
