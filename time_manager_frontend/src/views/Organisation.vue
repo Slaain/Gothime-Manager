@@ -1,38 +1,35 @@
 <template>
-  
   <div class="flex min-h-screen organisation-page bg-custom-background">
-    <Sidebar />
+    <Sidebar active="Organisations" />
     <div class="flex-1 p-6 content">
       <div class="mb-6 header">
         <h1 class="text-3xl font-bold text-yellow-400">Organisations</h1>
-        <div
-            class="relative flex items-center space-x-4 text-white user-info"
-          >
-        <span>ADMIN</span>
-            <img
-              src="../assets/avatar.jpg"
-              alt="User Avatar"
-              class="w-10 h-10 rounded-full cursor-pointer"
-              @click="toggleDropdown"
-            />
+        <div class="relative flex items-center space-x-4 text-white user-info">
+          <span>ADMIN</span>
+          <img
+            src="../assets/avatar.jpg"
+            alt="User Avatar"
+            class="w-10 h-10 rounded-full cursor-pointer"
+            @click="toggleDropdown"
+          />
 
-            <!-- Dropdown Menu -->
-            <div
-              v-if="isDropdownOpen"
-              ref="dropdown"
-              class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10"
-            >
-              <ul class="py-1 text-gray-700">
-                <li>
-                  <button
-                    @click="logout"
-                    class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900"
-                  >
-                    Se déconnecter
-                  </button>
-                </li>
-              </ul>
-            </div>
+          <!-- Dropdown Menu -->
+          <div
+            v-if="isDropdownOpen"
+            ref="dropdown"
+            class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10"
+          >
+            <ul class="py-1 text-gray-700">
+              <li>
+                <button
+                  @click="logout"
+                  class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900"
+                >
+                  Se déconnecter
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 

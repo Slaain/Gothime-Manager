@@ -2,7 +2,7 @@
   <div class="bat-container">
     <div class="dashboard">
       <!-- Sidebar -->
-      <Sidebar />
+      <Sidebar active="Dashboard" />
       <!-- Main Content -->
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
