@@ -58,8 +58,14 @@
 import { ref } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router"; // Importation du router
+import Header from "../components/LandingPage/Header.vue";
+import HeroBanner from "../components/LandingPage/HeroBanner.vue";
 
 export default {
+  components: {
+    Header,
+    HeroBanner
+  },
   setup() {
     const form = ref({
       email: "",

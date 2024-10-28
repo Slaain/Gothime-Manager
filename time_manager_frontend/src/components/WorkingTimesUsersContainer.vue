@@ -228,7 +228,12 @@ export default {
     deleteWorkingTime() {
       axios
         .delete(
-          `http://localhost:4000/api/workingtime/${this.selectedWorkingTimeID}`
+          `http://localhost:4000/api/workingtime/${this.selectedWorkingTimeID}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
         )
         .then((response) => {
           console.log("Réponse :", response.data);
@@ -257,6 +262,7 @@ export default {
           },
           {
             headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
               "Content-Type": "application/json",
             },
           }
@@ -283,6 +289,7 @@ export default {
           },
           {
             headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`, 
               "Content-Type": "application/json",
             },
           }

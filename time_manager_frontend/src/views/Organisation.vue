@@ -1,9 +1,39 @@
 <template>
+  
   <div class="flex min-h-screen organisation-page bg-custom-background">
     <Sidebar />
     <div class="flex-1 p-6 content">
       <div class="mb-6 header">
         <h1 class="text-3xl font-bold text-yellow-400">Organisations</h1>
+        <div
+            class="relative flex items-center space-x-4 text-white user-info"
+          >
+        <span>ADMIN</span>
+            <img
+              src="../assets/avatar.jpg"
+              alt="User Avatar"
+              class="w-10 h-10 rounded-full cursor-pointer"
+              @click="toggleDropdown"
+            />
+
+            <!-- Dropdown Menu -->
+            <div
+              v-if="isDropdownOpen"
+              ref="dropdown"
+              class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10"
+            >
+              <ul class="py-1 text-gray-700">
+                <li>
+                  <button
+                    @click="logout"
+                    class="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    Se déconnecter
+                  </button>
+                </li>
+              </ul>
+            </div>
+        </div>
       </div>
 
       <!-- Bouton pour créer une nouvelle organisation, maintenant en dessous du titre -->
@@ -102,10 +132,20 @@ export default {
       selectedGroupUsers: [], // Stocker les utilisateurs du groupe sélectionné
       showUserModal: false, // Variable pour contrôler l'affichage de la modale des utilisateurs
       selectedOrganisationId: null, // ID de l'organisation sélectionnée pour voir les utilisateurs
-      showCreateModal: false, // Variable pour contrôler l'affichage de la modale de création d'organisation
+      showCreateModal: false,
+      isDropdownOpen: false, // Variable pour contrôler l'affichage de la modale de création d'organisation
     };
   },
   methods: {
+    toggleDropdown() {
+      console.log("Toggle dropdown");
+      this.isDropdownOpen = !this.isDropdownOpen;
+    },
+    logout() {
+      // Logique de déconnexion
+      localStorage.removeItem("authToken"); // Supprime le token de l'utilisateur
+      this.$router.push("/login"); // Redirige vers la page de connexion
+    },
     async handleDeleteOrganisation(organisationId) {
       try {
         await axios.delete(

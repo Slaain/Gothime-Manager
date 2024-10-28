@@ -302,7 +302,8 @@
                     openUpdateUserModal(
                       employee.id,
                       employee.username,
-                      employee.email
+                      employee.email,
+                      
                     )
                   "
                   class="text-sm text-blue-600 hover:underline"
@@ -382,6 +383,8 @@ export default {
   name: "EmployeeList",
   data() {
     return {
+      newPassword: "",
+      confirmNewPassword: "",
       organisations_list: [],
       employees: [],
       currentPage: 1,
@@ -449,6 +452,13 @@ export default {
     },
 
     openUserModal() {
+      this.newUser.username = "";
+      this.newUser.email = "";
+      this.error = "";
+      this.newUser.password = "";
+      this.newUser.confirmPassword = "";
+      this.newUser.selectedOrganisation = null;
+      this.newUser.selectedRole = null;
       this.showCreateUserModal = true;
     },
 
@@ -456,6 +466,10 @@ export default {
       this.newUser.username = "";
       this.newUser.email = "";
       this.error = "";
+      this.newUser.password = "";
+      this.newUser.confirmPassword = "";
+      this.newUser.selectedOrganisation = null;
+      this.newUser.selectedRole = null;
       this.showCreateUserModal = false;
     },
 
@@ -572,6 +586,7 @@ export default {
         user: {
           username: this.newUser.username,
           email: this.newUser.email,
+          ...(this.newPassword && { password: this.newPassword }),
         },
       };
 

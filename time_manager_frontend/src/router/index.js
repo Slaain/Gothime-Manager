@@ -8,6 +8,18 @@ const routes = [
     component: () => import("@/views/AdminDashboard.vue"),
     meta: { requiresAdmin: true }, // Ajout d'une meta donnée pour vérifier le rôle admin
   },
+  //Contact page
+
+  {
+    path: '/contact',
+    name: 'Contact',
+    component: () => import("@/views/Contact.vue"),
+  },
+  {
+    path: '/charts',
+    name: 'Charts',
+    component: () => import("@/views/Chart.vue"),
+  },
   {
     path: '/manager/:organisationId',
     name: 'ManagerDashboard',
