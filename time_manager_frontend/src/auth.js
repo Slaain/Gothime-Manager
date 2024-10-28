@@ -102,6 +102,8 @@ export async function getOrganization(token){
 
   const decoded = VueJwtDecode.decode(token);
 
+  console.log(`http://localhost:4000/api/organisations/${decoded.sub}/organisations`);
+  
   const response = await axios.get(`http://localhost:4000/api/organisations/${decoded.sub}/organisations`)
 
   return response.data.organisation_id;

@@ -84,7 +84,7 @@ router.beforeEach(async (to, from, next) => {
       if (to.meta.requiresOrganizationAuth) {
         // Vérifie si l'utilisateur a l'accès à cette organisation
         const organizationId = to.params.organisationId;
-        const isAuthorized = await authorizedOrganizationRoute(authToken, organizationId);
+        const isAuthorized = isAdmin ? true : await authorizedOrganizationRoute(authToken, organizationId);
         const getOrganizationId = await getOrganization(authToken);
 
         // console.log("getOrganization : ", await getOrganization(authToken));
