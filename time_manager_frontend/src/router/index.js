@@ -6,10 +6,8 @@ const routes = [
     path: '/admin',
     name: 'AdminDashboard',
     component: () => import("@/views/AdminDashboard.vue"),
-    meta: { requiresAdmin: true }, // Ajout d'une meta donnée pour vérifier le rôle admin
+    meta: { requiresAdmin: true },
   },
-  //Contact page
-
   {
     path: '/contact',
     name: 'Contact',
@@ -25,7 +23,7 @@ const routes = [
     name: 'ManagerDashboard',
     component: () => import("@/views/ManagerDashboard.vue"),
     props: true,
-    meta: { requiresManager: true, requiresOrganizationAuth: true }, // Ajout d'une meta donnée pour vérifier l'organisation
+    meta: { requiresManager: true, requiresOrganizationAuth: true },
   },
   {
     path: '/manager/:organisationId/groups',
@@ -68,43 +66,45 @@ router.beforeEach(async (to, from, next) => {
   const isManager = await isUserManager(authToken);
 
   console.log("isAdmin:", isAdmin);
-  
+
+  // Route protégée pour les admins
   if (to.matched.some(record => record.meta.requiresAdmin)) {
     if (!authToken || !isAdmin) {
       next('/login');
     } else {
       next();
     }
-  } else if (to.matched.some(record => record.meta.requiresManager)) {
+  } 
+  // Route protégée pour les managers avec vérification de l'organisation
+  else if (to.matched.some(record => record.meta.requiresManager)) {
     if (!authToken || !isManager) {
-      console.log("not manager");
-      
       next('/login');
     } else {
+      // Si une vérification d'organisation est requise
       if (to.meta.requiresOrganizationAuth) {
-        // Vérifie si l'utilisateur a l'accès à cette organisation
         const organizationId = to.params.organisationId;
-        const isAuthorized = isAdmin ? true : await authorizedOrganizationRoute(authToken, organizationId);
-        const getOrganizationId = await getOrganization(authToken);
-
-        // console.log("getOrganization : ", await getOrganization(authToken));
-        
-        console.log("isAuthorized:", isAuthorized);
-        console.log("organizationId:", organizationId);
-        
-        
+        const isAuthorized = isAdmin || await authorizedOrganizationRoute(authToken, organizationId);
 
         if (!isAuthorized) {
-          alert("Vous n'êtes pas autorisé à accéder à cette organisation.");
-          next(`/manager/${getOrganizationId}`);
+          // Rediriger le manager vers sa page organisation par défaut
+          const managerOrganizationId = await getOrganization(authToken);
+          next(`/manager/${managerOrganizationId}`);
         } else {
           next();
         }
       } else {
-        next();
+        // Pour les routes accessibles aux managers sans vérification d'organisation
+        const managerOrganizationId = await getOrganization(authToken);
+        if (!to.params.organisationId && managerOrganizationId) {
+          next(`/manager/${managerOrganizationId}`);
+        } else {
+          next();
+        }
       }
     }
-  } else {
+  } 
+  // Routes ouvertes ou sans restriction spécifique
+  else {
     next();
   }
 });
