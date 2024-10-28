@@ -1,13 +1,17 @@
 <template>
   <div class="bat-container">
-    <div class="dashboard">  
+    <div class="dashboard">
       <SidebarManager />
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
           <h1 class="text-3xl font-bold text-white">Dashboard : {{ organisation?.name }}</h1>
           <div class="flex items-center space-x-4 text-white user-info">
             <span>Manager</span>
-            <img src="../assets/avatar.jpg" alt="User Avatar" class="w-10 h-10 rounded-full" @click="toggleDropdown" />
+            <img src="../assets/avatar.jpg" 
+              alt="User Avatar" 
+              class="w-10 h-10 rounded-full"
+              @click="toggleDropdown" />
+
             <div v-if="isDropdownOpen" ref="dropdown"
               class="absolute right-0 z-20 w-48 mt-2 bg-white rounded-md shadow-lg top-10">
               <ul class="py-1 text-gray-700">
@@ -22,8 +26,8 @@
           </div>
         </header>
 
-        <div class="container">
-          <div v-if="organisation" class="organisation-card">
+          <div class="container ">
+          <div v-if="organisation" class="organisation-card p-6 mb-6 rounded-lg shadow-lg glassmorphism">
             <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
               {{ organisation.name }}
             </h2>
@@ -151,13 +155,14 @@
               </div>
             </div>
 
-              <button @click="viewUsers" class="mt-2 btn btn-secondary">
-                Voir les employés
-              </button>
+            <button @click="viewUsers" class="mt-2 btn btn-secondary">
+              Voir les employés
+            </button>
 
           </div>
         </div>
 
+        
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
           <LineChartManager :organisationId="organisationId" />
@@ -186,7 +191,7 @@
           </div>
         </section>
 
-        <section id="employeeList"  class="p-0 users">
+        <section id="employeeList" class="p-0 users">
           <h2 class="mb-4 text-xl text-white">Listes des employés</h2>
           <div class="overflow-x-auto">
             <UserListManager :organisationId="organisationId" @updateUserId="selectUser" />
@@ -213,6 +218,7 @@ import BarChart from "@/components/WorkingTimesChart.vue";
 import { useToast } from "vue-toastification";
 
 export default {
+  name: "Dashboard",
   components: {
     SidebarManager,
     LineChartManager,
@@ -237,6 +243,7 @@ export default {
       organisation: null,
       currentUsers: 0,
       workingTimes: [],
+      workingTimesThisMonth: 0,
       showGroupComponent: false,
       groups: [],
       selectedGroup: null,
@@ -253,7 +260,8 @@ export default {
       allEmployees: [],
       selectedUserId: null,
       organisationName: null,
-      
+      monthlyUsers: 0,
+
     };
   },
   methods: {
@@ -305,12 +313,12 @@ export default {
         console.error(
           "Erreur lors de la mise à jour du nom de l'organisation:",
           error
-        );      
+        );
       }
     },
     toggleEdit() {
       if (!this.isEditing) {
-        this.isEditing = true; 
+        this.isEditing = true;
       }
     },
 
@@ -327,13 +335,13 @@ export default {
       }
     },
     viewUsers() {
-    const element = document.getElementById("employeeList");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  },
-  
-  formatDate(date) {
+      const element = document.getElementById("employeeList");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    },
+
+    formatDate(date) {
       const options = {
         year: "numeric",
         month: "2-digit",
@@ -355,12 +363,12 @@ export default {
         console.error("Erreur lors de la récupération des working times:", error);
       }
     },
-    // Récupérer et filtrer les working times en fonction de l'organisation
 
+    // Récupérer et filtrer les working times en fonction de l'organisation
     async getWorkingTimesThisMonthByOrganisation() {
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/workingtimes/count_by_organisation/${this.organisationId}`,
+          "http://localhost:4000/api/workingtimes/count_by_organisation/${this.organisationId}",
           {
             headers: {
               "Content-Type": "application/json",
@@ -398,11 +406,6 @@ export default {
         );
       }
     },
-
-    
-  
-   
-    
 
     async fetchGroups() {
       try {
@@ -468,7 +471,7 @@ export default {
       this.showUserModal = false;
       this.selectedUser = null;
     },
-    
+
     async addUserToGroup() {
       if (!this.selectedUser) {
         console.error("Aucun utilisateur sélectionné");
@@ -546,6 +549,12 @@ export default {
       ) {
         this.isDropdownOpen = false;
       }
+    },
+    showDashboard() {
+      this.showGroupComponent = false;
+    },
+    toggleGroupView() {
+      this.showGroupComponent = !this.showGroupComponent;
     },
 
   },
@@ -667,8 +676,9 @@ export default {
 }
 
 .groups-container {
-  max-height: 150px;
+  max-height: 200px;
   overflow-y: auto;
+  padding-right: 10px;
   margin-bottom: 10px;
 }
 
@@ -694,6 +704,18 @@ export default {
 
 .groups-container li button:hover {
   background-color: #5a6268;
+}
+.groups-container::-webkit-scrollbar {
+  width: 12px; /* Définit la largeur de la barre de défilement */
+}
+.groups-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* Couleur de fond de la piste */
+}
+
+.groups-container::-webkit-scrollbar-thumb {
+  background-color: #fdcb12; /* Couleur de la barre de défilement */
+  border-radius: 10px;
+  border: 3px solid rgba(0, 0, 0, 0.1); /* Bordure pour une séparation nette */
 }
 
 .glassmorphism {
@@ -810,50 +832,26 @@ h1 {
 
 .container {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
-  /* height: 50vh;  */
+ height: 80vh;
 }
 
 .organisation-card {
-  position: relative;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1); 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px; 
+  border-radius: 15px; 
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.2);
   color: white;
-  overflow: hidden;
-  transition: transform 0.3s ease-in-out;
-  z-index: 2;
-  width: 500px;
-  height: 355px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: center;
+  width: 80%; 
+  max-width: 900px; 
+  text-align: center;
 }
 
-.organisation-card:hover {
-  transform: translateY(-10px);
-}
-
-.organisation-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-  background: linear-gradient(to bottom right,
-      rgba(255, 255, 255, 0.2),
-      rgba(255, 255, 255, 0.1),
-      #fdcb12);
-  opacity: 0.4;
-  z-index: 1;
-  pointer-events: none;
+.organisation-card p {
+  margin: 10px 0;
 }
 
 .organisation-card h2 {
@@ -889,7 +887,6 @@ h1 {
 }
 
 .working-time-container {
-  /* background-color: #2d3748; */
   padding: 20px;
   border-radius: 10px;
 }
