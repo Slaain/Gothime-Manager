@@ -8,7 +8,6 @@
 
         <!-- Bouton + et fermeture -->
         <div class="flex items-center space-x-2">
-          <!-- Bouton + qui se transforme en Add -->
           <button
             @click="toggleAddUser"
             class="relative flex items-center p-2 space-x-1 transition-all duration-300 ease-in-out"
@@ -16,7 +15,6 @@
             <span v-if="!showEmailInput">+</span>
           </button>
 
-          <!-- Bouton de fermeture -->
           <button
             @click="$emit('close-modal')"
             class="text-gray-500 hover:text-gray-700"
@@ -62,9 +60,7 @@
             <td class="p-2">{{ user.username }}</td>
             <td class="p-2">{{ user.email }}</td>
             <td class="p-4 border-b border-slate-200">
-              <!-- Afficher "Admin" en lecture seule si le rôle est Admin -->
               <div v-if="user.role_id === 1">Admin</div>
-              <!-- Sinon, afficher le select pour Manager et Employee -->
               <select
                 v-else
                 v-model="user.role_id"
@@ -75,8 +71,6 @@
                 <option value="3">Employee</option>
               </select>
             </td>
-
-            <!-- Toggle button for Clock In/Out -->
             <td class="p-2">
               <label class="switch">
                 <input
@@ -88,7 +82,12 @@
               </label>
             </td>
             <td class="p-2">
-              <button class="text-blue-600 hover:underline">Edit</button>
+              <button
+                @click="openEditModal(user)"
+                class="text-blue-600 hover:underline"
+              >
+                Edit
+              </button>
             </td>
             <td class="p-2">
               <button
@@ -101,15 +100,28 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Modale d'édition d'utilisateur -->
+      <edit-user-modal
+        v-if="showEditModal"
+        :user="selectedUser"
+        @close="closeEditModal"
+        @save="fetchUsers"
+      />
     </div>
   </div>
 </template>
 
+
 <script>
 import axios from "axios";
 import { useToast } from "vue-toastification";
+import EditUserModal from "./EditUserModal.vue"; // Assurez-vous du bon chemin d'importation
 
 export default {
+  components: {
+    EditUserModal,
+  },
   props: {
     organisationId: {
       type: Number,
@@ -125,6 +137,8 @@ export default {
       users: [],
       showEmailInput: false, // Contrôle la visibilité du champ d'email
       searchEmail: "", // Stocke l'email saisi
+      showEditModal: false,
+      selectedUser: null,
     };
   },
   mounted() {
@@ -137,6 +151,33 @@ export default {
     },
   },
   methods: {
+    openEditModal(user) {
+      this.selectedUser = { ...user };
+      this.showEditModal = true;
+    },
+    closeEditModal() {
+      this.selectedUser = null;
+      this.showEditModal = false;
+    },
+
+    async deleteUser(userId) {
+      try {
+        await axios.delete(
+          `http://localhost:4000/api/organisations/${this.organisationId}/users/${userId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        this.showSuccessToast("Utilisateur supprimé avec succès !");
+        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
+      } catch (error) {
+        console.error("Erreur lors de la suppression de l'utilisateur:", error);
+        this.showErrorToast("Échec de la suppression de l'utilisateur.");
+      }
+    },
     // Ajouter un utilisateur sélectionné à l'organisation
     async addUserToOrganisation() {
       try {
@@ -148,8 +189,9 @@ export default {
           },
           {
             headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+
               "Content-Type": "application/json", // Assure que le contenu est envoyé comme JSON
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Assure que l'utilisateur est authentifié
             },
           }
         );
@@ -171,13 +213,7 @@ export default {
     async fetchUsers() {
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/organisations/${this.organisationId}/users`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
+          `http://localhost:4000/api/organisations/${this.organisationId}/users`
         );
         this.users = response.data.users; // Assign the fetched users to the component data
       } catch (error) {
@@ -199,14 +235,7 @@ export default {
 
       try {
         await axios.put(
-          `http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`,
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
+          `http://localhost:4000/api/organisations/${this.organisationId}/users/${user.id}/${user.role_id}`
         );
         this.showSuccessToast("Role mis à jour avec succès !");
       } catch (error) {
@@ -217,18 +246,9 @@ export default {
 
     async handleClockToggle(user) {
       try {
-        await axios.post(
-          `http://localhost:4000/api/clocks/${user.id}`,
-          {
-            status: user.clock.status ? "clock_in" : "clock_out",
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
+        await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
+          status: user.clock.status ? "clock_in" : "clock_out",
+        });
         this.fetchUsers();
         this.showSuccessToast("Clock action successful!");
       } catch (error) {
@@ -246,25 +266,6 @@ export default {
 
     showErrorToast(message = "An error occurred") {
       this.toast.error(message);
-    },
-
-    async deleteUser(userId) {
-      try {
-        await axios.delete(
-          `http://localhost:4000/api/organisations/${this.organisationId}/users/${userId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
-        this.showSuccessToast("Utilisateur supprimé avec succès !");
-        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
-      } catch (error) {
-        console.error("Erreur lors de la suppression de l'utilisateur:", error);
-        this.showErrorToast("Échec de la suppression de l'utilisateur.");
-      }
     },
   },
 };

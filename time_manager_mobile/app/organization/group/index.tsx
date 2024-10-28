@@ -1,11 +1,12 @@
-import { useLocalSearchParams } from 'expo-router';
-import { ImageBackground, ScrollView, View, Text as DefaultText, Image, StyleSheet, Dimensions } from 'react-native';
-
+import { useLocalSearchParams, useNavigation } from 'expo-router';
+import { ImageBackground, ScrollView, View, Text as DefaultText, Image, StyleSheet, Dimensions, Platform, StatusBar } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 export default function GroupDetails() {
   let { group, users } = useLocalSearchParams();
   group = JSON.parse(group);
   users = JSON.parse(users);
   const { width: screenWidth, height: windowHeight } = Dimensions.get('window');
+  const navigation = useNavigation();
 
   const Text = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'Montserrat' }]} />;
   const TextBold = (props) => <DefaultText {...props} style={[props.style, { fontFamily: 'MontserratBold' }]} />;
@@ -31,6 +32,13 @@ export default function GroupDetails() {
         paddingHorizontal: 20,
         minHeight: windowHeight + 100
       }}>
+        <AntDesign
+          name="arrowleft"
+          size={26}
+          color="white"
+          style={{ top: Platform.OS === "android" ? StatusBar.currentHeight + 15 : 15, position: 'absolute', left: 15, top: 50 }}
+          onPress={() => navigation.goBack()}
+        />
         <TextOrbitronBold style={{ color: 'white', fontSize: 25, marginBottom: 30 }}>{group.name}</TextOrbitronBold>
         {allUsers}
       </ScrollView>

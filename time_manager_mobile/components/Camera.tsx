@@ -41,7 +41,7 @@ export default function Camera() {
   }
 
   const onBarcodeScanned = (data) => {
-    const transformDataRaw = data.raw.replace('localhost', '192.168.1.133');
+    const transformDataRaw = data.raw.replace('localhost', '10.79.216.9');
 
     // Vérifie si l'URL a déjà été scannée et marquée comme expirée
     if (expiredUrls.includes(transformDataRaw)) {

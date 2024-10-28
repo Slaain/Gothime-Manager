@@ -68,6 +68,9 @@ defmodule TimeManagerApiWeb.Router do
     scope "/users" do
       # GET /api/users - liste des utilisateurs paginée
       get "/", UserController, :paginated_users
+      get "/by_email/:email", UserController, :get_user_id_by_email
+      put "/update_password_with_token/:id", AuthController, :update_password_with_token
+
 
       # GET /api/users/:id - affichage d'un utilisateur spécifique
       get "/:id", UserController, :show
@@ -117,6 +120,7 @@ defmodule TimeManagerApiWeb.Router do
 
   # routes pour les organisations
   scope "/organisations" do
+    get "/:user_id/organisations", RoleController, :get_organisation_id_by_user
     get "/", OrganisationController, :index
     get "/:id/users", OrganisationController, :users
     get "/:id", OrganisationController, :show
@@ -146,9 +150,16 @@ defmodule TimeManagerApiWeb.Router do
   post "/login", AuthController, :login        # Route pour la connexion
   post "/decrypt_token", AuthController, :decrypt_token  # Route pour décrypter le token
   put "/update_password/:id", AuthController, :update_password
+  post "/generate_token/:user_id", UserTokenController, :generate_token
+  get "/mail_token/:user_id", UserTokenController, :get_token
 
 
 
+
+
+  scope "/mail" do
+    post "/send", MailController, :send_notification_email
+  end
 
   end
 end

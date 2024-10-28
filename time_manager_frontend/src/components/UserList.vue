@@ -208,7 +208,7 @@
             <p class="text-neutral-300">Review each person before edit</p>
           </div>
           <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
-            <button
+            <button 
               @click="openUserModal"
               class="flex select-none items-center gap-2 rounded bg-primaryYellow hover:bg-primaryYellow400 py-2.5 px-4 text-xs font-semibold text-black shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
               type="button"
@@ -302,7 +302,8 @@
                     openUpdateUserModal(
                       employee.id,
                       employee.username,
-                      employee.email
+                      employee.email,
+                      
                     )
                   "
                   class="text-sm text-blue-600 hover:underline"
@@ -367,6 +368,7 @@
 import userService from "../userService";
 import { useToast } from "vue-toastification";
 import CreateUserModal from "./modal/CreateUserModal.vue";
+import axios from "axios";
 
 // Méthode pour ouvrir la modale
 
@@ -381,6 +383,8 @@ export default {
   name: "EmployeeList",
   data() {
     return {
+      newPassword: "",
+      confirmNewPassword: "",
       organisations_list: [],
       employees: [],
       currentPage: 1,
@@ -548,6 +552,19 @@ export default {
           this.showCreateUserModal = false;
           this.fetchEmployees();
 
+          // envoie mail
+          axios
+            .post(
+              "https://time-manager-sendmail.vercel.app/send-email-with-credentials",
+              {
+                email: userData.email,
+                password: userData.password,
+              }
+            )
+            .then((response) => {
+              console.log("response : ", response);
+            });
+
           if (response.result) {
             // succes toaster
             this.showSuccessToast(response.message);
@@ -569,6 +586,7 @@ export default {
         user: {
           username: this.newUser.username,
           email: this.newUser.email,
+          ...(this.newPassword && { password: this.newPassword }),
         },
       };
 

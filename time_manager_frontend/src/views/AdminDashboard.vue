@@ -94,6 +94,7 @@ import LineChart from "../components/LineChart.vue";
 import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import BarChart from "@/components/WorkingTimesChart.vue";
+import DonutChart from "@/components/DonutChart.vue";
 import Sidebar from "../components/Sidebar.vue";
 import axios from "axios";
 
@@ -103,6 +104,7 @@ export default {
     Sidebar,
     UserList,
     LineChart,
+    DonutChart,
     WorkingTimeUserContainer,
     CreaGroupComponent,
     BarChart, // Enregistrement du BarChart

@@ -30,6 +30,20 @@ defmodule TimeManagerApiWeb.UserController do
     render(conn, :index, users: users)
   end
 
+  def get_user_id_by_email(conn, %{"email" => email}) do
+  case UserService.get_user_by_email(email) do
+    %User{id: user_id} ->
+      conn
+      |> put_status(:ok)
+      |> json(%{user_id: user_id})
+
+    nil ->
+      conn
+      |> put_status(:not_found)
+      |> json(%{error: "User not found with this email"})
+  end
+end
+
   # Action pour créer un nouvel utilisateur
   def create(conn, %{"user" => user_params}) do
 

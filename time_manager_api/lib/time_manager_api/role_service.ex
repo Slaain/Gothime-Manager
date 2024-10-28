@@ -27,6 +27,15 @@ defmodule TimeManagerApi.RoleService do
     Repo.one(user_role_query)
   end
 
+  def user_in_another_organisation?(user_id, organisation_id) do
+    query = from(
+      uro in UserRoleOrganisation,
+      where: uro.user_id == ^user_id and uro.organisation_id != ^organisation_id
+    )
+
+    Repo.exists?(query)
+  end
+
 
   # Vérifier si l'utilisateur est déjà dans l'organisation
   def user_in_organisation?(user_id, organisation_id) do

@@ -12,7 +12,8 @@ import {
     Keyboard,
     Alert,
     ImageBackground,
-    Dimensions
+    Dimensions,
+    Pressable
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import axios from 'axios';
@@ -44,7 +45,7 @@ export default function HomeScreen() {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://192.168.1.133:4000/api/login', {
+            const response = await axios.post('http://10.79.216.9:4000/api/login', {
                 email: emailInput,
                 password,
             }, {
@@ -130,14 +131,19 @@ export default function HomeScreen() {
                             <TouchableOpacity style={styles.signInButton} onPress={handleLogin}>
                                 <TextOrbitron style={styles.buttonText}>Sign In</TextOrbitron>
                             </TouchableOpacity>
-                            <TextOrbitron style={styles.forgetPasswordText}>
-                                Forget Password?
-                            </TextOrbitron>
+                            <Pressable
+                                onPress={() => router.push('/change-password')}
+                            >
+
+                                <TextOrbitron style={styles.forgetPasswordText}>
+                                    Forget Password?
+                                </TextOrbitron>
+                            </Pressable>
                         </View>
                     </KeyboardAvoidingView>
                 </LinearGradient>
             </TouchableWithoutFeedback>
-        </ImageBackground>
+        </ImageBackground >
     );
 }
 

@@ -48,7 +48,7 @@ defmodule TimeManagerApi.MixProject do
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:heroicons, github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
-      {:swoosh, "~> 1.5"},
+      # {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
@@ -59,7 +59,9 @@ defmodule TimeManagerApi.MixProject do
       {:guardian, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.0"},
       {:dotenv, "~> 3.1.0"},
-      {:joken, "~> 2.0-rc0"}
+      {:joken, "~> 2.0-rc0"},
+      {:swoosh, "~> 1.3"},
+    # {:swoosh_mailer, "~> 0.1.2"} # e.g., for SMTP
 
     ]
   end
