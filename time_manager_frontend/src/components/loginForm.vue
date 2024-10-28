@@ -43,14 +43,6 @@
     </form>
 
     <!-- <p v-if="success" class="mt-4 text-center text-green-500">{{ success }}</p> -->
-
-    <!-- Lien vers la page d'inscription -->
-    <p class="mt-4 text-center text-white">
-      Don't have an account?
-      <a href="/register" class="text-primaryYellow hover:text-primaryYellow400"
-        >Sign up</a
-      >
-    </p>
   </div>
 </template>
 
@@ -60,11 +52,12 @@ import axios from "axios";
 import { useRouter } from "vue-router"; // Importation du router
 import Header from "../components/LandingPage/Header.vue";
 import HeroBanner from "../components/LandingPage/HeroBanner.vue";
+import { isUserAdmin, isUserManager } from "../auth";
 
 export default {
   components: {
     Header,
-    HeroBanner
+    HeroBanner,
   },
   setup() {
     const form = ref({
@@ -118,7 +111,27 @@ export default {
         form.value.email = "";
         form.value.password = "";
         localStorage.setItem("authToken", response.data.token);
-        router.push("/admin");
+
+        console.log(
+          "isUserAdmin : ",
+          isUserAdmin(localStorage.getItem("authToken"))
+        );
+        console.log(
+          "isUserManager : ",
+          isUserManager(localStorage.getItem("authToken"))
+        );
+
+        if (await isUserAdmin(localStorage.getItem("authToken"))) {
+          console.log("router push admin");
+          router.push("/admin");
+        } else if (await isUserManager(localStorage.getItem("authToken"))) {
+          console.log("router push manager");
+          router.push("/manager/2");
+        } else {
+          console.log("router push employee");
+
+          alert("You are an employee, please login from the mobile app");
+        }
       } catch (apiError) {
         // error.value = "Invalid credentials";
         console.log("catch : ", apiError.response.data);

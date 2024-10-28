@@ -1,7 +1,7 @@
 <template>
   <div class="bat-container">
     <div class="dashboard">
-      <SidebarManager />
+      <Sidebar active="Manager" />
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
           <h1 class="text-3xl font-bold text-white">
@@ -313,7 +313,7 @@
 import axios from "axios";
 import LineChartManager from "../components/LineChartManager.vue";
 import UserModal from "../components/OrganisationUserList.vue";
-import SidebarManager from "../components/SidebarManager.vue";
+import Sidebar from "../components/Sidebar.vue";
 import UserListManager from "../components/UserListManager.vue";
 import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
@@ -324,7 +324,7 @@ import QRCode from "qrcode";
 export default {
   name: "Dashboard",
   components: {
-    SidebarManager,
+    Sidebar,
     LineChartManager,
     BarChart,
     UserModal,
@@ -1011,7 +1011,7 @@ h1 {
   background-color: #f5b900;
 }
 
-.sidebarManager {
+.Sidebar {
   width: 200px;
   background-color: #212327;
   padding: 20px;

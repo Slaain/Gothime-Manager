@@ -6,11 +6,8 @@ const routes = [
     path: '/admin',
     name: 'AdminDashboard',
     component: () => import("@/views/AdminDashboard.vue"),
-    meta: { requiresAdmin: true }, // Ajout d'une meta donnée pour vérifier le rôle admin
-
+    meta: { requiresAdmin: true },
   },
-  //Contact page
-
   {
     path: '/contact',
     name: 'Contact',
@@ -45,8 +42,7 @@ const routes = [
     path: '/organisations',
     name: 'organisations',
     component: () => import("@/views/Organisation.vue"),
-        meta: { requiresManager: true }, // Ajout d'une meta donnée pour vérifier le rôle manager
-
+    meta: { requiresManager: true, requiresAdmin: true }, // Access for managers and admins
   },
   {
     path: '/login',
@@ -80,15 +76,35 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next(); // L'utilisateur est admin, permet de continuer
     }
-  } else if (to.matched.some(record => record.meta.requiresManager)) {
-    // Si l'utilisateur n'est pas manager, redirige vers la page de connexion
+  }
+  // Route spécifique pour /organisations, accessible pour managers et admins
+  else if (to.path === '/organisations' && (isManager || isAdmin)) {
+    next();
+  }
+  // Routes protégées pour les managers avec vérification de l'organisation
+  else if (to.matched.some(record => record.meta.requiresManager)) {
     if (!authToken || !isManager) {
-      next('/login'); // Redirige vers la page de connexion si l'utilisateur n'est pas manager
+      next('/login');
     } else {
-      next(); // L'utilisateur est manager, permet de continuer
+      if (to.meta.requiresOrganizationAuth) {
+        const organizationId = to.params.organisationId;
+        const isAuthorized = isAdmin || await authorizedOrganizationRoute(authToken, organizationId);
+
+        if (!isAuthorized) {
+          // Rediriger le manager vers sa page organisation par défaut
+          const managerOrganizationId = await getOrganization(authToken);
+          next(`/manager/${managerOrganizationId}`);
+        } else {
+          next();
+        }
+      } else {
+        next();
+      }
     }
-  } else {
-    next(); // Pas de restriction d'accès, on continue
+  } 
+  // Routes ouvertes ou sans restriction spécifique
+  else {
+    next();
   }
 });
 
