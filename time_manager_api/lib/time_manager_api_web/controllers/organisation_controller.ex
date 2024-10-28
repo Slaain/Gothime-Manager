@@ -1,9 +1,10 @@
 defmodule TimeManagerApiWeb.OrganisationController do
   use TimeManagerApiWeb, :controller
+  import Ecto.Query
 
   alias TimeManagerApi.User
 
-  alias TimeManagerApi.{Repo, Organisation, Group, OrganisationGroup, OrganisationService, UserRoleOrganisation}
+  alias TimeManagerApi.{Repo, Organisation, Group, OrganisationGroup, OrganisationService, UserRoleOrganisation, GroupUser}
 
   # Liste des organisations
   def index(conn, _params) do
@@ -34,14 +35,6 @@ defmodule TimeManagerApiWeb.OrganisationController do
         |> json(%{errors: errors})
     end
   end
-
-  #récupérer les détails d'une organisation, y compris les groupes et les utilisateurs qui ont travaillé dans chaque groupe
-  def show_with_users(conn, %{"id" => organisation_id}) do
-    organisation = Repo.get!(Organisation, organisation_id)|> Repo.preload(groups: :users)
-    # Précharger les groupes et leurs utilisateurs
-    render(conn, "show_with_users.json", organisation: organisation)
-  end
-
 
   # Ajouter un groupe dans une organisation
   def add_group(conn, %{"organisation_id" => organisation_id, "group_id" => group_id}) do
@@ -223,4 +216,40 @@ defmodule TimeManagerApiWeb.OrganisationController do
         end
     end
   end
+
+  def users_with_groups(conn, %{"organisation_id" => organisation_id}) do
+    # Obtenez les utilisateurs directement associés à l'organisation
+    users = Repo.all(
+      from u in TimeManagerApi.User,
+      join: uro in TimeManagerApi.UserRoleOrganisation, on: u.id == uro.user_id,
+      where: uro.organisation_id == ^organisation_id
+    )
+
+    # Obtenez les groupes associés à l'organisation
+    group_ids = Repo.all(
+      from g in TimeManagerApi.Group,
+      join: og in TimeManagerApi.OrganisationGroup, on: g.id == og.group_id,
+      where: og.organisation_id == ^String.to_integer(organisation_id),
+      select: g.id
+    )
+
+    # Obtenez les utilisateurs des groupes de l'organisation
+    group_user_ids = Repo.all(
+      from u in TimeManagerApi.User,
+      join: gu in TimeManagerApi.GroupUser, on: u.id == gu.user_id,
+      where: gu.group_id in ^group_ids
+    )
+
+    # Combinez les utilisateurs de l'organisation et ceux des groupes
+    all_users = users ++ group_user_ids |> Enum.uniq_by(& &1.id)
+
+    conn
+    |> put_status(:ok)
+    |> json(%{
+      users: all_users
+    })
+  end
+
+
+
 end
