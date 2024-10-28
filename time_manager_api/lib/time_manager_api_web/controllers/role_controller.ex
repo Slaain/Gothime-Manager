@@ -25,6 +25,7 @@ defmodule TimeManagerApiWeb.RoleController do
   end
 
   # Ajouter un utilisateur dans une organisation via son email
+  # Ajouter un utilisateur dans une organisation via son email
   def add_user_to_organisation(conn, %{"organisation_id" => organisation_id, "email" => email}) do
     # Rechercher l'utilisateur par email
     case UserService.get_user_by_email(email) do
@@ -35,29 +36,36 @@ defmodule TimeManagerApiWeb.RoleController do
         |> json(%{error: "Utilisateur non trouvé"})
 
       user ->
-        # Vérifier si l'utilisateur est déjà dans l'organisation
-        case RoleService.user_in_organisation?(user.id, organisation_id) do
-          true ->
-            # Si l'utilisateur est déjà dans l'organisation
-            conn
-            |> put_status(:conflict)
-            |> json(%{error: "L'utilisateur est déjà dans l'organisation"})
+        # Vérifier si l'utilisateur est déjà dans une autre organisation
+        if RoleService.user_in_another_organisation?(user.id, organisation_id) do
+          conn
+          |> put_status(:conflict)
+          |> json(%{error: "L'utilisateur est déjà dans une autre organisation"})
+        else
+          # Vérifier si l'utilisateur est déjà dans l'organisation actuelle
+          case RoleService.user_in_organisation?(user.id, organisation_id) do
+            true ->
+              # Si l'utilisateur est déjà dans l'organisation
+              conn
+              |> put_status(:conflict)
+              |> json(%{error: "L'utilisateur est déjà dans l'organisation"})
 
-          false ->
-            # Ajouter l'utilisateur à l'organisation avec le rôle 3 (Employee)
-            case RoleService.add_user_to_organisation(user.id, organisation_id, 3) do
-              {:ok, _user_role} ->
-                # Succès
-                conn
-                |> put_status(:created)
-                |> json(%{message: "Utilisateur ajouté avec succès à l'organisation"})
+            false ->
+              # Ajouter l'utilisateur à l'organisation avec le rôle 3 (Employee)
+              case RoleService.add_user_to_organisation(user.id, organisation_id, 3) do
+                {:ok, _user_role} ->
+                  # Succès
+                  conn
+                  |> put_status(:created)
+                  |> json(%{message: "Utilisateur ajouté avec succès à l'organisation"})
 
-              {:error, reason} ->
-                # Gérer les erreurs d'ajout
-                conn
-                |> put_status(:unprocessable_entity)
-                |> json(%{error: "Échec de l'ajout de l'utilisateur", reason: reason})
-            end
+                {:error, reason} ->
+                  # Gérer les erreurs d'ajout
+                  conn
+                  |> put_status(:unprocessable_entity)
+                  |> json(%{error: "Échec de l'ajout de l'utilisateur", reason: reason})
+              end
+          end
         end
     end
   end

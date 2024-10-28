@@ -41,7 +41,7 @@
 
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
-          <LineChart />
+          <DonutChart />
         </section>
 
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
@@ -94,6 +94,7 @@ import LineChart from "../components/LineChart.vue";
 import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
 import BarChart from "@/components/WorkingTimesChart.vue";
+import DonutChart from "@/components/DonutChart.vue";
 import Sidebar from "../components/Sidebar.vue";
 import axios from "axios";
 
@@ -103,6 +104,7 @@ export default {
     Sidebar,
     UserList,
     LineChart,
+    DonutChart,
     WorkingTimeUserContainer,
     CreaGroupComponent,
     BarChart, // Enregistrement du BarChart
