@@ -41,7 +41,7 @@ const routes = [
     path: '/organisations',
     name: 'organisations',
     component: () => import("@/views/Organisation.vue"),
-    meta: { requiresManager: true },
+    meta: { requiresManager: true, requiresAdmin: true }, // Access for managers and admins
   },
   {
     path: '/login',
@@ -74,13 +74,16 @@ router.beforeEach(async (to, from, next) => {
     } else {
       next();
     }
-  } 
-  // Route protégée pour les managers avec vérification de l'organisation
+  }
+  // Route spécifique pour /organisations, accessible pour managers et admins
+  else if (to.path === '/organisations' && (isManager || isAdmin)) {
+    next();
+  }
+  // Routes protégées pour les managers avec vérification de l'organisation
   else if (to.matched.some(record => record.meta.requiresManager)) {
     if (!authToken || !isManager) {
       next('/login');
     } else {
-      // Si une vérification d'organisation est requise
       if (to.meta.requiresOrganizationAuth) {
         const organizationId = to.params.organisationId;
         const isAuthorized = isAdmin || await authorizedOrganizationRoute(authToken, organizationId);
@@ -93,13 +96,7 @@ router.beforeEach(async (to, from, next) => {
           next();
         }
       } else {
-        // Pour les routes accessibles aux managers sans vérification d'organisation
-        const managerOrganizationId = await getOrganization(authToken);
-        if (!to.params.organisationId && managerOrganizationId) {
-          next(`/manager/${managerOrganizationId}`);
-        } else {
-          next();
-        }
+        next();
       }
     }
   } 

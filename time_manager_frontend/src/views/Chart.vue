@@ -1,13 +1,13 @@
 <script setup>
-import Sidebar from '../components/Sidebar.vue';
-import LineChart from '../components/LineChart.vue';
-import BarChart from '../components/BarChart.vue';
+import Sidebar from "../components/Sidebar.vue";
+import LineChart from "../components/LineChart.vue";
+import BarChart from "../components/BarChart.vue";
 </script>
 
 <template>
   <div class="chart-container">
     <!-- Sidebar -->
-    <Sidebar />
+    <Sidebar active="Charts" />
 
     <!-- Main Content with Line Chart -->
     <main class="flex-1 p-6 main-content">
