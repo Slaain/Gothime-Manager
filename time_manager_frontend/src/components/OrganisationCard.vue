@@ -6,7 +6,8 @@
     >
       <div class="flex items-center justify-between mb-4 header" @click.stop>
         <!-- Affichage du nom de l'organisation ou champ d'édition -->
-        <h2 v-if="!isEditing" class="text-xl font-semibold text-white">
+        <h2 v-if="!isEditing" class="text-xl font-semibold text-white cursor-pointer hover:underline" @click="redirectToOrganisation"
+        >
           {{ organisation.name }}
         </h2>
         <div v-if="isEditing" class="flex items-center">
@@ -246,6 +247,9 @@ export default {
     this.fetchAllUsers(); // Charger tous les utilisateurs pour l'ajout dans le groupe
   },
   methods: {
+    redirectToOrganisation() {
+      window.location.href = `http://localhost:5173/manager/${this.organisation.id}`;
+    },
     modifyOrganisation() {
       this.$emit("modify-organisation", this.organisation.id);
     },

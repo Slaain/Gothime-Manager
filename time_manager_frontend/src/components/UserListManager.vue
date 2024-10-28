@@ -7,14 +7,12 @@
       aria-hidden="true"
       class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
     >
-      <div class="w-1/2 px-8 py-4 bg-white">
+    <div class="w-1/2 px-8 py-4 bg-white">
         <p class="text-xl font-extrabold text-zinc-950">New User</p>
 
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
           User's Name
-          <p
-            class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
-          >
+          <p class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500">
             (30 characters maximum)
           </p>
         </label>
@@ -24,9 +22,7 @@
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
         />
-        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-          >User's Email</label
-        >
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">User's Email</label>
         <input
           v-model="newUser.email"
           placeholder="Email"
@@ -52,9 +48,7 @@
           </button>
         </div>
 
-        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-          >Confirm Password</label
-        >
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">Confirm Password</label>
         <div class="flex items-center">
           <input
             v-model="newUser.confirmPassword"
@@ -87,6 +81,13 @@
           disabled
         />
 
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">Role</label>
+        <input
+          value="Employee"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-gray-100 border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+          disabled 
+        />
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
           >Role</label
         >
@@ -111,6 +112,8 @@
           Cancel
         </button>
       </div>
+    </div>
+  </div>
     </div>
   </div>
 
@@ -303,6 +306,135 @@
       </div>
     </div>
   </div>
+      <div class="p-0 overflow-scroll">
+        <table class="w-full mt-4 text-left table-auto min-w-max">
+          <thead>
+            <tr>
+              <th
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+              >
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
+                >
+                  Member
+                </p>
+              </th>
+              <th
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+              >
+                <p
+                  class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
+                >
+                  Status
+                </p>
+              </th>
+              <th
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+              ></th>
+              <th
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+              ></th>
+              <th
+                class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
+              ></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(employee, index) in employees" :key="index">
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="flex flex-col">
+                    <p class="text-sm font-semibold text-slate-700">
+                      {{ employee.username }}
+                    </p>
+                    <p class="text-sm text-slate-500">{{ employee.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
+              >
+                <!-- Toggle button for Clock In/Out -->
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    v-model="employee.isWorking"
+                    @change="handleClockToggle(employee)"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </td>
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
+              >
+                <button
+                  @click.stop="
+                    openUpdateUserModal(
+                      employee.id,
+                      employee.username,
+                      employee.email
+                    )
+                  "
+                  class="text-sm text-blue-600 hover:underline"
+                >
+                  Edit
+                </button>
+              </td>
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
+              >
+                <button
+                  @click.stop="openUserDeleteModal(employee.id)"
+                  class="text-sm text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </td>
+              <td
+                class="p-4 border-b border-slate-200"
+                :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
+              >
+                <button
+                  @click.stop="selectUser(employee.id)"
+                  class="text-sm text-green-600 hover:underline"
+                >
+                  Select
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="flex items-center justify-between p-3">
+        <p class="block text-sm text-slate-500">
+          Page {{ currentPage }} of {{ totalPages }} ({{ totalUsers }} users)
+        </p>
+        <div class="flex gap-1">
+          <button
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            type="button"
+            @click="previousPage"
+            :disabled="currentPage === 1"
+          >
+            Previous
+          </button>
+          <button
+            class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            type="button"
+            @click="nextPage"
+            :disabled="currentPage === totalPages"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script>
