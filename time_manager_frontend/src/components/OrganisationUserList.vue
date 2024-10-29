@@ -1,12 +1,9 @@
 <template>
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 modal"
-  >
+  <div class="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black bg-opacity-50 modal">
     <div class="w-2/3 p-6 bg-white rounded-lg">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-2xl font-bold">Organisation's Users</h2>
 
-        <!-- Bouton + et fermeture -->
         <div class="flex items-center space-x-2">
           <button
             @click="toggleAddUser"
@@ -24,7 +21,6 @@
         </div>
       </div>
 
-      <!-- Barre de recherche pour ajouter un utilisateur avec l'email -->
       <div
         class="relative flex items-center overflow-hidden transition-all duration-500 ease-in-out"
         :style="showEmailInput ? 'max-width: 300px;' : 'max-width: 0px;'"
@@ -56,7 +52,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in sortedUsers" :key="user.id" class="border-b">
+          <tr v-for="user in displayedUsers" :key="user.id" class="border-b">
             <td class="p-2">{{ user.username }}</td>
             <td class="p-2">{{ user.email }}</td>
             <td class="p-4 border-b border-slate-200">
@@ -101,7 +97,44 @@
         </tbody>
       </table>
 
-      <!-- Modale d'édition d'utilisateur -->
+      <!-- Pagination -->
+      <div class="flex items-center justify-between mt-4">
+        <div class="text-sm text-gray-500">
+          Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalUsers }} users
+        </div>
+        <div class="flex gap-2">
+          <button
+            @click="handlePageChange(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            :class="currentPage === 1 ? 'bg-gray-200' : 'bg-blue-500 text-white hover:bg-blue-600'"
+          >
+            Previous
+          </button>
+          
+          <div class="flex gap-1">
+            <button
+              v-for="pageNumber in displayedPages"
+              :key="pageNumber"
+              @click="handlePageChange(pageNumber)"
+              class="px-3 py-1 rounded"
+              :class="pageNumber === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'"
+            >
+              {{ pageNumber }}
+            </button>
+          </div>
+
+          <button
+            @click="handlePageChange(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="px-3 py-1 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            :class="currentPage === totalPages ? 'bg-gray-200' : 'bg-blue-500 text-white hover:bg-blue-600'"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
       <edit-user-modal
         v-if="showEditModal"
         :user="selectedUser"
@@ -112,11 +145,10 @@
   </div>
 </template>
 
-
 <script>
 import axios from "axios";
 import { useToast } from "vue-toastification";
-import EditUserModal from "./EditUserModal.vue"; // Assurez-vous du bon chemin d'importation
+import EditUserModal from "./EditUserModal.vue";
 
 export default {
   components: {
@@ -135,22 +167,61 @@ export default {
   data() {
     return {
       users: [],
-      showEmailInput: false, // Contrôle la visibilité du champ d'email
-      searchEmail: "", // Stocke l'email saisi
+      showEmailInput: false,
+      searchEmail: "",
       showEditModal: false,
       selectedUser: null,
+      currentPage: 1,
+      itemsPerPage: 6,
     };
+  },
+  computed: {
+    sortedUsers() {
+      return [...this.users].sort((a, b) => a.role_id - b.role_id);
+    },
+    totalUsers() {
+      return this.sortedUsers.length;
+    },
+    totalPages() {
+      return Math.ceil(this.totalUsers / this.itemsPerPage);
+    },
+    startIndex() {
+      return (this.currentPage - 1) * this.itemsPerPage;
+    },
+    endIndex() {
+      return Math.min(this.startIndex + this.itemsPerPage, this.totalUsers);
+    },
+    displayedUsers() {
+      return this.sortedUsers.slice(this.startIndex, this.endIndex);
+    },
+    displayedPages() {
+      const pages = [];
+      const maxVisiblePages = 5;
+      const halfVisible = Math.floor(maxVisiblePages / 2);
+      
+      let startPage = Math.max(1, this.currentPage - halfVisible);
+      let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+      
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      
+      return pages;
+    }
   },
   mounted() {
     this.fetchUsers();
   },
-  computed: {
-    // Trier les utilisateurs : Admin (1), Manager (2), Employee (3)
-    sortedUsers() {
-      return this.users.slice().sort((a, b) => a.role_id - b.role_id);
-    },
-  },
   methods: {
+    handlePageChange(newPage) {
+      if (newPage >= 1 && newPage <= this.totalPages) {
+        this.currentPage = newPage;
+      }
+    },
     openEditModal(user) {
       this.selectedUser = { ...user };
       this.showEditModal = true;
@@ -159,7 +230,6 @@ export default {
       this.selectedUser = null;
       this.showEditModal = false;
     },
-
     async deleteUser(userId) {
       try {
         await axios.delete(
@@ -172,17 +242,19 @@ export default {
           }
         );
         this.showSuccessToast("Utilisateur supprimé avec succès !");
-        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
+        await this.fetchUsers();
+        
+        if (this.displayedUsers.length === 0 && this.currentPage > 1) {
+          this.currentPage--;
+        }
       } catch (error) {
         console.error("Erreur lors de la suppression de l'utilisateur:", error);
         this.showErrorToast("Échec de la suppression de l'utilisateur.");
       }
     },
-    // Ajouter un utilisateur sélectionné à l'organisation
     async addUserToOrganisation() {
       try {
-        // Requête pour ajouter un utilisateur via son email
-        const response = await axios.post(
+        await axios.post(
           `http://localhost:4000/api/organisations/${this.organisationId}/users`,
           {
             email: this.searchEmail,
@@ -190,23 +262,21 @@ export default {
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-
-              "Content-Type": "application/json", // Assure que le contenu est envoyé comme JSON
+              "Content-Type": "application/json",
             },
           }
         );
 
-        this.fetchUsers(); // Rafraîchir la liste des utilisateurs
+        await this.fetchUsers();
+        this.currentPage = this.totalPages; // Aller à la dernière page
         this.showSuccessToast("Utilisateur ajouté avec succès !");
+        this.searchEmail = "";
+        this.showEmailInput = false;
       } catch (error) {
-        console.error(
-          "Erreur lors de l'ajout de l'utilisateur à l'organisation:",
-          error
-        );
+        console.error("Erreur lors de l'ajout de l'utilisateur à l'organisation:", error);
         this.showErrorToast(error.response.data.error);
       }
     },
-
     toggleAddUser() {
       this.showEmailInput = !this.showEmailInput;
     },
@@ -215,21 +285,14 @@ export default {
         const response = await axios.get(
           `http://localhost:4000/api/organisations/${this.organisationId}/users`
         );
-        this.users = response.data.users; // Assign the fetched users to the component data
+        this.users = response.data.users;
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des utilisateurs:",
-          error
-        );
+        console.error("Erreur lors de la récupération des utilisateurs:", error);
       }
     },
-
-    // Méthode pour gérer le changement de rôle
     async updateUserRole(user) {
       if (user.role_id === 1) {
-        this.showErrorToast(
-          "Le rôle d'un administrateur ne peut pas être modifié."
-        );
+        this.showErrorToast("Le rôle d'un administrateur ne peut pas être modifié.");
         return;
       }
 
@@ -243,27 +306,21 @@ export default {
         this.showErrorToast("Échec de la mise à jour du rôle.");
       }
     },
-
     async handleClockToggle(user) {
       try {
         await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
           status: user.clock.status ? "clock_in" : "clock_out",
         });
-        this.fetchUsers();
+        await this.fetchUsers();
         this.showSuccessToast("Clock action successful!");
       } catch (error) {
-        console.error(
-          "Erreur lors de la mise à jour du statut de la clock:",
-          error
-        );
+        console.error("Erreur lors de la mise à jour du statut de la clock:", error);
         this.showErrorToast("Failed to toggle clock.");
       }
     },
-
     showSuccessToast(message = "Successful operation") {
       this.toast.success(message);
     },
-
     showErrorToast(message = "An error occurred") {
       this.toast.error(message);
     },
