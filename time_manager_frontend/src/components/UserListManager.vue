@@ -7,12 +7,14 @@
       aria-hidden="true"
       class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
     >
-    <div class="w-1/2 px-8 py-4 bg-white">
+      <div class="w-1/2 px-8 py-4 bg-white">
         <p class="text-xl font-extrabold text-zinc-950">New User</p>
 
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
           User's Name
-          <p class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500">
+          <p
+            class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
+          >
             (30 characters maximum)
           </p>
         </label>
@@ -22,7 +24,9 @@
           class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           type="text"
         />
-        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">User's Email</label>
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
+          >User's Email</label
+        >
         <input
           v-model="newUser.email"
           placeholder="Email"
@@ -30,8 +34,8 @@
           type="text"
         />
         <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-          >Enter Password</label
-        >
+          >Enter Password
+        </label>
         <div class="flex items-center">
           <input
             v-model="newUser.password"
@@ -48,7 +52,9 @@
           </button>
         </div>
 
-        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">Confirm Password</label>
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          Confirm Password
+        </label>
         <div class="flex items-center">
           <input
             v-model="newUser.confirmPassword"
@@ -71,32 +77,35 @@
           Generate random Password
         </button>
 
-        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-          >Organisation</label
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          Select Organisation
+        </label>
+        <select
+          v-model="newUser.selectedOrganisation"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
-        <input
-          :value="organisationName"
-          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-gray-100 border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          type="text"
-          disabled
-        />
+          <option value="" disabled>Select an organisation</option>
+          <option
+            v-for="organisation in organisations_list"
+            :key="organisation.id"
+            :value="organisation.id"
+          >
+            {{ organisation.name }}
+          </option>
+        </select>
 
-        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">Role</label>
-        <input
-          value="Employee"
-          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-gray-100 border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          type="text"
-          disabled 
-        />
-        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
-          >Role</label
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          Select Role
+        </label>
+        <select
+          v-model="newUser.selectedRole"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
-        <input
-          value="Employee"
-          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-gray-100 border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          type="text"
-          disabled
-        />
+          <option value="" disabled>Select a role</option>
+          <option v-for="role in roles" :key="role.id" :value="role.id">
+            {{ role.name }}
+          </option>
+        </select>
 
         <p class="h-6 text-red-600">{{ error }}</p>
         <button
@@ -113,199 +122,115 @@
         </button>
       </div>
     </div>
-  </div>
-    </div>
-  </div>
 
-  <div
-    v-if="showDeleteUserModal"
-    id="default-modal"
-    tabindex="-1"
-    aria-hidden="true"
-    class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
-  >
-    <div class="w-1/2 px-8 py-4 bg-white">
-      <p class="text-xl font-extrabold text-zinc-950">Delete User</p>
-      <p class="text-black">Are you sure you want to delete this user?</p>
-      <p class="h-6 text-red-600">{{ error }}</p>
-      <button
-        @click="deleteEmployee"
-        class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
-      >
-        Delete
-      </button>
-      <button
-        @click="closeUserDeleteModal"
-        class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg border-primaryYellow hover:bg-neutral-100"
-      >
-        Cancel
-      </button>
-    </div>
-  </div>
-  <div
-    class="relative flex flex-col w-full h-full shadow-md glassmorphism-bg-white text-neutral-100 rounded-xl bg-clip-border"
-  >
     <div
-      class="relative mx-4 mt-4 overflow-hidden rounded-none text-neutral-100 bg-clip-border"
+      v-if="showUpdateUserModal"
+      id="default-modal"
+      tabindex="-1"
+      aria-hidden="true"
+      class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
     >
-      <div class="flex items-center justify-between">
-        <div>
-          <h3 class="text-lg font-semibold text-white">Employees List</h3>
-          <p class="text-neutral-300">Review each person before edit</p>
-        </div>
-        <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
-          <button
-            @click="openUserModal"
-            class="flex select-none items-center gap-2 rounded bg-primaryYellow hover:bg-primaryYellow400 py-2.5 px-4 text-xs font-semibold text-black shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-            type="button"
+      <div class="w-1/2 px-8 py-4 bg-white">
+        <p class="text-xl font-extrabold text-zinc-950">Update User</p>
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950">
+          User's Name
+          <p
+            class="ml-1 mt-[1px] text-sm font-medium leading-none text-zinc-500"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-              stroke-width="2"
-              class="w-4 h-4"
-            >
-              <path
-                d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"
-              ></path>
-            </svg>
-            Add member
-          </button>
-        </div>
+            (30 characters maximum)
+          </p>
+        </label>
+        <input
+          v-model="newUser.username"
+          placeholder="Please enter your full name"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        <label class="mb-3 flex px-2.5 font-bold leading-none text-zinc-950"
+          >User's Email</label
+        >
+        <input
+          v-model="newUser.email"
+          placeholder="Please enter your email"
+          class="flex items-center justify-center w-full h-full px-4 py-4 mb-2 transition-all duration-200 bg-transparent border-2 border-gray-400 rounded-lg shadow-sm outline-none text-zinc-950 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+        <p class="h-6 text-red-600">{{ error }}</p>
+        <button
+          @click="updateUser"
+          class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
+        >
+          Update
+        </button>
+        <button
+          @click="closeUpdateUserModal"
+          class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg border-primaryYellow hover:bg-neutral-100"
+        >
+          Cancel
+        </button>
       </div>
     </div>
 
-    <div class="p-0 overflow-scroll">
-      <table class="w-full mt-4 text-left table-auto min-w-max">
-        <thead>
-          <tr>
-            <th
-              class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-            >
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-              >
-                Member
-              </p>
-            </th>
-            <th
-              class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-            >
-              <p
-                class="flex items-center justify-between gap-2 font-sans text-sm font-normal leading-none text-slate-500"
-              >
-                Status
-              </p>
-            </th>
-            <th
-              class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-            ></th>
-            <th
-              class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-            ></th>
-            <th
-              class="p-4 transition-colors cursor-pointer border-y border-slate-200 bg-slate-50 hover:bg-slate-100"
-            ></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(employee, index) in employees" :key="index">
-            <td
-              class="p-4 border-b border-slate-200"
-              :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
-            >
-              <div class="flex items-center gap-3">
-                <div class="flex flex-col">
-                  <p class="text-sm font-semibold text-slate-700">
-                    {{ employee.username }}
-                  </p>
-                  <p class="text-sm text-slate-500">{{ employee.email }}</p>
-                </div>
-              </div>
-            </td>
-            <td
-              class="p-4 border-b border-slate-200"
-              :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
-            >
-              <!-- Toggle button for Clock In/Out -->
-              <label class="switch">
-                <input
-                  type="checkbox"
-                  v-model="employee.isWorking"
-                  @change="handleClockToggle(employee)"
-                />
-                <span class="slider round"></span>
-              </label>
-            </td>
-            <td
-              class="p-4 border-b border-slate-200"
-              :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
-            >
-              <button
-                @click.stop="
-                  openUpdateUserModal(
-                    employee.id,
-                    employee.username,
-                    employee.email
-                  )
-                "
-                class="text-sm text-blue-600 hover:underline"
-              >
-                Edit
-              </button>
-            </td>
-            <td
-              class="p-4 border-b border-slate-200"
-              :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
-            >
-              <button
-                @click.stop="openUserDeleteModal(employee.id)"
-                class="text-sm text-red-600 hover:underline"
-              >
-                Delete
-              </button>
-            </td>
-            <td
-              class="p-4 border-b border-slate-200"
-              :class="{ 'bg-neutral-500/50': employee.id === selectedUserId }"
-            >
-              <button
-                @click.stop="selectUser(employee.id)"
-                class="text-sm text-green-600 hover:underline"
-              >
-                Select
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="flex items-center justify-between p-3">
-      <p class="block text-sm text-slate-500">
-        Page {{ currentPage }} of {{ totalPages }} ({{ totalUsers }} users)
-      </p>
-      <div class="flex gap-1">
+    <div
+      v-if="showDeleteUserModal"
+      id="default-modal"
+      tabindex="-1"
+      aria-hidden="true"
+      class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-gray-800 bg-opacity-50"
+    >
+      <div class="w-1/2 px-8 py-4 bg-white">
+        <p class="text-xl font-extrabold text-zinc-950">Delete User</p>
+        <p class="text-black">Are you sure you want to delete this user?</p>
+        <p class="h-6 text-red-600">{{ error }}</p>
         <button
-          class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-          type="button"
-          @click="previousPage"
-          :disabled="currentPage === 1"
+          @click="deleteEmployee"
+          class="w-full py-2 mt-4 text-black transition-all rounded-lg bg-primaryYellow hover:bg-primaryYellow400"
         >
-          Previous
+          Delete
         </button>
         <button
-          class="rounded border border-slate-300 py-2.5 px-3 text-center text-xs font-semibold text-slate-600 transition-all hover:opacity-75 focus:ring focus:ring-slate-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-          type="button"
-          @click="nextPage"
-          :disabled="currentPage === totalPages"
+          @click="closeUserDeleteModal"
+          class="w-full py-2 mt-2 text-black transition-all bg-white border rounded-lg border-primaryYellow hover:bg-neutral-100"
         >
-          Next
+          Cancel
         </button>
       </div>
     </div>
-  </div>
+    <div
+      class="relative flex flex-col w-full h-full shadow-md glassmorphism-bg-white text-neutral-100 rounded-xl bg-clip-border"
+    >
+      <div
+        class="relative mx-4 mt-4 overflow-hidden rounded-none text-neutral-100 bg-clip-border"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-white">Employees List</h3>
+            <p class="text-neutral-300">Review each person before edit</p>
+          </div>
+          <div class="flex flex-col gap-2 shrink-0 sm:flex-row">
+            <button
+              @click="openUserModal"
+              class="flex select-none items-center gap-2 rounded bg-primaryYellow hover:bg-primaryYellow400 py-2.5 px-4 text-xs font-semibold text-black shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+              type="button"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+                stroke-width="2"
+                class="w-4 h-4"
+              >
+                <path
+                  d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"
+                ></path>
+              </svg>
+              Add member
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="p-0 overflow-scroll">
         <table class="w-full mt-4 text-left table-auto min-w-max">
           <thead>
@@ -435,6 +360,7 @@
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -445,16 +371,7 @@ import CreateUserModal from "./modal/CreateUserModal.vue";
 // Méthode pour ouvrir la modale
 
 export default {
-  props: {
-    organisationId: {
-      type: String,
-      required: true,
-    },
-    organisationName: {
-      type: String,
-      required: true,
-    },
-  },
+  props: ["organisationId"],
   emits: ["updateUserId", "fetchEmployees"],
   setup() {
     const toast = useToast();
@@ -531,8 +448,6 @@ export default {
     },
 
     openUserModal() {
-      this.newUser.selectedOrganisation = this.organisationId;
-      this.newUser.selectedRole = 3; // Set to Employee
       this.showCreateUserModal = true;
     },
 
@@ -704,7 +619,6 @@ export default {
 
     fetchEmployees() {
       console.log("Fetching employees");
-
       const offset = (this.currentPage - 1) * this.limit;
       console.log(
         `Fetching employees for organisation ID: ${this.organisationId} with limit ${this.limit} and offset ${offset}`

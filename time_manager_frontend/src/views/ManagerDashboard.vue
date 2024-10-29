@@ -317,7 +317,7 @@ import Sidebar from "../components/Sidebar.vue";
 import UserListManager from "../components/UserListManager.vue";
 import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
-import BarChart from "@/components/WorkingTimesChart.vue";
+import BarChartManager from '../components/BarChartManager.vue';
 import { useToast } from "vue-toastification";
 import QRCode from "qrcode";
 
@@ -326,7 +326,7 @@ export default {
   components: {
     Sidebar,
     LineChartManager,
-    BarChart,
+    BarChartManager,
     UserModal,
     UserListManager,
     WorkingTimeUserContainer,

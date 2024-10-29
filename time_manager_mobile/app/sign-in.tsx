@@ -45,7 +45,7 @@ export default function HomeScreen() {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('http://10.79.216.9:4000/api/login', {
+            const response = await axios.post('http://10.79.216.202:4000/api/login', {
                 email: emailInput,
                 password,
             }, {
