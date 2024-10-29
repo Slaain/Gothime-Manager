@@ -83,7 +83,7 @@ export default function ResetPasswordScreen() {
       // try {
       console.log("yo");
 
-      const responseUserId = await axios.get(`http://10.79.216.202:4000/api/users/by_email/${email}`)
+      const responseUserId = await axios.get(`http://10.79.216.9:4000/api/users/by_email/${email}`)
 
       console.log("responseUserId : ", responseUserId.data.user_id);
 
@@ -91,7 +91,7 @@ export default function ResetPasswordScreen() {
 
 
 
-      const response = await axios.get(`http://10.79.216.202:4000/api/mail_token/${responseUserId.data.user_id}`)
+      const response = await axios.get(`http://10.79.216.9:4000/api/mail_token/${responseUserId.data.user_id}`)
       console.log("response : ", response);
 
       setTokenForChangePassword(response.data.token)
@@ -112,7 +112,7 @@ export default function ResetPasswordScreen() {
     }
 
 
-    await axios.put(`http://10.79.216.202:4000/api/users/update_password_with_token/${userId}`, {
+    await axios.put(`http://10.79.216.9:4000/api/users/update_password_with_token/${userId}`, {
       token: tokenForChangePassword,
       new_password: newPassword
     })

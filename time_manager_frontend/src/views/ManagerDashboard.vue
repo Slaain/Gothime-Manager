@@ -294,10 +294,9 @@
           <div class="overflow-x-auto">
             <UserListManager
               :organisationId="organisationId"
-              :organisationName="organisation?.name" 
+              :organisationName="organisation?.name"
               @updateUserId="selectUser"
               @clock-toggle="getCurrentUsers"
-
             />
           </div>
         </section>
@@ -318,7 +317,7 @@ import Sidebar from "../components/Sidebar.vue";
 import UserListManager from "../components/UserListManager.vue";
 import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
-import BarChartManager from '../components/BarChartManager.vue';
+import BarChartManager from "../components/BarChartManager.vue";
 import { useToast } from "vue-toastification";
 import QRCode from "qrcode";
 
@@ -346,6 +345,7 @@ export default {
   data() {
     return {
       organisation: null,
+      organisationId: null,
       currentUsers: 0,
       workingTimes: [],
       workingTimesThisMonth: 0,
@@ -372,7 +372,7 @@ export default {
     generateQRCode() {
       axios
         .post(
-          `http://localhost:4000/api/qrcode/generate/2`,
+          `http://localhost:4000/api/qrcode/generate/${this.organisationId}`,
           {},
           {
             headers: {
@@ -412,7 +412,6 @@ export default {
         this.organisation = response.data.data;
         this.groups = response.data.data.groups;
         console.log("Organisation fetched:", this.organisation); // Vérification du nom
-
       } catch (error) {
         console.error(
           "Erreur lors de la récupération de l'organisation:",
@@ -701,6 +700,9 @@ export default {
 
   mounted() {
     console.log("Dashboard mounted : ", localStorage.getItem("authToken"));
+    const organisationId = this.$route.params.organisationId;
+    this.organisationId = organisationId;
+    console.log("Organisation ID:", organisationId); // Affiche "1" dans ce cas
     this.fetchOrganisation();
     this.fetchWorkingTimesByOrganisation();
     this.getWorkingTimesThisMonthByOrganisation();

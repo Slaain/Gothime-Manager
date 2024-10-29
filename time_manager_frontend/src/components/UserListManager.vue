@@ -215,7 +215,7 @@
             >
               <div class="flex items-center gap-3">
                 <div class="flex flex-col">
-                  <p class="text-sm font-semibold text-slate-700">
+                  <p class="text-sm font-semibold text-primaryYellow">
                     {{ employee.username }}
                   </p>
                   <p class="text-sm text-slate-500">{{ employee.email }}</p>
@@ -365,6 +365,26 @@ export default {
     };
   },
   methods: {
+    async getCurrentUsers() {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/clocks/countactive_by_organisation/${this.organisationId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+
+        this.currentUsers = response.data.count;
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des utilisateurs actifs",
+          error
+        );
+      }
+    },
     generateRandomPassword() {
       const charset =
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
@@ -580,7 +600,11 @@ export default {
       );
 
       try {
-        const data = await userService.getUsers(this.limit, offset);
+        const data = await userService.getUsersByOrganisationAndGroups(
+          1,
+          this.limit,
+          offset
+        );
 
         // Utiliser Promise.all pour attendre que toutes les promesses dans map soient résolues
         this.employees = await Promise.all(
