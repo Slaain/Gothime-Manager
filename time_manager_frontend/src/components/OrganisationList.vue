@@ -34,8 +34,8 @@ export default {
       this.$emit("modify-organisation", organisationId);
     },
 
-    handleDeleteOrganisation() {
-      this.$emit("delete-organisation");
+    handleDeleteOrganisation(organisationId) {
+      this.$emit("delete-organisation", organisationId);
     },
 
     handleOrganisationUpdated() {

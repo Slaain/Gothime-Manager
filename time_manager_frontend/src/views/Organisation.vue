@@ -144,6 +144,8 @@ export default {
       this.$router.push("/login"); // Redirige vers la page de connexion
     },
     async handleDeleteOrganisation(organisationId) {
+      console.log("organisationId:", organisationId);
+
       try {
         await axios.delete(
           `http://localhost:4000/api/organisations/${organisationId}`,
@@ -201,6 +203,8 @@ export default {
 
     // Gestion de l'affichage des utilisateurs d'une organisation
     handleViewUsers(organisationId) {
+      console.log("orguser :", organisationId);
+
       console.log(
         "Voir les utilisateurs de l'organisatioooon :",
         organisationId

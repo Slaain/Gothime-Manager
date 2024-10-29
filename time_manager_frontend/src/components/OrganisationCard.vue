@@ -6,7 +6,10 @@
     >
       <div class="flex items-center justify-between mb-4 header" @click.stop>
         <!-- Affichage du nom de l'organisation ou champ d'édition -->
-        <h2 v-if="!isEditing" class="text-xl font-semibold text-white cursor-pointer hover:underline" @click="redirectToOrganisation"
+        <h2
+          v-if="!isEditing"
+          class="text-xl font-semibold text-white cursor-pointer hover:underline"
+          @click="redirectToOrganisation"
         >
           {{ organisation.name }}
         </h2>
@@ -48,19 +51,24 @@
 
       <!-- Liste des groupes -->
       <div class="mb-4 overflow-y-auto groups-container">
-        <h3 class="font-medium text-white">List Groups:</h3>
-        <ul>
-          <li
-            v-for="group in groups"
-            :key="group.id"
-            class="flex items-center justify-between mb-2 text-white"
-          >
-            {{ group.groupname }}
-            <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
-              Show
-            </button>
-          </li>
-        </ul>
+        <div v-if="groups.length > 0">
+          <h3 class="font-medium text-white">List Groups:</h3>
+          <ul>
+            <li
+              v-for="group in groups"
+              :key="group.id"
+              class="flex items-center justify-between mb-2 text-white"
+            >
+              {{ group.groupname }}
+              <button @click="viewGroup(group)" class="ml-4 btn btn-secondary">
+                Show
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div v-else>
+          <p class="text-white">No groups yet</p>
+        </div>
       </div>
 
       <button @click="viewUsers" class="mt-2 btn btn-secondary">
@@ -295,6 +303,8 @@ export default {
     },
     deleteOrganisation() {
       if (confirm("Are you sure you want to delete this organisation?")) {
+        console.log("this.organisation : ", this.organisation.id);
+
         this.$emit("delete-organisation", this.organisation.id);
       }
     },
