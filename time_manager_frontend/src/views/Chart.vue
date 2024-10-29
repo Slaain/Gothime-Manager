@@ -2,6 +2,7 @@
 import Sidebar from "../components/Sidebar.vue";
 import LineChart from "../components/LineChart.vue";
 import BarChart from "../components/BarChart.vue";
+import DonutChart from "@/components/DonutChart.vue";
 </script>
 
 <template>
@@ -18,6 +19,10 @@ import BarChart from "../components/BarChart.vue";
       <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
         <h2 class="mb-4 text-xl text-white">Working Hours Bar Chart</h2>
         <BarChart />
+      </section>
+      <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
+        <h2 class="mb-4 text-xl text-white">Working Hours Donut</h2>
+        <DonutChart />
       </section>
     </main>
   </div>
