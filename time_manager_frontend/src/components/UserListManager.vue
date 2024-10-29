@@ -379,6 +379,7 @@ export default {
 
     // Handle the toggle switch when clock in/out is triggered
     handleClockToggle(employee) {
+      this.$emit("clock-toggle");
       // On fait un POST vers /api/clocks/:user_id
       this.toggleClock(employee.id);
     },

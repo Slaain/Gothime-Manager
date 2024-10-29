@@ -7,10 +7,7 @@
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
           <h1 class="text-3xl font-bold text-white">Dashboard</h1>
-          <div
-            class="relative flex items-center space-x-4 text-white user-info"
-          >
-            <!-- Avatar et nom de l'utilisateur -->
+          <div class="relative flex items-center space-x-4 text-white user-info">
             <span>ADMIN</span>
             <img
               src="../assets/avatar.jpg"
@@ -40,34 +37,47 @@
         </header>
 
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
-          <h2 class="mb-4 text-xl text-white">Working Hours Line Chart</h2>
-          <DonutChart/>
+          <div class="flex items-center justify-between mb-4">
+            <button 
+              @click="previousChart" 
+              class="p-2 text-white transition-colors rounded-full hover:bg-white/10"
+            >
+              <ChevronLeftIcon class="w-6 h-6" />
+            </button>
+            
+            <h2 class="text-xl text-white">
+              Working Hours - {{ currentChartLabel }}
+            </h2>
+            
+            <button 
+              @click="nextChart" 
+              class="p-2 text-white transition-colors rounded-full hover:bg-white/10"
+            >
+              <ChevronRightIcon class="w-6 h-6" />
+            </button>
+          </div>
+          
+          <component :is="currentChart" />
         </section>
 
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
-            <div
-              class="flex items-center justify-center h-40 working-times-number"
-            >
+            <div class="flex items-center justify-center h-40 working-times-number">
               {{ monthlyUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
-            <div
-              class="flex items-center justify-center h-40 working-times-number"
-            >
+            <div class="flex items-center justify-center h-40 working-times-number">
               {{ currentUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
-            <div
-              class="flex items-center justify-center h-40 working-times-number"
-            >
+            <div class="flex items-center justify-center h-40 working-times-number">
               {{ workingTimesThisMonth }}
             </div>
           </div>
@@ -76,7 +86,7 @@
         <section class="p-0 users">
           <h2 class="mb-4 text-xl text-white">Users List</h2>
           <div class="overflow-x-auto">
-            <UserList @updateUserId="selectUser" />
+            <UserList @updateUserId="selectUser" @clock-toggle="getCurrentUsers" />
           </div>
         </section>
 
@@ -89,14 +99,19 @@
 </template>
 
 <script>
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from 'lucide-vue-next';
 import UserList from "../components/UserList.vue";
 import LineChart from "../components/LineChart.vue";
 import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
 import CreaGroupComponent from "@/components/CreaGroupComponent.vue";
-import BarChart from "@/components/WorkingTimesChart.vue";
 import DonutChart from "@/components/DonutChart.vue";
 import Sidebar from "../components/Sidebar.vue";
 import axios from "axios";
+
+const CHART_TYPES = [
+  { component: LineChart, label: 'Line Chart' },
+  { component: DonutChart, label: 'Donut Chart' }
+];
 
 export default {
   name: "Dashboard",
@@ -107,29 +122,45 @@ export default {
     DonutChart,
     WorkingTimeUserContainer,
     CreaGroupComponent,
-    BarChart, // Enregistrement du BarChart
+    ChevronLeftIcon,
+    ChevronRightIcon
   },
   data() {
     return {
       currentUsers: 0,
-      workingTimesThisMonth: 0, // Initialisation avec une valeur par défaut
+      workingTimesThisMonth: 0,
       monthlyUsers: 0,
-      isDropdownOpen: false, // Contrôle l'affichage du dropdown
+      isDropdownOpen: false,
       selectedUserId: null,
-      showGroupComponent: false, // Variable pour contrôler l'affichage du composant CreaGroupComponent
+      showGroupComponent: false,
+      currentChartIndex: 0,
     };
   },
+  computed: {
+    currentChart() {
+      return CHART_TYPES[this.currentChartIndex].component;
+    },
+    currentChartLabel() {
+      return CHART_TYPES[this.currentChartIndex].label;
+    }
+  },
   mounted() {
-    console.log("Dashboard mounted : ", localStorage.getItem("authToken"));
-
     this.getCurrentUsers();
-    this.getWorkingTimesThisMonth(); // Appel de la méthode pour récupérer le count lors du montage du composant
+    this.getWorkingTimesThisMonth();
     document.addEventListener("click", this.handleClickOutside);
   },
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);
   },
   methods: {
+    previousChart() {
+      this.currentChartIndex = 
+        (this.currentChartIndex - 1 + CHART_TYPES.length) % CHART_TYPES.length;
+    },
+    nextChart() {
+      this.currentChartIndex = 
+        (this.currentChartIndex + 1) % CHART_TYPES.length;
+    },
     showDashboard() {
       this.showGroupComponent = false;
     },
@@ -137,12 +168,11 @@ export default {
       this.showGroupComponent = !this.showGroupComponent;
     },
     toggleDropdown() {
-      this.isDropdownOpen = !this.isDropdownOpen; // Ouvre/ferme le dropdown
+      this.isDropdownOpen = !this.isDropdownOpen;
     },
     logout() {
-      // Logique de déconnexion
-      localStorage.removeItem("authToken"); // Supprime le token de l'utilisateur
-      this.$router.push("/login"); // Redirige vers la page de connexion
+      localStorage.removeItem("authToken");
+      this.$router.push("/login");
     },
     handleClickOutside(event) {
       const dropdown = this.$refs.dropdown;
@@ -165,7 +195,7 @@ export default {
             },
           }
         );
-        this.monthlyUsers = response.data.users_count; // Assigner le nombre retourné par l'API
+        this.monthlyUsers = response.data.users_count;
         this.workingTimesThisMonth = response.data.working_times_count;
       } catch (error) {
         console.error(
@@ -185,7 +215,6 @@ export default {
             },
           }
         );
-
         this.currentUsers = response.data.count;
       } catch (error) {
         console.error(
@@ -194,7 +223,6 @@ export default {
         );
       }
     },
-    // Méthode pour mettre à jour l'ID de l'utilisateur sélectionné
     selectUser(userId) {
       this.selectedUserId = userId;
     },
@@ -202,33 +230,32 @@ export default {
 };
 </script>
 
-  
-  
-  <style scoped>
+<style scoped>
+/* Les styles restent identiques */
 .working-times-number {
   font-size: 6rem;
-  color: transparent; /* Texte transparent */
-  -webkit-text-stroke: 2px #fdcb12; /* Contour jaune */
+  color: transparent;
+  -webkit-text-stroke: 2px #fdcb12;
   border-radius: 10px;
-  transition: all 0.3s ease; /* Transition pour l'effet smooth */
+  transition: all 0.3s ease;
 }
 
 .chart:hover .working-times-number {
-  color: #fdcb12; /* Le texte devient entièrement jaune */
-  -webkit-text-stroke: 0px; /* Retire le contour au hover */
+  color: #fdcb12;
+  -webkit-text-stroke: 0px;
   text-shadow: 0 0 10px rgba(253, 203, 18, 0.8),
-    /* Ombre jaune */ 0 0 20px rgba(253, 203, 18, 0.6); /* Ombre plus lointaine */
+    0 0 20px rgba(253, 203, 18, 0.6);
 }
 
 .glassmorphism {
   position: relative;
-  background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */
-  backdrop-filter: blur(10px); /* Effet de flou sur l'arrière-plan */
-  -webkit-backdrop-filter: blur(10px); /* Support pour Safari */
-  border-radius: 10px; /* Arrondi des angles */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Légère ombre pour effet de profondeur */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   color: white;
-  overflow: hidden; /* Pour assurer que le pseudo-élément reste dans les limites du conteneur */
+  overflow: hidden;
 }
 
 .glassmorphism::before {
@@ -238,24 +265,24 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 2px; /* Épaisseur de la bordure */
-  border-radius: 10px; /* Même bordure arrondie */
+  padding: 2px;
+  border-radius: 10px;
   background: linear-gradient(
     to bottom right,
     #ffffff,
     rgba(255, 255, 255, 0.5),
     #fdcb12
-  ); /* Dégradé de la bordure */
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
-  pointer-events: none; /* Empêche les événements de la souris sur le pseudo-élément */
+  pointer-events: none;
 }
 
 .glassmorphism h2 {
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.85); /* Couleur blanche avec transparence */
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .glassmorphism .line-chart {
@@ -265,13 +292,13 @@ export default {
 
 .glassmorphism-bg-white {
   position: relative;
-  background: rgba(255, 255, 255, 0.1); /* Couleur blanche semi-transparente */
-  backdrop-filter: blur(10px); /* Effet de flou sur l'arrière-plan */
-  -webkit-backdrop-filter: blur(10px); /* Support pour Safari */
-  border-radius: 10px; /* Arrondi des angles */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Légère ombre pour effet de profondeur */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   color: white;
-  overflow: hidden; /* Pour assurer que le pseudo-élément reste dans les limites du conteneur */
+  overflow: hidden;
 }
 
 .glassmorphism-bg-white::before {
@@ -281,24 +308,24 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 2px; /* Épaisseur de la bordure */
-  border-radius: 10px; /* Même bordure arrondie */
+  padding: 2px;
+  border-radius: 10px;
   background: linear-gradient(
     to bottom right,
     #ffffff,
     rgba(255, 255, 255, 0.8),
     #ffffff
-  ); /* Dégradé entièrement blanc */
+  );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: destination-out;
   mask-composite: exclude;
-  pointer-events: none; /* Empêche les événements de la souris sur le pseudo-élément */
+  pointer-events: none;
 }
 
 .glassmorphism-bg-white h2 {
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.85); /* Couleur blanche avec transparence */
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .glassmorphism-bg-white .line-chart {
@@ -313,6 +340,7 @@ export default {
   background-size: 100px 100px;
   background-position: 0 0;
 }
+
 .bat-container::after {
   content: "";
   position: fixed;
@@ -320,25 +348,26 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("../assets/images/noise.png"); /* Image PNG du bruit */
+  background-image: url("../assets/images/noise.png");
   background-repeat: repeat;
-  opacity: 0.1; /* Ajuste l'opacité du bruit */
+  opacity: 0.1;
   pointer-events: none;
-  z-index: 1; /* Met le bruit au-dessus des chauves-souris */
+  z-index: 1;
 }
 
 .dashboard {
   display: flex;
   min-height: 100vh;
   position: relative;
-  background-image: url("../assets/images/noise.png"); /* Image PNG du bruit */
-  z-index: 2; /* S'assurer que le contenu reste au-dessus */
+  background-image: url("../assets/images/noise.png");
+  z-index: 2;
 }
 
 .dashboard {
   display: flex;
   min-height: 100vh;
 }
+
 .sidebar {
   width: 200px;
   background-color: #212327;
@@ -352,13 +381,11 @@ export default {
 }
 
 .chart {
-  /* background-color: #2d3748; */
   padding: 20px;
   border-radius: 10px;
 }
 
 .line-chart {
-  /* background-color: #2d3748; */
   padding: 20px;
   border-radius: 10px;
   width: 100%;
@@ -366,9 +393,7 @@ export default {
 }
 
 .working-time-container {
-  /* background-color: #2d3748; */
   padding: 20px;
   border-radius: 10px;
 }
 </style>
-  

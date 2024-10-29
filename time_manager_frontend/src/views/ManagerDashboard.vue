@@ -296,6 +296,7 @@
               :organisationId="organisationId"
               :organisationName="organisation?.name" 
               @updateUserId="selectUser"
+              @clock-toggle="getCurrentUsers"
 
             />
           </div>
