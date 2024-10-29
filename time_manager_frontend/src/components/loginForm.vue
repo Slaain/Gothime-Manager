@@ -126,7 +126,7 @@ export default {
           router.push("/admin");
         } else if (await isUserManager(localStorage.getItem("authToken"))) {
           console.log("router push manager");
-          router.push("/manager/2");
+          router.push("/manager/1");
         } else {
           console.log("router push employee");
 

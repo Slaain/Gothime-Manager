@@ -39,7 +39,7 @@
 
       <router-link
         v-if="isUserManager"
-        to="/manager/2"
+        to="/manager/1"
         class="p-2 bg-gray-700 rounded-md hover:bg-gray-800"
         :class="{
           'bg-yellow-500 hover:bg-yellow-700': active === 'Manager',

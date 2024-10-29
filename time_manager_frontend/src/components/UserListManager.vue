@@ -392,6 +392,7 @@ export default {
           this.getCurrentUsers();
           this.showSuccessToast("Clock action successful!");
           this.fetchEmployees(); // Rafraîchir la liste si nécessaire
+          this.$emit("clock-toggle");
         })
         .catch((error) => {
           console.error("Error during clock action:", error);
@@ -571,38 +572,35 @@ export default {
       this.$emit("show-account-details", employeeId);
     },
 
-    fetchEmployees() {
-      console.log("Fetching employees");
-
+    async fetchEmployees() {
       const offset = (this.currentPage - 1) * this.limit;
+
       console.log(
-        `Fetching employees for organisation ID: ${this.organisationId} with limit ${this.limit} and offset ${offset}`
+        `Fetching employees with limit ${this.limit} and offset ${offset}`
       );
-      userService
-        .getUsersByOrganisationAndGroups(
-          this.organisationId,
-          this.limit,
-          offset
-        )
-        .then((data) => {
-          console.log("dataemployee : ", data);
 
-          if (data && data.users) {
-            this.employees = data.users.map((user) => ({
+      try {
+        const data = await userService.getUsers(this.limit, offset);
+
+        // Utiliser Promise.all pour attendre que toutes les promesses dans map soient résolues
+        this.employees = await Promise.all(
+          data.users.map(async (user) => {
+            const isWorking = await userService.checkIfUserIsWorking(user.id);
+            return {
               ...user,
-              isWorking: user.clock ? user.clock.status : false,
-            }));
-            this.totalPages = data.total_pages;
-            this.totalUsers = data.total_users;
-          } else {
-            console.error("Data or users property is undefined:", data);
-          }
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la récupération des employés:", error);
-        });
-    },
+              isWorking: isWorking || false, // Définit le statut d'horloge
+            };
+          })
+        );
 
+        console.log("this.employees : ", this.employees);
+
+        this.totalPages = data.total_pages;
+        this.totalUsers = data.total_users;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des employés:", error);
+      }
+    },
     watch: {
       organisationId: {
         handler(newValue) {

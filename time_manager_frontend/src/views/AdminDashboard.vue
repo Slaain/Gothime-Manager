@@ -7,7 +7,9 @@
       <main class="flex-1 p-6 main-content">
         <header class="flex items-center justify-between mb-6">
           <h1 class="text-3xl font-bold text-white">Dashboard</h1>
-          <div class="relative flex items-center space-x-4 text-white user-info">
+          <div
+            class="relative flex items-center space-x-4 text-white user-info"
+          >
             <span>ADMIN</span>
             <img
               src="../assets/avatar.jpg"
@@ -38,46 +40,52 @@
 
         <section class="p-6 mb-6 rounded-lg shadow-lg glassmorphism line-chart">
           <div class="flex items-center justify-between mb-4">
-            <button 
-              @click="previousChart" 
+            <button
+              @click="previousChart"
               class="p-2 text-white transition-colors rounded-full hover:bg-white/10"
             >
               <ChevronLeftIcon class="w-6 h-6" />
             </button>
-            
+
             <h2 class="text-xl text-white">
               Working Hours - {{ currentChartLabel }}
             </h2>
-            
-            <button 
-              @click="nextChart" 
+
+            <button
+              @click="nextChart"
               class="p-2 text-white transition-colors rounded-full hover:bg-white/10"
             >
               <ChevronRightIcon class="w-6 h-6" />
             </button>
           </div>
-          
+
           <component :is="currentChart" />
         </section>
 
         <section class="grid grid-cols-3 gap-6 mb-6 charts">
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Worked This Month</h2>
-            <div class="flex items-center justify-center h-40 working-times-number">
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
               {{ monthlyUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Users Currently Working</h2>
-            <div class="flex items-center justify-center h-40 working-times-number">
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
               {{ currentUsers }}
             </div>
           </div>
 
           <div class="p-4 rounded-lg shadow-lg glassmorphism-bg-white chart">
             <h2 class="mb-4 text-xl text-white">Working Times This Month</h2>
-            <div class="flex items-center justify-center h-40 working-times-number">
+            <div
+              class="flex items-center justify-center h-40 working-times-number"
+            >
               {{ workingTimesThisMonth }}
             </div>
           </div>
@@ -86,7 +94,10 @@
         <section class="p-0 users">
           <h2 class="mb-4 text-xl text-white">Users List</h2>
           <div class="overflow-x-auto">
-            <UserList @updateUserId="selectUser" @clock-toggle="getCurrentUsers" />
+            <UserList
+              @updateUserId="selectUser"
+              @clock-toggle="getCurrentUsers"
+            />
           </div>
         </section>
 
@@ -99,7 +110,10 @@
 </template>
 
 <script>
-import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from 'lucide-vue-next';
+import {
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+} from "lucide-vue-next";
 import UserList from "../components/UserList.vue";
 import LineChart from "../components/LineChart.vue";
 import WorkingTimeUserContainer from "../components/WorkingTimesUsersContainer.vue";
@@ -109,8 +123,8 @@ import Sidebar from "../components/Sidebar.vue";
 import axios from "axios";
 
 const CHART_TYPES = [
-  { component: LineChart, label: 'Line Chart' },
-  { component: DonutChart, label: 'Donut Chart' }
+  { component: LineChart, label: "Line Chart" },
+  { component: DonutChart, label: "Donut Chart" },
 ];
 
 export default {
@@ -123,7 +137,7 @@ export default {
     WorkingTimeUserContainer,
     CreaGroupComponent,
     ChevronLeftIcon,
-    ChevronRightIcon
+    ChevronRightIcon,
   },
   data() {
     return {
@@ -142,7 +156,7 @@ export default {
     },
     currentChartLabel() {
       return CHART_TYPES[this.currentChartIndex].label;
-    }
+    },
   },
   mounted() {
     this.getCurrentUsers();
@@ -154,11 +168,11 @@ export default {
   },
   methods: {
     previousChart() {
-      this.currentChartIndex = 
+      this.currentChartIndex =
         (this.currentChartIndex - 1 + CHART_TYPES.length) % CHART_TYPES.length;
     },
     nextChart() {
-      this.currentChartIndex = 
+      this.currentChartIndex =
         (this.currentChartIndex + 1) % CHART_TYPES.length;
     },
     showDashboard() {

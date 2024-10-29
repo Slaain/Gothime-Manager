@@ -444,6 +444,7 @@ export default {
           // this.getCurrentUsers();
           this.showSuccessToast("Clock action successful!");
           this.fetchEmployees(); // Rafraîchir la liste si nécessaire
+          this.$emit("clock-toggle");
         })
         .catch((error) => {
           console.error("Error during clock action:", error);
