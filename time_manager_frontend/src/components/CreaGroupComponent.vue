@@ -146,7 +146,8 @@ export default {
         );
 
         console.log("Groupe créé avec succès", response.data);
-        this.closeGroupModal();
+        this.$emit("close"); // Émettre un événement pour le parent
+        this.$emit("organisation-updated"); // Émettre un événement pour le parent
       } catch (error) {
         console.error("Erreur lors de la création du groupe", error);
       }

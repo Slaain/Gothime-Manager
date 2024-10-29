@@ -169,6 +169,7 @@
         <CreaGroupComponent
           @group-created="handleGroupCreated"
           @close="closeCreateGroupModal"
+          @organisation-updated="fetchGroups"
         />
       </div>
     </div>
