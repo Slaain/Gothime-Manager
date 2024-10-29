@@ -1,7 +1,7 @@
 <template>
   <aside class="text-white bg-gray-900 sidebar">
     <div class="flex items-center justify-center py-6 logo">
-      <img src="/public/logo.ico" alt="Vue Logo" class="w-12 h-12" />
+      <img src="/public/bat.ico" alt="Vue Logo" class="w-12 h-12" />
     </div>
     <nav class="flex flex-col space-y-4 text-center nav">
       <!-- Afficher que si on est admin -->

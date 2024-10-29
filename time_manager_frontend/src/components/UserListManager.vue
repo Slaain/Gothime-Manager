@@ -272,7 +272,7 @@
               >
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
-                    <p class="text-sm font-semibold text-slate-700">
+                    <p class="text-sm font-semibold text-primaryYellow">
                       {{ employee.username }}
                     </p>
                     <p class="text-sm text-slate-500">{{ employee.email }}</p>
@@ -437,7 +437,7 @@ export default {
       userService
         .toggleClock(userID)
         .then((response) => {
-          this.getCurrentUsers();
+          // this.getCurrentUsers();
           this.showSuccessToast("Clock action successful!");
           this.fetchEmployees(); // Rafraîchir la liste si nécessaire
         })
@@ -617,37 +617,41 @@ export default {
       this.$emit("show-account-details", employeeId);
     },
 
-    fetchEmployees() {
-      console.log("Fetching employees");
-      const offset = (this.currentPage - 1) * this.limit;
-      console.log(
-        `Fetching employees for organisation ID: ${this.organisationId} with limit ${this.limit} and offset ${offset}`
-      );
-      userService
-        .getUsersByOrganisationAndGroups(
+    async fetchEmployees() {
+      try {
+        console.log("Fetching employees");
+        const offset = (this.currentPage - 1) * this.limit;
+        console.log(
+          `Fetching employees for organisation ID: ${this.organisationId} with limit ${this.limit} and offset ${offset}`
+        );
+
+        const data = await userService.getUsersByOrganisationAndGroups(
           this.organisationId,
           this.limit,
           offset
-        )
-        .then((data) => {
-          console.log("dataemployee : ", data);
+        );
 
-          if (data && data.users) {
-            this.employees = data.users.map((user) => ({
-              ...user,
-              isWorking: user.clock ? user.clock.status : false,
-            }));
-            this.totalPages = data.total_pages;
-            this.totalUsers = data.total_users;
-          } else {
-            console.error("Data or users property is undefined:", data);
-          }
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la récupération des employés:", error);
-        });
+        console.log("dataemployee:", data);
+
+        if (data && data.users) {
+          this.employees = await Promise.all(
+            data.users.map(async (user) => {
+              const isWorking = await userService.checkIfUserIsWorking(user.id);
+              return {
+                ...user,
+                isWorking: isWorking || false, // Définit le statut d'horloge
+              };
+            })
+          );
+          this.totalPages = data.total_pages;
+          this.totalUsers = data.total_users;
+        } else {
+          console.error("Data or users property is undefined:", data);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des employés:", error);
+      }
     },
-
     watch: {
       organisationId: {
         handler(newValue) {

@@ -11,17 +11,36 @@
       </div>
 
       <div v-else>
+        <!-- Button to open the create working time modal -->
+
         <table class="min-w-full glassmorphism-bg-white">
           <thead class="border-b">
             <tr>
-              <th class="px-4 py-2 text-left text-gray-600">
-                Session {{ userID }}
+              <th class="px-4 py-2 text-gray">Sessions User {{ userID }}</th>
+              <th class="px-4 py-2 text text-gray">Start</th>
+              <th class="px-4 py-2 text-gray">End</th>
+              <th class="px-4 py-2 text-gray">Duration (hrs)</th>
+              <th class="px-4 py-2 text-gray">
+                <button
+                  @click="openCreateWorkingtimeModal"
+                  class="flex select-none items-center gap-2 rounded bg-primaryYellow hover:bg-primaryYellow400 py-2.5 px-4 text-xs font-semibold text-black shadow-md shadow-slate-900/10 transition-all hover:shadow-lg hover:shadow-slate-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    stroke-width="2"
+                    class="w-4 h-4"
+                  >
+                    <path
+                      d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"
+                    ></path>
+                  </svg>
+                  Add
+                </button>
               </th>
-              <th class="px-4 py-2 text-left text-gray-600">Start</th>
-              <th class="px-4 py-2 text-left text-gray-600">End</th>
-              <th class="px-4 py-2 text-left text-gray-600">Duration (hrs)</th>
-              <th class="px-4 py-2 text-left text-gray-600"></th>
-              <th class="px-4 py-2 text-left text-gray-600"></th>
             </tr>
           </thead>
           <tbody>
@@ -64,7 +83,6 @@
   >
     <div class="px-12 py-4 bg-white">
       <h2 class="mb-4 text-lg font-bold">Update working time</h2>
-      <!-- Dropdown et input pour la modification -->
       <p class="mb-2">User</p>
       <Dropdown class="w-full" />
       <div class="w-full">
@@ -128,9 +146,6 @@
   >
     <div class="w-1/2 px-8 py-4 bg-white">
       <h2 class="mb-4 text-lg font-bold">Add Working Time</h2>
-      <!-- Dropdown and input for creation -->
-      <h2 class="mb-4 text-lg font-bold">Update working time</h2>
-      <!-- Dropdown et input pour la modification -->
       <p class="mb-2">User</p>
       <Dropdown class="w-full" />
       <div class="w-full">
@@ -151,7 +166,7 @@
       </div>
       <button
         @click="createWorkingTime"
-        class="w-full px-4 py-2 mt-4 text-white bg-purple-700 rounded-md hover:bg-purple-800"
+        class="w-full px-4 py-2 mt-4 text-white rounded-md bg-primaryYellow hover:bg-primaryYellow400"
       >
         Create
       </button>
@@ -164,7 +179,7 @@
     </div>
   </div>
 </template>
-
+ 
 <script>
 import axios from "axios";
 import { useToast } from "vue-toastification";
@@ -222,6 +237,7 @@ export default {
       }
     },
     formatDateTime(datetime) {
+      if (!datetime) return "Is working";
       const date = new Date(datetime);
       return date.toLocaleString();
     },
@@ -247,6 +263,7 @@ export default {
     },
     calculateDuration(totalTimeInMinutes) {
       const totalTimeInHours = totalTimeInMinutes / 60;
+      if (totalTimeInHours === 0) return "";
       return Math.ceil(totalTimeInHours);
     },
     createWorkingTime() {
@@ -267,6 +284,7 @@ export default {
             },
           }
         )
+
         .then((response) => {
           console.log("Réponse :", response.data);
           this.toast.success(response.data.message);
@@ -289,7 +307,7 @@ export default {
           },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`, 
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
               "Content-Type": "application/json",
             },
           }
@@ -356,8 +374,8 @@ export default {
   },
 };
 </script>
-
-
+ 
+ 
 <style scoped>
 .glassmorphism-bg-white {
   position: relative;

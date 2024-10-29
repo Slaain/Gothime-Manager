@@ -29,9 +29,10 @@ const routes = [
 
   },
   {
-    path: '/manager/qrcode',
-    name: 'ManagerQRCode',
-    component: () => import("@/views/ManagerQRCode.vue")
+    path: '/charts',
+    name: 'Charts',
+    component: () => import("@/views/Chart.vue"),
+    meta: { requiresAdmin: true }, // Access for managers
   },
   // {
   //   path: '/register',

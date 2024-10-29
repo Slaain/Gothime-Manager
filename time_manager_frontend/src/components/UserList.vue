@@ -272,7 +272,7 @@
               >
                 <div class="flex items-center gap-3">
                   <div class="flex flex-col">
-                    <p class="text-sm font-semibold text-slate-700">
+                    <p class="text-sm font-semibold text-primaryYellow">
                       {{ employee.username }}
                     </p>
                     <p class="text-sm text-slate-500">{{ employee.email }}</p>
